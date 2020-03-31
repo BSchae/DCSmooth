@@ -17,6 +17,7 @@ List fastLm(NumericVector y, NumericMatrix x, NumericMatrix w)
   arma::colvec coef = arma::solve(xMatrix, yVector);
   
   return List::create(coef);
+<<<<<<< HEAD
 }
 
 
@@ -53,3 +54,6 @@ int test3(int x)
   return test0(x, test2);
 }
 
+=======
+}
+>>>>>>> b5df29349f4b8889e2d5ea5910a895694b4e9768
