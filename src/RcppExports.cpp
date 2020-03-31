@@ -7,14 +7,38 @@
 using namespace Rcpp;
 
 // fastLm
-List fastLm(Rcpp::NumericVector y, Rcpp::NumericMatrix x);
-RcppExport SEXP _DCSmooth_fastLm(SEXP ySEXP, SEXP xSEXP) {
+List fastLm(NumericVector y, NumericMatrix x, NumericMatrix w);
+RcppExport SEXP _DCSmooth_fastLm(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastLm(y, x));
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastLm(y, x, w));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test
+List test(NumericVector x, double q);
+RcppExport SEXP _DCSmooth_test(SEXP xSEXP, SEXP qSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type q(qSEXP);
+    rcpp_result_gen = Rcpp::wrap(test(x, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test3
+int test3(int x);
+RcppExport SEXP _DCSmooth_test3(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(test3(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -63,7 +87,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_fastLm", (DL_FUNC) &_DCSmooth_fastLm, 2},
+    {"_DCSmooth_fastLm", (DL_FUNC) &_DCSmooth_fastLm, 3},
+    {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
+    {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 1},
     {"_DCSmooth_rcpparma_hello_world", (DL_FUNC) &_DCSmooth_rcpparma_hello_world, 0},
     {"_DCSmooth_rcpparma_outerproduct", (DL_FUNC) &_DCSmooth_rcpparma_outerproduct, 1},
     {"_DCSmooth_rcpparma_innerproduct", (DL_FUNC) &_DCSmooth_rcpparma_innerproduct, 1},
