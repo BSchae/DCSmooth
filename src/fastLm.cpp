@@ -15,4 +15,3 @@ List fastLm(Rcpp::NumericVector y, Rcpp::NumericMatrix x)
   
   return List::create(coef);
 }
-//test
