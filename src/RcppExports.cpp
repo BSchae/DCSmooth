@@ -6,19 +6,6 @@
 
 using namespace Rcpp;
 
-// fastLm
-List fastLm(NumericVector y, NumericMatrix x, NumericMatrix w);
-RcppExport SEXP _DCSmooth_fastLm(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastLm(y, x, w));
-    return rcpp_result_gen;
-END_RCPP
-}
 // test
 List test(NumericVector x, double q);
 RcppExport SEXP _DCSmooth_test(SEXP xSEXP, SEXP qSEXP) {
@@ -42,58 +29,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpparma_hello_world
-arma::mat rcpparma_hello_world();
-RcppExport SEXP _DCSmooth_rcpparma_hello_world() {
+// outputTest
+List outputTest(arma::colvec y, arma::colvec x, arma::colvec w, int order);
+RcppExport SEXP _DCSmooth_outputTest(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP orderSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpparma_hello_world());
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_outerproduct
-arma::mat rcpparma_outerproduct(const arma::colvec& x);
-RcppExport SEXP _DCSmooth_rcpparma_outerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_outerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_innerproduct
-double rcpparma_innerproduct(const arma::colvec& x);
-RcppExport SEXP _DCSmooth_rcpparma_innerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_innerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_bothproducts
-Rcpp::List rcpparma_bothproducts(const arma::colvec& x);
-RcppExport SEXP _DCSmooth_rcpparma_bothproducts(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_bothproducts(x));
+    Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type order(orderSEXP);
+    rcpp_result_gen = Rcpp::wrap(outputTest(y, x, w, order));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_fastLm", (DL_FUNC) &_DCSmooth_fastLm, 3},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
     {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 1},
-    {"_DCSmooth_rcpparma_hello_world", (DL_FUNC) &_DCSmooth_rcpparma_hello_world, 0},
-    {"_DCSmooth_rcpparma_outerproduct", (DL_FUNC) &_DCSmooth_rcpparma_outerproduct, 1},
-    {"_DCSmooth_rcpparma_innerproduct", (DL_FUNC) &_DCSmooth_rcpparma_innerproduct, 1},
-    {"_DCSmooth_rcpparma_bothproducts", (DL_FUNC) &_DCSmooth_rcpparma_bothproducts, 1},
+    {"_DCSmooth_outputTest", (DL_FUNC) &_DCSmooth_outputTest, 4},
     {NULL, NULL, 0}
 };
 
