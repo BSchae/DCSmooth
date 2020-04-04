@@ -2,10 +2,24 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
 
+// LPSmooth
+arma::colvec LPSmooth(const arma::colvec y, const double h, const int polyOrder);
+RcppExport SEXP _DCSmooth_LPSmooth(SEXP ySEXP, SEXP hSEXP, SEXP polyOrderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::colvec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth(y, h, polyOrder));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test
 List test(NumericVector x, double q);
 RcppExport SEXP _DCSmooth_test(SEXP xSEXP, SEXP qSEXP) {
@@ -19,34 +33,36 @@ BEGIN_RCPP
 END_RCPP
 }
 // test3
-int test3(int x);
-RcppExport SEXP _DCSmooth_test3(SEXP xSEXP) {
+arma::colvec test3(arma::colvec a, arma::colvec b);
+RcppExport SEXP _DCSmooth_test3(SEXP aSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(test3(x));
+    Rcpp::traits::input_parameter< arma::colvec >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(test3(a, b));
     return rcpp_result_gen;
 END_RCPP
 }
 // outputTest
-List outputTest(arma::colvec y, arma::colvec x, arma::colvec w, int order);
-RcppExport SEXP _DCSmooth_outputTest(SEXP ySEXP, SEXP xSEXP, SEXP wSEXP, SEXP orderSEXP) {
+List outputTest(arma::colvec y, arma::colvec x, int order, int h);
+RcppExport SEXP _DCSmooth_outputTest(SEXP ySEXP, SEXP xSEXP, SEXP orderSEXP, SEXP hSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
     Rcpp::traits::input_parameter< int >::type order(orderSEXP);
-    rcpp_result_gen = Rcpp::wrap(outputTest(y, x, w, order));
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(outputTest(y, x, order, h));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_DCSmooth_LPSmooth", (DL_FUNC) &_DCSmooth_LPSmooth, 3},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
-    {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 1},
+    {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 2},
     {"_DCSmooth_outputTest", (DL_FUNC) &_DCSmooth_outputTest, 4},
     {NULL, NULL, 0}
 };

@@ -25,9 +25,9 @@ int test2(int x)
 }
 
 // [[Rcpp::export]]
-int test3(int x)
+arma::colvec test3(arma::colvec a, arma::colvec b)
 {
-  return test0(x, test2);
+  return a % b;
 }
 
 
