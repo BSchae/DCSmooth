@@ -52,27 +52,26 @@ arma::colvec LPSmooth(const arma::colvec y,
   
 // smoothing over boundaries
   // initialise empty variables for data inside the loop
-  arma::colvec  xLeft(arma::linspace(0, windowWidth - 1, windowWidth));
-  arma::colvec  xRight(arma::linspace(windowWidth, 0, windowWidth - 1));
-  arma::colvec  uLeft(windowWidth);
-  arma::colvec  uRight(windowWidth);
-  arma::mat     xMatLeft(windowWidth, polyOrder + 1);
-  arma::mat     xMatRight(windowWidth, polyOrder + 1);
-  arma::colvec  weightsLeft(windowWidth);
-  arma::colvec  weightsRight(windowWidth);
+  arma::colvec  xBound(arma::linspace(0, windowWidth - 1, windowWidth));
+  arma::colvec  uBound(windowWidth);
+  arma::mat     xMatBound(windowWidth, polyOrder + 1);
+  arma::colvec  weightsBound(windowWidth);
   arma::colvec  yLeft(windowWidth);
   arma::colvec  yRight(windowWidth);
 
   for (int index{ 0 }; index < bndw; ++index)
   {
-    uLeft       = (xLeft - index)/h;
-    weightsLeft = (pow(1 - pow(uLeft, 2), 2));
-    yLeft       = weightsLeft % y.subvec(0, windowWidth - 1);
-    xMatLeft    = xMatrix(xLeft - index, polyOrder);
-    xMatLeft    = weightMatrix(weightsLeft, xMatLeft);
+    uBound        = (index - xBound)/(2 * bndw - index);
+    weightsBound  = (pow(1 - pow(uBound, 2), 2));
+    yLeft         = weightsBound % y.subvec(0, windowWidth - 1);
+    yRight        = weightsBound % reverse(y.subvec(n - windowWidth, n - 1));
+    xMatBound     = xMatrix(xBound - index, polyOrder);
+    xMatBound     = weightMatrix(weightsBound, xMatBound);
     
-    arma::mat   coefMatrix{ arma::solve(xMatLeft, yLeft) };
-    yOut(index) = coefMatrix(0,0);
+    arma::mat     coefLeft{ arma::solve(xMatBound, yLeft) };
+    arma::mat     coefRight{ arma::solve(xMatBound, yRight)};
+    yOut(index) = coefLeft(0,0);
+    yOut(n - index - 1) = coefRight(0,0);
   }
 
   return yOut;
