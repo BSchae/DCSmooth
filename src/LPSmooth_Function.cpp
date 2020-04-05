@@ -44,32 +44,34 @@ arma::colvec LPSmooth(const arma::colvec y,
 
   for (int index{ bndw }; index < (n - bndw); ++index)
   {
-    yInterior = weightsInterior % y.subvec(index - bndw, index + bndw);
-    arma::mat coefMatrix{ arma::solve(xMatInterior, yInterior) };
+    yInterior   = weightsInterior % y.subvec(index - bndw, index + bndw);
+    arma::mat   coefMatrix{ arma::solve(xMatInterior, yInterior) };
     yOut(index) = coefMatrix(0,0);
   }
 
   
-// smoothing over left boundary
-  arma::colvec  xSubLeft{ x.subvec(0, 2 * bndw) }; // constant window width at boundaries
-  arma::colvec  ySubLeft{ y.subvec(0, 2 * bndw) }; // constant window width at boundaries
-
+// smoothing over boundaries
   // initialise empty variables for data inside the loop
-  arma::colvec  uLeft(xSubLeft.n_rows);                        // vector for holding normalized x values around x0
-  arma::mat     xWeightedMat(xSubLeft.n_rows, polyOrder + 1);  // holds weighted x-matrix for lm
-  arma::mat     weights(xSubLeft.n_rows, xSubLeft.n_rows);     // holds computed weights
-  arma::colvec  yWeighted(ySubLeft.n_rows);                    // holds weigted y-values
+  arma::colvec  xLeft(arma::linspace(0, windowWidth - 1, windowWidth));
+  arma::colvec  xRight(arma::linspace(windowWidth, 0, windowWidth - 1));
+  arma::colvec  uLeft(windowWidth);
+  arma::colvec  uRight(windowWidth);
+  arma::mat     xMatLeft(windowWidth, polyOrder + 1);
+  arma::mat     xMatRight(windowWidth, polyOrder + 1);
+  arma::colvec  weightsLeft(windowWidth);
+  arma::colvec  weightsRight(windowWidth);
+  arma::colvec  yLeft(windowWidth);
+  arma::colvec  yRight(windowWidth);
 
   for (int index{ 0 }; index < bndw; ++index)
   {
-    double x0{ x(index) };
-    uLeft   = (xSubLeft - x0)/h;
-    weights = arma::diagmat(pow(1 - pow(uLeft, 2), 2));
-    // compute weighted values for x and Y
-    xWeightedMat = xMatrix(xSubLeft, polyOrder);
-    yWeighted    = weights * ySubLeft;
-
-    arma::mat coefMatrix{ arma::solve(xWeightedMat, yWeighted) };
+    uLeft       = (xLeft - index)/h;
+    weightsLeft = (pow(1 - pow(uLeft, 2), 2));
+    yLeft       = weightsLeft % y.subvec(0, windowWidth - 1);
+    xMatLeft    = xMatrix(xLeft - index, polyOrder);
+    xMatLeft    = weightMatrix(weightsLeft, xMatLeft);
+    
+    arma::mat   coefMatrix{ arma::solve(xMatLeft, yLeft) };
     yOut(index) = coefMatrix(0,0);
   }
 
