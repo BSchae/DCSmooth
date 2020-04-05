@@ -24,16 +24,24 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 
 //---------------------------------------------------------------------------//
 
+double solveCoefs(arma::colvec y, arma::mat xMat, int degree)
+{
+  arma::mat returnMatrix{ arma::inv(xMat.t() * xMat) * xMat.t()
+          * y };
+  return returnMatrix(degree, 0);
+}
+
+//---------------------------------------------------------------------------//
+
 // [[Rcpp::export]]
-arma::colvec LPSmooth(const arma::colvec y,
+arma::colvec LPSmooth_grid(const arma::colvec y,
                       const double h, const int polyOrder)
 {
-
-  arma::colvec yOut{ y*0 };               // vector for results (??? edit me please)
   int n{ y.n_rows };                      // number of observations
   int bndw{ static_cast<int>(h * n) };    // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };          // width of estimation window
   
+  arma::colvec yOut(n);               // vector for results
   
 // smoothing over interior values
   arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * n) };          //
@@ -45,8 +53,7 @@ arma::colvec LPSmooth(const arma::colvec y,
   for (int index{ bndw }; index < (n - bndw); ++index)
   {
     yInterior   = weightsInterior % y.subvec(index - bndw, index + bndw);
-    arma::mat   coefMatrix{ arma::solve(xMatInterior, yInterior) };
-    yOut(index) = coefMatrix(0,0);
+    yOut(index) = solveCoefs(yInterior, xMatInterior, 0); // speed up code by inserting 'solveCoefs' directly
   }
 
   
@@ -68,10 +75,8 @@ arma::colvec LPSmooth(const arma::colvec y,
     xMatBound     = xMatrix(xBound - index, polyOrder);
     xMatBound     = weightMatrix(weightsBound, xMatBound);
     
-    arma::mat     coefLeft{ arma::solve(xMatBound, yLeft) };
-    arma::mat     coefRight{ arma::solve(xMatBound, yRight)};
-    yOut(index) = coefLeft(0,0);
-    yOut(n - index - 1) = coefRight(0,0);
+    yOut(index)   = solveCoefs(yLeft, xMatBound, 0);
+    yOut(n - index - 1) = solveCoefs(yRight, xMatBound, 0);
   }
 
   return yOut;

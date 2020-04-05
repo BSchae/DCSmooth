@@ -4,10 +4,12 @@
 
 using namespace Rcpp;
 
+//---------------------------------------------------------------------------//
+
 // Multiple linear regression, where y is the vector of endogenous variables
 // and x is the matrix of exogenous variables. w is the diagonal of the
 // weighting matrix. The function is progrtammed in c++/armadillo.
-arma::mat fastLm2(arma::colvec y, arma::mat x, arma::colvec w)
+arma::mat lmFunction(arma::colvec y, arma::mat x, arma::colvec w)
 {
   // put vector of weights into diagonal matrix
   arma::mat weights{ arma::diagmat(w) };
@@ -20,7 +22,7 @@ arma::mat fastLm2(arma::colvec y, arma::mat x, arma::colvec w)
   return arma::solve(xWeighted, yWeighted);
 }
 
-
+//---------------------------------------------------------------------------//
 
 // rewrite x-Vector as x-Matrix for lm model, x can be a vector before this function
 arma::mat xMatrix(arma::colvec xVector, int order)
@@ -34,13 +36,14 @@ arma::mat xMatrix(arma::colvec xVector, int order)
   return returnMatrix;
 }
 
-
+//---------------------------------------------------------------------------//
 
 // [[Rcpp::export]]
-List outputTest(arma::colvec y, arma::colvec x, int order, int h)
+arma::colvec LPSmooth_nongrid(const arma::colvec y, const arma::colvec x,
+                                  const int h, const int polyOrder)
 {
   // vector for results
-  arma::colvec yOut{ y*0 }; // ???change here, looks strange
+  arma::colvec yOut(y.n_rows);
   
   for (int index{ 0 }; index < y.n_rows; ++index)
   {
@@ -53,8 +56,8 @@ List outputTest(arma::colvec y, arma::colvec x, int order, int h)
     arma::colvec w{ pow(1 - pow(u, 2), 2) };
 
     arma::mat xMat{ xMatrix(xSub, order) };
-    yOut(index) = fastLm2(xMat, ySub, w)(0);
+    yOut(index) = lmFunction(xMat, ySub, w)(0);
   }
   
-  return List::create(yOut);
+  return yOut;
 }
