@@ -1,13 +1,9 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <cmath>
+#include "DCSmooth.h"
 
 using namespace Rcpp;
-
-//---------------------------------------------------------------------------//
-
-// declare xMatrix here
-arma::mat xMatrix(arma::colvec xVector, int order);
 
 //---------------------------------------------------------------------------//
 
@@ -18,7 +14,7 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
   {
     matrixOut.col(j) = weights % matrix.col(j);
   }
-  
+
   return matrixOut;
 }
 
@@ -40,23 +36,24 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
   int n{ y.n_rows };                      // number of observations
   int bndw{ static_cast<int>(h * n) };    // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };          // width of estimation window
-  
+
   arma::colvec yOut(n);               // vector for results
-  
+
 // smoothing over interior values
-  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * n) };          //
+  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * n) }; //
   arma::colvec  weightsInterior{ (0.75*pow(1 - pow(uInterior, 2), 2)) };
-  arma::colvec  yInterior{ arma::zeros(windowWidth) };                                  // empty vector for use in loop
-  arma::mat     xMatInterior{ xMatrix(arma::linspace(-bndw, bndw, windowWidth), polyOrder) }; //
+  arma::colvec  yInterior{ arma::zeros(windowWidth) };                         // empty vector for use in loop
+  arma::mat     xMatInterior{ xMatrix(arma::linspace(-bndw, bndw, 
+                windowWidth), polyOrder) };
   xMatInterior = weightMatrix(weightsInterior, xMatInterior);
 
   for (int index{ bndw }; index < (n - bndw); ++index)
   {
     yInterior   = weightsInterior % y.subvec(index - bndw, index + bndw);
-    yOut(index) = solveCoefs(yInterior, xMatInterior, 0); // speed up code by inserting 'solveCoefs' directly
+    yOut(index) = solveCoefs(yInterior, xMatInterior, 0);                       // speed up code by inserting 'solveCoefs' directly
   }
 
-  
+
 // smoothing over boundaries
   // initialise empty variables for data inside the loop
   arma::colvec  xBound(arma::linspace(0, windowWidth - 1, windowWidth));
@@ -74,7 +71,7 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
     yRight        = weightsBound % reverse(y.subvec(n - windowWidth, n - 1));
     xMatBound     = xMatrix(xBound - index, polyOrder);
     xMatBound     = weightMatrix(weightsBound, xMatBound);
-    
+
     yOut(index)   = solveCoefs(yLeft, xMatBound, 0);
     yOut(n - index - 1) = solveCoefs(yRight, xMatBound, 0);
   }

@@ -21,14 +21,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // LPSmooth_nongrid
-arma::colvec LPSmooth_nongrid(const arma::colvec y, const arma::colvec x, const int h, const int polyOrder);
+arma::colvec LPSmooth_nongrid(const arma::colvec y, const arma::colvec x, const double h, const int polyOrder);
 RcppExport SEXP _DCSmooth_LPSmooth_nongrid(SEXP ySEXP, SEXP xSEXP, SEXP hSEXP, SEXP polyOrderSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::colvec >::type y(ySEXP);
     Rcpp::traits::input_parameter< const arma::colvec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const int >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
     Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
     rcpp_result_gen = Rcpp::wrap(LPSmooth_nongrid(y, x, h, polyOrder));
     return rcpp_result_gen;
