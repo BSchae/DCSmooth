@@ -7,16 +7,59 @@
 
 using namespace Rcpp;
 
+// DoubleSmooth
+arma::mat DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::colvec polyOrderS, arma::colvec drv);
+RcppExport SEXP _DCSmooth_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderSSEXP, SEXP drvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type polyOrderS(polyOrderSSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(DoubleSmooth(yMat, hVec, polyOrderS, drv));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LPSmooth_matrix
+arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv);
+RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
+    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth_matrix(yMat, h, polyOrder, drv));
+    return rcpp_result_gen;
+END_RCPP
+}
+// FastDoubleSmooth
+arma::mat FastDoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
+RcppExport SEXP _DCSmooth_FastDoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
+    Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
+    Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
+    rcpp_result_gen = Rcpp::wrap(FastDoubleSmooth(yMat, hVec, polyOrderVec, drvVec));
+    return rcpp_result_gen;
+END_RCPP
+}
 // LPSmooth_grid
-arma::colvec LPSmooth_grid(const arma::colvec y, const double h, const int polyOrder);
-RcppExport SEXP _DCSmooth_LPSmooth_grid(SEXP ySEXP, SEXP hSEXP, SEXP polyOrderSEXP) {
+arma::colvec LPSmooth_grid(const arma::colvec y, const double h, const int polyOrder, const int drv);
+RcppExport SEXP _DCSmooth_LPSmooth_grid(SEXP ySEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::colvec >::type y(ySEXP);
     Rcpp::traits::input_parameter< const double >::type h(hSEXP);
     Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
-    rcpp_result_gen = Rcpp::wrap(LPSmooth_grid(y, h, polyOrder));
+    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth_grid(y, h, polyOrder, drv));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -60,7 +103,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_LPSmooth_grid", (DL_FUNC) &_DCSmooth_LPSmooth_grid, 3},
+    {"_DCSmooth_DoubleSmooth", (DL_FUNC) &_DCSmooth_DoubleSmooth, 4},
+    {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
+    {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
+    {"_DCSmooth_LPSmooth_grid", (DL_FUNC) &_DCSmooth_LPSmooth_grid, 4},
     {"_DCSmooth_LPSmooth_nongrid", (DL_FUNC) &_DCSmooth_LPSmooth_nongrid, 4},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
     {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 2},

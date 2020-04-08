@@ -20,18 +20,18 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 
 //---------------------------------------------------------------------------//
 
-double solveCoefs(arma::colvec y, arma::mat xMat, int degree)
+double solveCoefs(arma::colvec y, arma::mat xMat, int drv)
 {
   arma::mat returnMatrix{ arma::inv(xMat.t() * xMat) * xMat.t()
           * y };
-  return returnMatrix(degree, 0);
+  return returnMatrix(drv, 0);
 }
 
 //---------------------------------------------------------------------------//
 
 // [[Rcpp::export]]
 arma::colvec LPSmooth_grid(const arma::colvec y,
-                      const double h, const int polyOrder)
+                      const double h, const int polyOrder, const int drv)
 {
   int n{ y.n_rows };                      // number of observations
   int bndw{ static_cast<int>(h * n) };    // calculate absolute bandwidth, decimals will be dumped
@@ -50,7 +50,7 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
   for (int index{ bndw }; index < (n - bndw); ++index)
   {
     yInterior   = weightsInterior % y.subvec(index - bndw, index + bndw);
-    yOut(index) = solveCoefs(yInterior, xMatInterior, 0);                       // speed up code by inserting 'solveCoefs' directly
+    yOut(index) = solveCoefs(yInterior, xMatInterior, drv);                    // speed up code by inserting 'solveCoefs' directly
   }
 
 
@@ -72,8 +72,8 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
     xMatBound     = xMatrix(xBound - index, polyOrder);
     xMatBound     = weightMatrix(weightsBound, xMatBound);
 
-    yOut(index)   = solveCoefs(yLeft, xMatBound, 0);
-    yOut(n - index - 1) = solveCoefs(yRight, xMatBound, 0);
+    yOut(index)   = solveCoefs(yLeft, xMatBound, drv);
+    yOut(n - index - 1) = pow(-1, drv) * solveCoefs(yRight, xMatBound, drv); // pow... ensures the correct sign
   }
 
   return yOut;
