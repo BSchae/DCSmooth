@@ -17,6 +17,7 @@ bndwSelect = function(Y, dcsOptions = setOptions())
   n = dim(Y)[1] * dim(Y)[2]
   
   hOpt = c(0.05, 0.05)
+
   iterate = TRUE
   s = 0
   while(iterate)
@@ -40,8 +41,9 @@ hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
   i0x = intCalc(mxx, mtt, n, p)
   i0t = intCalc(mtt, mxx, n, p)
   
-  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n *kernelProp$mu^2 * i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n *kernelProp$mu^2 * i0x)
+  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
+  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
+
   hxOpt = hxOpt^(1/(2*p + 4))
   htOpt = htOpt^(1/(2*p + 4))
   

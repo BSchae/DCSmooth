@@ -7,6 +7,11 @@ using namespace Rcpp;
 
 //---------------------------------------------------------------------------//
 
+int factorialFunction(int value);
+
+//---------------------------------------------------------------------------//
+
+// [[Rcpp::export]]
 arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 {
   arma::mat matrixOut{ arma::mat(matrix.n_rows, matrix.n_cols) };
@@ -40,11 +45,11 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
   arma::colvec yOut(n);               // vector for results
 
 // smoothing over interior values
-  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * n) }; //
-  arma::colvec  weightsInterior{ (0.75*pow(1 - pow(uInterior, 2), 2)) };
+  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/bndw}; //
+  arma::colvec  weightsInterior{ sqrt(pow(1 - pow(uInterior, 2), 2)) };
   arma::colvec  yInterior{ arma::zeros(windowWidth) };                         // empty vector for use in loop
   arma::mat     xMatInterior{ xMatrix(arma::linspace(-bndw, bndw, 
-                windowWidth), polyOrder) };
+                windowWidth)/bndw, polyOrder) };
   xMatInterior = weightMatrix(weightsInterior, xMatInterior);
 
   for (int index{ bndw }; index < (n - bndw); ++index)
@@ -69,12 +74,12 @@ arma::colvec LPSmooth_grid(const arma::colvec y,
     weightsBound  = (pow(1 - pow(uBound, 2), 2));
     yLeft         = weightsBound % y.subvec(0, windowWidth - 1);
     yRight        = weightsBound % reverse(y.subvec(n - windowWidth, n - 1));
-    xMatBound     = xMatrix(xBound - index, polyOrder);
+    xMatBound     = xMatrix((xBound - index)/bndw, polyOrder);
     xMatBound     = weightMatrix(weightsBound, xMatBound);
 
     yOut(index)   = solveCoefs(yLeft, xMatBound, drv);
     yOut(n - index - 1) = pow(-1, drv) * solveCoefs(yRight, xMatBound, drv); // pow... ensures the correct sign
   }
 
-  return yOut;
+  return factorialFunction(drv) * yOut / pow(h, drv);
 }

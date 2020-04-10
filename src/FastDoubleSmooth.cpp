@@ -9,6 +9,19 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
 
 //---------------------------------------------------------------------------//
 
+// [[Rcpp::export]]
+int factorialFunction(int value)
+{
+  int outValue{ 1 };
+
+  for(int count{ 1 }; count <= value; ++count)
+    outValue *= count;
+
+  return outValue;
+}
+
+//---------------------------------------------------------------------------//
+
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
@@ -28,7 +41,7 @@ arma::mat LPSmooth_matrix(const arma::mat yMat, const double h,
   arma::colvec  yRowInterior{ arma::zeros(windowWidth) };                           // empty vector for use inside loop
   arma::mat     coefMat(polyOrder, 1);                                              // empty matrix for lm results
   arma::mat     xMatInterior{ xMatrix(arma::linspace(-bndw, bndw,
-                                                     windowWidth), polyOrder) };    // compute x-matrix for lm-regression
+                                    windowWidth)/bndw, polyOrder) };                // compute x-matrix for lm-regression
   xMatInterior  = weightMatrix(weightsInterior, xMatInterior);
   arma::mat     xMatSolved{ arma::inv(xMatInterior.t() * xMatInterior)
                           * xMatInterior.t() };                                     // compute inv(X*X)*X only once here
@@ -60,7 +73,7 @@ arma::mat LPSmooth_matrix(const arma::mat yMat, const double h,
   {
     uBound        = (colIndex - xBound)/(2 * bndw - colIndex);
     weightsBound  = (pow(1 - pow(uBound, 2), 2));
-    xMatBound     = xMatrix(xBound - colIndex, polyOrder);
+    xMatBound     = xMatrix((xBound - colIndex)/bndw, polyOrder);
     xMatBound     = weightMatrix(weightsBound, xMatBound);
     xMatSolved    = arma::inv(xMatBound.t() * xMatBound)
                     * xMatBound.t();
@@ -76,11 +89,11 @@ arma::mat LPSmooth_matrix(const arma::mat yMat, const double h,
       yMatOut(rowIndex, colIndex) = coefMatrix(drv, 0);
       
       coefMatrix  = xMatSolved * yRight;
-      yMatOut(rowIndex, nCol - colIndex - 1) = pow(-1, drv) * coefMatrix(drv, 0); // pow... ensures the correct sign
+      yMatOut(rowIndex, nCol - colIndex - 1) = pow(-1, drv) * coefMatrix(drv, 0); // pow(-1, drv) ensures the correct sign
     }
   }
   
-  return yMatOut;
+  return factorialFunction(drv) * yMatOut / pow(h, drv);
 }
 
 //---------------------------------------------------------------------------//
