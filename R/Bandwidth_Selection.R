@@ -50,6 +50,7 @@ hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
 
 intCalc = function(m11, m22, n, p)
 {
+  
   i11 = sum(m11 * m11)/n
   i22 = sum(m22 * m22)/n
   i12 = sum(m11 * m22)/n
