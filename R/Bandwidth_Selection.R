@@ -40,10 +40,10 @@ hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
   i0x = intCalc(mxx, mtt, n, p)
   i0t = intCalc(mtt, mxx, n, p)
   
-  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n *kernelProp$mu^2 * i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n *kernelProp$mu^2 * i0x)
-  hxOpt = hxOpt^(2*p + 4)
-  htOpt = htOpt^(2*p + 4)
+  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
+  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
+  hxOpt = hxOpt^(1/(2*p + 4))
+  htOpt = htOpt^(1/(2*p + 4))
   
   return(c(hxOpt, htOpt))
 }

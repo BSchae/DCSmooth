@@ -21,6 +21,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// factorialFunction
+int factorialFunction(int value);
+RcppExport SEXP _DCSmooth_factorialFunction(SEXP valueSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type value(valueSEXP);
+    rcpp_result_gen = Rcpp::wrap(factorialFunction(value));
+    return rcpp_result_gen;
+END_RCPP
+}
 // LPSmooth_matrix
 arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv);
 RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
@@ -46,6 +57,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
     rcpp_result_gen = Rcpp::wrap(FastDoubleSmooth(yMat, hVec, polyOrderVec, drvVec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// weightMatrix
+arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
+RcppExport SEXP _DCSmooth_weightMatrix(SEXP weightsSEXP, SEXP matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type matrix(matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(weightMatrix(weights, matrix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -104,8 +127,10 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_DoubleSmooth", (DL_FUNC) &_DCSmooth_DoubleSmooth, 4},
+    {"_DCSmooth_factorialFunction", (DL_FUNC) &_DCSmooth_factorialFunction, 1},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
+    {"_DCSmooth_weightMatrix", (DL_FUNC) &_DCSmooth_weightMatrix, 2},
     {"_DCSmooth_LPSmooth_grid", (DL_FUNC) &_DCSmooth_LPSmooth_grid, 4},
     {"_DCSmooth_LPSmooth_nongrid", (DL_FUNC) &_DCSmooth_LPSmooth_nongrid, 4},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},

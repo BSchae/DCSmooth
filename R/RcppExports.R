@@ -5,12 +5,20 @@ DoubleSmooth <- function(yMat, hVec, polyOrderS, drv) {
     .Call(`_DCSmooth_DoubleSmooth`, yMat, hVec, polyOrderS, drv)
 }
 
+factorialFunction <- function(value) {
+    .Call(`_DCSmooth_factorialFunction`, value)
+}
+
 LPSmooth_matrix <- function(yMat, h, polyOrder, drv) {
     .Call(`_DCSmooth_LPSmooth_matrix`, yMat, h, polyOrder, drv)
 }
 
 FastDoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call(`_DCSmooth_FastDoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
+}
+
+weightMatrix <- function(weights, matrix) {
+    .Call(`_DCSmooth_weightMatrix`, weights, matrix)
 }
 
 LPSmooth_grid <- function(y, h, polyOrder, drv) {
