@@ -17,6 +17,10 @@ FastDoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call(`_DCSmooth_FastDoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
 }
 
+putFunPtrInXPtr <- function(fstr) {
+    .Call(`_DCSmooth_putFunPtrInXPtr`, fstr)
+}
+
 weightMatrix <- function(weights, matrix) {
     .Call(`_DCSmooth_weightMatrix`, weights, matrix)
 }

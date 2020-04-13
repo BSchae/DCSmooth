@@ -60,6 +60,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// putFunPtrInXPtr
+XPtr<funcPtr> putFunPtrInXPtr(std::string fstr);
+RcppExport SEXP _DCSmooth_putFunPtrInXPtr(SEXP fstrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type fstr(fstrSEXP);
+    rcpp_result_gen = Rcpp::wrap(putFunPtrInXPtr(fstr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // weightMatrix
 arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
 RcppExport SEXP _DCSmooth_weightMatrix(SEXP weightsSEXP, SEXP matrixSEXP) {
@@ -130,6 +141,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_factorialFunction", (DL_FUNC) &_DCSmooth_factorialFunction, 1},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
+    {"_DCSmooth_putFunPtrInXPtr", (DL_FUNC) &_DCSmooth_putFunPtrInXPtr, 1},
     {"_DCSmooth_weightMatrix", (DL_FUNC) &_DCSmooth_weightMatrix, 2},
     {"_DCSmooth_LPSmooth_grid", (DL_FUNC) &_DCSmooth_LPSmooth_grid, 4},
     {"_DCSmooth_LPSmooth_nongrid", (DL_FUNC) &_DCSmooth_LPSmooth_nongrid, 4},

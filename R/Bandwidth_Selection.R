@@ -12,7 +12,7 @@ setOptions = function(...)
   .setOptions(...)
 }
 
-bndwSelect = function(Y, dcsOptions = setOptions())
+bndwSelect = function(Y, kernelFunction, dcsOptions = setOptions())
 {
   n = dim(Y)[1] * dim(Y)[2]
   
