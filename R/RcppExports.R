@@ -17,8 +17,12 @@ FastDoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call(`_DCSmooth_FastDoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
 }
 
-putFunPtrInXPtr <- function(fstr) {
-    .Call(`_DCSmooth_putFunPtrInXPtr`, fstr)
+kernelFkt_assign <- function(fstr) {
+    .Call(`_DCSmooth_kernelFkt_assign`, fstr)
+}
+
+kernelFkt_use <- function(x, q, xpsexp) {
+    .Call(`_DCSmooth_kernelFkt_use`, x, q, xpsexp)
 }
 
 weightMatrix <- function(weights, matrix) {
