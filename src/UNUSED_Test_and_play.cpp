@@ -19,9 +19,11 @@ int test0(int x, int (*testFcn)(int))
   return testFcn(x) - 1;
 }
 
-int test2(int x)
+// [[Rcpp::export]]
+arma::vec test2(double q)
 {
-  return x + 1;
+  arma::vec qVec{ arma::vec(5).fill(q) };
+  return pow(qVec, 2) - 1 ;
 }
 
 // [[Rcpp::export]]

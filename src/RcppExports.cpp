@@ -8,31 +8,6 @@
 
 using namespace Rcpp;
 
-// DoubleSmooth
-arma::mat DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::colvec polyOrderS, arma::colvec drv);
-RcppExport SEXP _DCSmooth_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderSSEXP, SEXP drvSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type polyOrderS(polyOrderSSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type drv(drvSEXP);
-    rcpp_result_gen = Rcpp::wrap(DoubleSmooth(yMat, hVec, polyOrderS, drv));
-    return rcpp_result_gen;
-END_RCPP
-}
-// factorialFunction
-int factorialFunction(int value);
-RcppExport SEXP _DCSmooth_factorialFunction(SEXP valueSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type value(valueSEXP);
-    rcpp_result_gen = Rcpp::wrap(factorialFunction(value));
-    return rcpp_result_gen;
-END_RCPP
-}
 // LPSmooth_matrix
 arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv);
 RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
@@ -85,46 +60,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// weightMatrix
-arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
-RcppExport SEXP _DCSmooth_weightMatrix(SEXP weightsSEXP, SEXP matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::colvec >::type weights(weightsSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type matrix(matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(weightMatrix(weights, matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// LPSmooth_grid
-arma::colvec LPSmooth_grid(const arma::colvec y, const double h, const int polyOrder, const int drv);
-RcppExport SEXP _DCSmooth_LPSmooth_grid(SEXP ySEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
-    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
-    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
-    rcpp_result_gen = Rcpp::wrap(LPSmooth_grid(y, h, polyOrder, drv));
-    return rcpp_result_gen;
-END_RCPP
-}
-// LPSmooth_nongrid
-arma::colvec LPSmooth_nongrid(const arma::colvec y, const arma::colvec x, const double h, const int polyOrder);
-RcppExport SEXP _DCSmooth_LPSmooth_nongrid(SEXP ySEXP, SEXP xSEXP, SEXP hSEXP, SEXP polyOrderSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const arma::colvec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
-    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
-    rcpp_result_gen = Rcpp::wrap(LPSmooth_nongrid(y, x, h, polyOrder));
-    return rcpp_result_gen;
-END_RCPP
-}
 // test
 List test(NumericVector x, double q);
 RcppExport SEXP _DCSmooth_test(SEXP xSEXP, SEXP qSEXP) {
@@ -134,6 +69,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
     rcpp_result_gen = Rcpp::wrap(test(x, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test2
+arma::vec test2(double q);
+RcppExport SEXP _DCSmooth_test2(SEXP qSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type q(qSEXP);
+    rcpp_result_gen = Rcpp::wrap(test2(q));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -151,16 +97,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_DoubleSmooth", (DL_FUNC) &_DCSmooth_DoubleSmooth, 4},
-    {"_DCSmooth_factorialFunction", (DL_FUNC) &_DCSmooth_factorialFunction, 1},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
     {"_DCSmooth_kernelFkt_assign", (DL_FUNC) &_DCSmooth_kernelFkt_assign, 1},
     {"_DCSmooth_kernelFkt_use", (DL_FUNC) &_DCSmooth_kernelFkt_use, 3},
-    {"_DCSmooth_weightMatrix", (DL_FUNC) &_DCSmooth_weightMatrix, 2},
-    {"_DCSmooth_LPSmooth_grid", (DL_FUNC) &_DCSmooth_LPSmooth_grid, 4},
-    {"_DCSmooth_LPSmooth_nongrid", (DL_FUNC) &_DCSmooth_LPSmooth_nongrid, 4},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
+    {"_DCSmooth_test2", (DL_FUNC) &_DCSmooth_test2, 1},
     {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 2},
     {NULL, NULL, 0}
 };
