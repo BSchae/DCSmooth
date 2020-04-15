@@ -2,7 +2,6 @@
 #include <RcppArmadillo.h>
 #include "DCSmooth_types.h"
 
-using namespace arma;
 using namespace Rcpp;
 
 // Müller-Wang kernels
@@ -20,37 +19,39 @@ arma::vec kernFkt_MW200(const arma::vec& u, double q)
 arma::vec kernFkt_MW210(const arma::vec& u, double q)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
-  arma::vec wq{ (1 + u) % (qVec - u) };
+  arma::vec wq{ (1 + u) };
   arma::vec q2{ pow(qVec, 2) };
-  double n0{ 12.0/pow(q + 1, 5) };
+  double n0{ 6.0/pow(q + 1, 4) };
 
-  return n0 * ((2*q2 - 4*qVec + 1) - 5*u % (qVec - 1)) % wq;
+  return n0 * ((3*q2 - 2*qVec + 1) + 2*u % (1 - 2*qVec)) % wq;
 }
 
 arma::vec kernFkt_MW220(const arma::vec& u, double q)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
-  arma::vec wq{ (1 + u) % (qVec - u) };
+  arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
   arma::vec q2{ pow(qVec, 2) };
-  double n0{ 60.0/pow(q + 1, 7) };
+  double n0{ 60.0/pow(q + 1, 6) };
 
-  return n0 * ((2*q2 - 3*qVec + 2) - 7*(qVec - 1) % u) % pow(wq, 2);
+  return n0 * ((2*q2 - 2*qVec + 1) - (3*qVec - 2) % u) % wq;
 }
 
 // [[Rcpp::export]]
-XPtr<funcPtr> kernelFkt_assign(std::string fstr) {
+XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
   if (fstr == "MW200")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW200)));
   else if (fstr == "MW210")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW210)));
+  else if (fstr == "MW220")
+    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW220)));
   else
     return XPtr<funcPtr>(R_NilValue); // runtime error as NULL no XPtr
 }
 
 // [[Rcpp::export]]
-arma::vec kernelFkt_use(const arma::vec x, double q, SEXP xpsexp) {
+arma::vec kernelFcn_use(const arma::vec x, double q, SEXP xpsexp) {
   XPtr<funcPtr> xpfun(xpsexp);
   funcPtr fun = *xpfun;
-  vec y = fun(x, q);
-  return (y);
+  arma::vec y = fun(x, q);
+  return y;
 }

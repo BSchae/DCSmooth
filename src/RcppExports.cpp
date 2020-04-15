@@ -8,6 +8,34 @@
 
 using namespace Rcpp;
 
+// LPSmooth_matrix2
+arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h, const int polyOrder, const int drv);
+RcppExport SEXP _DCSmooth_LPSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
+    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth_matrix2(yMat, h, polyOrder, drv));
+    return rcpp_result_gen;
+END_RCPP
+}
+// FastDoubleSmooth2
+arma::mat FastDoubleSmooth2(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
+RcppExport SEXP _DCSmooth_FastDoubleSmooth2(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
+    Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
+    Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
+    rcpp_result_gen = Rcpp::wrap(FastDoubleSmooth2(yMat, hVec, polyOrderVec, drvVec));
+    return rcpp_result_gen;
+END_RCPP
+}
 // LPSmooth_matrix
 arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv);
 RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
@@ -36,27 +64,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// kernelFkt_assign
-XPtr<funcPtr> kernelFkt_assign(std::string fstr);
-RcppExport SEXP _DCSmooth_kernelFkt_assign(SEXP fstrSEXP) {
+// kernelFcn_assign
+XPtr<funcPtr> kernelFcn_assign(std::string fstr);
+RcppExport SEXP _DCSmooth_kernelFcn_assign(SEXP fstrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fstr(fstrSEXP);
-    rcpp_result_gen = Rcpp::wrap(kernelFkt_assign(fstr));
+    rcpp_result_gen = Rcpp::wrap(kernelFcn_assign(fstr));
     return rcpp_result_gen;
 END_RCPP
 }
-// kernelFkt_use
-arma::vec kernelFkt_use(const arma::vec x, double q, SEXP xpsexp);
-RcppExport SEXP _DCSmooth_kernelFkt_use(SEXP xSEXP, SEXP qSEXP, SEXP xpsexpSEXP) {
+// kernelFcn_use
+arma::vec kernelFcn_use(const arma::vec x, double q, SEXP xpsexp);
+RcppExport SEXP _DCSmooth_kernelFcn_use(SEXP xSEXP, SEXP qSEXP, SEXP xpsexpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::vec >::type x(xSEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
     Rcpp::traits::input_parameter< SEXP >::type xpsexp(xpsexpSEXP);
-    rcpp_result_gen = Rcpp::wrap(kernelFkt_use(x, q, xpsexp));
+    rcpp_result_gen = Rcpp::wrap(kernelFcn_use(x, q, xpsexp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,23 +112,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // test3
-arma::colvec test3(arma::colvec a, arma::colvec b);
-RcppExport SEXP _DCSmooth_test3(SEXP aSEXP, SEXP bSEXP) {
+arma::mat test3(int colIndex, int bndw);
+RcppExport SEXP _DCSmooth_test3(SEXP colIndexSEXP, SEXP bndwSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::colvec >::type a(aSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(test3(a, b));
+    Rcpp::traits::input_parameter< int >::type colIndex(colIndexSEXP);
+    Rcpp::traits::input_parameter< int >::type bndw(bndwSEXP);
+    rcpp_result_gen = Rcpp::wrap(test3(colIndex, bndw));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_DCSmooth_LPSmooth_matrix2", (DL_FUNC) &_DCSmooth_LPSmooth_matrix2, 4},
+    {"_DCSmooth_FastDoubleSmooth2", (DL_FUNC) &_DCSmooth_FastDoubleSmooth2, 4},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
-    {"_DCSmooth_kernelFkt_assign", (DL_FUNC) &_DCSmooth_kernelFkt_assign, 1},
-    {"_DCSmooth_kernelFkt_use", (DL_FUNC) &_DCSmooth_kernelFkt_use, 3},
+    {"_DCSmooth_kernelFcn_assign", (DL_FUNC) &_DCSmooth_kernelFcn_assign, 1},
+    {"_DCSmooth_kernelFcn_use", (DL_FUNC) &_DCSmooth_kernelFcn_use, 3},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
     {"_DCSmooth_test2", (DL_FUNC) &_DCSmooth_test2, 1},
     {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 2},

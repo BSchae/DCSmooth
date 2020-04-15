@@ -3,6 +3,8 @@
 
 using namespace Rcpp;
 
+arma::mat xMatrix(arma::colvec xVector, int polyOrder);
+
 // test function to play around with
 // [[Rcpp::export]]
 List test(NumericVector x, double q)
@@ -27,9 +29,11 @@ arma::vec test2(double q)
 }
 
 // [[Rcpp::export]]
-arma::colvec test3(arma::colvec a, arma::colvec b)
+arma::mat test3(int colIndex, int bndw)
 {
-  return a % b;
+  arma::colvec  uBound(arma::regspace(-colIndex, bndw) / bndw);
+  arma::mat     xMatBound{ xMatrix(uBound, 3) };
+  return xMatBound;
 }
 
 
