@@ -8,7 +8,6 @@
 #-----------------------Set Options via Function------------------------------#
 
 .setOptions = function(    # inside function with default values in arguments
-  bandwidth = "auto",      # if bandwidth == "auto", IPI will be executed
   kernPar   = c(2, 2),     # choose a kernel function with mu = 2, 
   pOrder    = 1,           # choose order of polynomials for X-/T-smoothing
                            # (orders have to be the same in both directions)
@@ -16,22 +15,16 @@
   inflPar   = c(1.5, 0.5)  # inflation parameters c (regression), d (2nd derivative)
 )
 {
-  return(list(bandwidth = bandwidth, kernPar = kernPar, pOrder = pOrder,
+  return(list(kernPar = kernPar, pOrder = pOrder,
               inflExp = inflExp, inflPar = inflPar))
-}
-
-setOptions = function(...) # user friendly wrapper function for .setOptions
-{
-  .setOptions(...)
 }
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-bndwSelect = function(Y, kernelFunction = "MW220", dcsOptions = setOptions())
+bndwSelect = function(Y, kernelFcn, dcsOptions)
 {
   n = dim(Y)[1] * dim(Y)[2]    # total number of observations is needed later
   
-  kernelFcn  = kernelFcn_assign(kernelFunction) # set kernel Function to use in optimization
   kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
   
   hOpt = c(0.01, 0.01)                          # initial values for h_0, arbitrary chosen
