@@ -27,27 +27,26 @@ bndwSelect = function(Y, kernelFcn, dcsOptions)
   
   kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
   
-  hOpt = c(0.01, 0.01)                          # initial values for h_0, arbitrary chosen
+  hOpt = c(0.05, 0.05)                          # initial values for h_0, arbitrary chosen
 
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
   while(iterate)                                # loop for IPI
   {
     iterationCount = iterationCount + 1
-    hOptTemp = hOpt                             # store old bandwidths for breaking condition
-    hInfl = inflationFcn(hOptTemp, dcsOptions)  # inflation of bandwidths for drv estimation
+    hOptTemp   = pmin(hOpt, c(0.5, 0.5))        # store old bandwidths for breaking condition
+    hInfl      = inflationFcn(hOptTemp, dcsOptions)  # inflation of bandwidths for drv estimation
     hInfl$h_xx = pmin(hInfl$h_xx, c(0.45, 0.45))
-    hInfl$h_tt = pmin(hInfl$h_tt, c(0.45, 0.45))
-                                                # ensure no bandwidth > 0.5 (or 0.45)
-      
+    hInfl$h_tt = pmin(hInfl$h_tt, c(0.45, 0.45))# ensure no bandwidth > 0.5 (or 0.45)
+    
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = FastDoubleSmooth(yMat = Y, hVec = hOptTemp, polyOrderVec 
+    YSmth = FastDoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
                              = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
     
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = FastDoubleSmooth(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
+    mxx = FastDoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
                       = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
-    mtt = FastDoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
+    mtt = FastDoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
       = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
     
     # calculate variance factor
@@ -57,7 +56,8 @@ bndwSelect = function(Y, kernelFcn, dcsOptions)
     hOpt = hOptFunction(mxx, mtt, varCoef, n, dcsOptions$pOrder, kernelProp)
     
     # break condition
-    if( (hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 < 0.001) )
+    if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
+                                               < 0.001)) || iterationCount > 10)
     {
       iterate = FALSE
     }
@@ -74,7 +74,7 @@ hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
   i0t = intCalc(mtt, mxx, n, p)
   
   hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
+  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0t)
 
   hxOpt = hxOpt^(1/(2*p + 4))
   htOpt = htOpt^(1/(2*p + 4))
@@ -110,10 +110,10 @@ kernelPropFcn = function(kernelFcn, nInt = 5000)
 
 inflationFcn = function(h, dcsOptions)
 {
-  hInflxx = c(dcsOptions$inflPar[2]*h[1]^dcsOptions$inflExp,
-                dcsOptions$inflPar[1]*h[2]^dcsOptions$inflExp)
-  hInfltt = c(dcsOptions$inflPar[1]*h[1]^dcsOptions$inflExp,
-           dcsOptions$inflPar[2]*h[2]^dcsOptions$inflExp)
+  hInflxx = c(dcsOptions$inflPar[1]*h[1]^dcsOptions$inflExp,
+                dcsOptions$inflPar[2]*h[2]^dcsOptions$inflExp)
+  hInfltt = c(dcsOptions$inflPar[2]*h[1]^dcsOptions$inflExp,
+           dcsOptions$inflPar[1]*h[2]^dcsOptions$inflExp)
   
   return(list(h_xx = hInflxx, h_tt = hInfltt))
 }

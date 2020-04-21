@@ -96,9 +96,9 @@ arma::mat FastDoubleSmooth2(arma::mat yMat, arma::colvec hVec,
                        arma::icolvec polyOrderVec, arma::icolvec drvVec)
 {
   arma::mat mMatTemp{ LPSmooth_matrix2(yMat, hVec(0),
-                                      polyOrderVec(0), drvVec(0)) };
-  arma::mat yMatOut{ LPSmooth_matrix2(mMatTemp.t(), hVec(1),
                                       polyOrderVec(1), drvVec(1)) };
+  arma::mat yMatOut{ LPSmooth_matrix2(mMatTemp.t(), hVec(1),
+                                      polyOrderVec(0), drvVec(0)) };
 
   return yMatOut.t();
 }

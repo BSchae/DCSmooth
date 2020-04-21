@@ -126,10 +126,13 @@ arma::mat LPSmooth_matrix(const arma::mat yMat, const double h,
 arma::mat FastDoubleSmooth(arma::mat yMat, arma::colvec hVec,
                        arma::icolvec polyOrderVec, arma::icolvec drvVec)
 {
+  // Smoothing over cond. on rows first (e.g. over single days).
+  // Thus, drv and order is (1) instead of (0) here (depending on t)
   arma::mat mMatTemp{ LPSmooth_matrix(yMat, hVec(0),
-                                      polyOrderVec(0), drvVec(0)) };
-  arma::mat yMatOut{ LPSmooth_matrix(mMatTemp.t(), hVec(1),
                                       polyOrderVec(1), drvVec(1)) };
+  // Smoothing over cols, drv and order is (0) (depending on x)
+  arma::mat yMatOut{ LPSmooth_matrix(mMatTemp.t(), hVec(1),
+                                      polyOrderVec(0), drvVec(0)) };
   
   return yMatOut.t();
 }

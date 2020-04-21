@@ -36,7 +36,7 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   DCSOut = FastDoubleSmooth(yMat = Y, hVec = bndw, polyOrderVec 
                             = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
   
-  return(list(X = X, T = T, Y = Y, M = DCSOut))
+  return(list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw))
 }
 
 #-------------------Function for plotting smoothed surface--------------------#
