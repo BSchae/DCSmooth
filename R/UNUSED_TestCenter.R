@@ -25,8 +25,6 @@ for (i in 1:n_x) {
   }
 }
 
-Y  = Y0 + matrix(sqrt(sigma_sq)*rnorm(n_x*n_t), nrow = n_x, ncol = n_t)
-
 ### Smoothing
 K_sine  = matrix(NA, nrow = n_sim, ncol = 3)
 set.seed(seed)
@@ -34,7 +32,7 @@ set.seed(seed)
 t0 = Sys.time()
 for(i in 1:n_sim) {
   Y = Y0 + matrix(sqrt(sigma_sq)*rnorm(n_x*n_t), nrow = n_x, ncol = n_t)
-  Smooth = DCSmooth(Y, dcsOptions = setOptions(inflPar = c(1.2, 0.5)))
+  Smooth = DCSmooth(Y, dcsOptions = setOptions(inflPar = c(1.5, 0.5), inflExp = 0.5))
   K_sine[i, 1:2] = Smooth$bndw
   K_sine[i, 3]   = mean((Smooth$M - Y0)^2)
   print(i)
@@ -70,9 +68,9 @@ set.seed(seed)
 
 for(i in 1:n_sim) {
   Y = Y0 + matrix(sqrt(sigma_sq)*rnorm(n_x*n_t), nrow = n_x, ncol = n_t)
-  Smooth = DCSmooth(Y, dcsOptions = setOptions(inflPar = c(1.2, 0.5)))
-    K_r1[i, 1:2] = Smooth$bndw
-    K_r1[i, 3] = mean((Smooth$est - Y0)^2)
+  Smooth = DCSmooth(Y, dcsOptions = setOptions(inflPar = c(1.5, 0.5)))
+  K_r1[i, 1:2] = Smooth$bndw
+  K_r1[i, 3] = mean((Smooth$est - Y0)^2)
   print(i)
 }
 

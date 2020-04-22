@@ -40,13 +40,13 @@ bndwSelect = function(Y, kernelFcn, dcsOptions)
     hInfl$h_tt = pmin(hInfl$h_tt, c(0.45, 0.45))# ensure no bandwidth > 0.5 (or 0.45)
     
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = FastDoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
-                             = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
+    YSmth = FastDoubleSmooth(yMat = Y, hVec = hOptTemp, polyOrderVec 
+                      = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
     
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = FastDoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
+    mxx = FastDoubleSmooth(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
                       = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
-    mtt = FastDoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
+    mtt = FastDoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
       = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
     
     # calculate variance factor
@@ -57,13 +57,12 @@ bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                                               < 0.001)) || iterationCount > 10)
+                                               < 0.001)) || iterationCount > 15)
     {
       iterate = FALSE
     }
   }
-  
-  return(hOpt)
+  return(c(hOpt, iterationCount))
 }
 
 #----------------------Formula for optimal bandwidths-------------------------#
@@ -110,22 +109,10 @@ kernelPropFcn = function(kernelFcn, nInt = 5000)
 
 inflationFcn = function(h, dcsOptions)
 {
-  hInflxx = c(dcsOptions$inflPar[1]*h[1]^dcsOptions$inflExp,
-                dcsOptions$inflPar[2]*h[2]^dcsOptions$inflExp)
-  hInfltt = c(dcsOptions$inflPar[2]*h[1]^dcsOptions$inflExp,
-           dcsOptions$inflPar[1]*h[2]^dcsOptions$inflExp)
+  hInflxx = c(dcsOptions$inflPar[1] * h[1]^dcsOptions$inflExp,
+                dcsOptions$inflPar[2] * h[2]^dcsOptions$inflExp)
+  hInfltt = c(dcsOptions$inflPar[2] * h[1]^dcsOptions$inflExp,
+           dcsOptions$inflPar[1] * h[2]^dcsOptions$inflExp)
   
   return(list(h_xx = hInflxx, h_tt = hInfltt))
-}
-
-#----------------function for fast calc of true bndw--------------------------#
-
-
-trueBndw = function(I, kernProp, n, p, varCoef)
-{
-  I0 = (I[1]/I[2])^0.75 * (sqrt(I[1]*I[2]) + I[3])
-  hx = ((kernProp$R^2 * varCoef) / (n * (p + 1) * kernProp$mu^2 * I0))^(1/(4 + 2*p))
-  ht = (I[1]/I[2])^0.25 * hx
-  
-  return(c(hx, ht))
 }
