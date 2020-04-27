@@ -30,7 +30,7 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   # bandwidth selection
   if (bndw == "auto")
   {
-    bndw = bndwSelect(Y, kernelFcn, dcsOptions)
+    bndw = KR_bndwSelect(Y, kernelFcn, dcsOptions)
   }
   
   DCSOut = FastDoubleSmooth(yMat = Y, hVec = bndw, polyOrderVec 
