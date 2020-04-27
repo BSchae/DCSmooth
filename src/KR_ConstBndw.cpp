@@ -77,12 +77,15 @@ arma::mat KRSmooth_matrix2(const arma::mat yMat, const double h,
 
 // [[Rcpp::export]]
 arma::mat KR_DoubleSmooth2(arma::mat yMat, arma::colvec hVec,
-              SEXP kernFcnPtrX, SEXP kernFcnPtrT)
+                    arma::colvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT)
 {
-  arma::mat mMatTemp{ KRSmooth_matrix2(yMat, hVec(0),
-                        kernFcnPtrX) };
-  arma::mat yMatOut{ KRSmooth_matrix2(mMatTemp.t(), hVec(1),
-                        kernFcnPtrT) };
+  // Smoothing over cond. on rows first (e.g. over single days).
+  // Thus, drv and order is (1) instead of (0) here (depending on t)
+  arma::mat mMatTemp{ KRSmooth_matrix2(yMat, hVec(1),
+                        kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
+  // Smoothing over cols, drv and order is (0) (depending on x)
+  arma::mat yMatOut{ KRSmooth_matrix2(mMatTemp.t(), hVec(0),
+                        kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
 
   return yMatOut.t();
 }

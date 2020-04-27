@@ -28,13 +28,18 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   kernelFcn  = kernelFcn_assign(nameKernFcn) # set kernel Function to use in optimization
 
   # bandwidth selection
-  if (bndw == "auto")
+  if (bndw == "auto" && dcsOptions$pOrder == 0)
   {
     bndw = KR_bndwSelect(Y, kernelFcn, dcsOptions)
+    DCSOut = KR_DoubleSmooth2(yMat = Y, hVec = bndw, drvVec = c(0, 0), 
+                              kernFcnPtrX = kernelFcn, kernFcnPtrT = kernelFcn)
   }
-  
-  DCSOut = FastDoubleSmooth(yMat = Y, hVec = bndw, polyOrderVec 
-                            = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
+  else if (bndw == "auto" && dcsOptions$pOrder > 0)
+  {
+    bndw = LP_bndwSelect(Y, kernelFcn, dcsOptions)
+    DCSOut = LP_DoubleSmooth(yMat = Y, hVec = bndw, polyOrderVec 
+                              = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
+  }
   
   return(list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw))
 }

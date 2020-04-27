@@ -22,16 +22,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // KR_DoubleSmooth2
-arma::mat KR_DoubleSmooth2(arma::mat yMat, arma::colvec hVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT);
-RcppExport SEXP _DCSmooth_KR_DoubleSmooth2(SEXP yMatSEXP, SEXP hVecSEXP, SEXP kernFcnPtrXSEXP, SEXP kernFcnPtrTSEXP) {
+arma::mat KR_DoubleSmooth2(arma::mat yMat, arma::colvec hVec, arma::colvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT);
+RcppExport SEXP _DCSmooth_KR_DoubleSmooth2(SEXP yMatSEXP, SEXP hVecSEXP, SEXP drvVecSEXP, SEXP kernFcnPtrXSEXP, SEXP kernFcnPtrTSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type drvVec(drvVecSEXP);
     Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrX(kernFcnPtrXSEXP);
     Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrT(kernFcnPtrTSEXP);
-    rcpp_result_gen = Rcpp::wrap(KR_DoubleSmooth2(yMat, hVec, kernFcnPtrX, kernFcnPtrT));
+    rcpp_result_gen = Rcpp::wrap(KR_DoubleSmooth2(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -137,9 +138,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// FastDoubleSmooth2
-arma::mat FastDoubleSmooth2(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
-RcppExport SEXP _DCSmooth_FastDoubleSmooth2(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
+// LP_DoubleSmooth2
+arma::mat LP_DoubleSmooth2(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
+RcppExport SEXP _DCSmooth_LP_DoubleSmooth2(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -147,7 +148,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
-    rcpp_result_gen = Rcpp::wrap(FastDoubleSmooth2(yMat, hVec, polyOrderVec, drvVec));
+    rcpp_result_gen = Rcpp::wrap(LP_DoubleSmooth2(yMat, hVec, polyOrderVec, drvVec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -165,9 +166,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// FastDoubleSmooth
-arma::mat FastDoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
-RcppExport SEXP _DCSmooth_FastDoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
+// LP_DoubleSmooth
+arma::mat LP_DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
+RcppExport SEXP _DCSmooth_LP_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -175,7 +176,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
-    rcpp_result_gen = Rcpp::wrap(FastDoubleSmooth(yMat, hVec, polyOrderVec, drvVec));
+    rcpp_result_gen = Rcpp::wrap(LP_DoubleSmooth(yMat, hVec, polyOrderVec, drvVec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -217,7 +218,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
-    {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 4},
+    {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 4},
     {"_DCSmooth_KR_DoubleSmooth", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth, 4},
     {"_DCSmooth_kernFkt_MW320", (DL_FUNC) &_DCSmooth_kernFkt_MW320, 2},
@@ -226,9 +227,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_kernelFcn_assign", (DL_FUNC) &_DCSmooth_kernelFcn_assign, 1},
     {"_DCSmooth_kernelFcn_use", (DL_FUNC) &_DCSmooth_kernelFcn_use, 3},
     {"_DCSmooth_LPSmooth_matrix2", (DL_FUNC) &_DCSmooth_LPSmooth_matrix2, 4},
-    {"_DCSmooth_FastDoubleSmooth2", (DL_FUNC) &_DCSmooth_FastDoubleSmooth2, 4},
+    {"_DCSmooth_LP_DoubleSmooth2", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth2, 4},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
-    {"_DCSmooth_FastDoubleSmooth", (DL_FUNC) &_DCSmooth_FastDoubleSmooth, 4},
+    {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 4},
     {"_DCSmooth_test", (DL_FUNC) &_DCSmooth_test, 2},
     {"_DCSmooth_test2", (DL_FUNC) &_DCSmooth_test2, 1},
     {"_DCSmooth_test3", (DL_FUNC) &_DCSmooth_test3, 2},

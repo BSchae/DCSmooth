@@ -5,8 +5,8 @@ KRSmooth_matrix2 <- function(yMat, h, kernFcnPtr) {
     .Call(`_DCSmooth_KRSmooth_matrix2`, yMat, h, kernFcnPtr)
 }
 
-KR_DoubleSmooth2 <- function(yMat, hVec, kernFcnPtrX, kernFcnPtrT) {
-    .Call(`_DCSmooth_KR_DoubleSmooth2`, yMat, hVec, kernFcnPtrX, kernFcnPtrT)
+KR_DoubleSmooth2 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
+    .Call(`_DCSmooth_KR_DoubleSmooth2`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
 KRSmooth_matrix <- function(yMat, h, drv, kernFcnPtr) {
@@ -41,16 +41,16 @@ LPSmooth_matrix2 <- function(yMat, h, polyOrder, drv) {
     .Call(`_DCSmooth_LPSmooth_matrix2`, yMat, h, polyOrder, drv)
 }
 
-FastDoubleSmooth2 <- function(yMat, hVec, polyOrderVec, drvVec) {
-    .Call(`_DCSmooth_FastDoubleSmooth2`, yMat, hVec, polyOrderVec, drvVec)
+LP_DoubleSmooth2 <- function(yMat, hVec, polyOrderVec, drvVec) {
+    .Call(`_DCSmooth_LP_DoubleSmooth2`, yMat, hVec, polyOrderVec, drvVec)
 }
 
 LPSmooth_matrix <- function(yMat, h, polyOrder, drv) {
     .Call(`_DCSmooth_LPSmooth_matrix`, yMat, h, polyOrder, drv)
 }
 
-FastDoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
-    .Call(`_DCSmooth_FastDoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
+LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
+    .Call(`_DCSmooth_LP_DoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
 }
 
 test <- function(x, q) {

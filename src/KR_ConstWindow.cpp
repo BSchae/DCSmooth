@@ -81,9 +81,9 @@ arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
 arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
               arma::icolvec drvVec, SEXP kernFcnPtr)
 {
-  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(0),
+  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1),
                           drvVec(1), kernFcnPtr) };
-  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(1),
+  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0),
                           drvVec(0), kernFcnPtr) };
   
   return yMatOut.t();
