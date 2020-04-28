@@ -18,7 +18,7 @@ arma::vec kernFkt_MW220(const arma::vec&, double);
 
 // [[Rcpp::export]]
 arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
-                          const int drv, SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
+                          , SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series
@@ -79,12 +79,12 @@ arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
 
 // [[Rcpp::export]]
 arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
-              arma::icolvec drvVec, SEXP kernFcnPtr)
+              arma::icolvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT)
 {
   arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1),
-                          drvVec(1), kernFcnPtr) };
-  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0),
-                          drvVec(0), kernFcnPtr) };
+    kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
+  arma::mat yMatOut{ KRSmooth_matrix(yMat, hVec(0),
+    kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
   
   return yMatOut.t();
 }

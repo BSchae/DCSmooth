@@ -11,7 +11,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
   
   kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
   
-  hOpt = c(0.05, 0.05)                          # initial values for h_0, arbitrary chosen
+  hOpt = c(1/nX, 1/nT)                          # initial values for h_0, arbitrary chosen
 
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
@@ -29,9 +29,9 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     # smoothing of derivatives m(2,0) and m(0,2)
     mxx = LP_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
-                      = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
+           = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
     mtt = LP_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
-      = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
+           = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
     
     # calculate variance factor
     varCoef = (sd(Y - YSmth))^2
@@ -41,7 +41,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                                               < 0.001)) || iterationCount > 15)
+                                               < 0.001)) || iterationCount > 10)
     {
       iterate = FALSE
     }

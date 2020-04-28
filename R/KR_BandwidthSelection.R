@@ -16,14 +16,14 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   kernFcn0 = kernelFcn_assign("MW420")
   kernFcn2 = kernelFcn_assign("MW422")
   
-  hOpt = c(0.05, 0.05)                          # initial values for h_0, arbitrary chosen
+  hOpt = c(1/nX, 1/nT)                          # initial values for h_0, arbitrary chosen
   
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
   while(iterate)                                # loop for IPI
   {
     iterationCount = iterationCount + 1
-    hOptTemp   = pmin(hOpt[1:2], c(0.5, 0.5))        # store old bandwidths for breaking condition
+    hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
     hInfl      = inflationFcn(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
 
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
@@ -31,9 +31,9 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
                              kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
     
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
+    mxx = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, drvVec = c(2, 0),
                            kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
-    mtt = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, drvVec = c(0, 2),
+    mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
                            kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
     
     # calculate variance factor
@@ -43,8 +43,8 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     hOpt = hOptKR(mxx, mtt, varCoef, n, kernelProp)
     
     # break condition
-    if( ((hOpt[1]/hOptTemp[1] - 1 < 0.0001) && (hOpt[2]/hOptTemp[2] - 1 
-                                               < 0.0001)) || iterationCount > 15)
+    if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
+                                               < 0.001)) || iterationCount > 10)
     {
       iterate = FALSE
     }

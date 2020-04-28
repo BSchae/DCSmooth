@@ -37,30 +37,30 @@ BEGIN_RCPP
 END_RCPP
 }
 // KRSmooth_matrix
-arma::mat KRSmooth_matrix(const arma::mat yMat, const double h, const int drv, SEXP kernFcnPtr);
-RcppExport SEXP _DCSmooth_KRSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP drvSEXP, SEXP kernFcnPtrSEXP) {
+arma::mat KRSmooth_matrix(const arma::mat yMat, const double h, SEXP kernFcnPtr);
+RcppExport SEXP _DCSmooth_KRSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat >::type yMat(yMatSEXP);
     Rcpp::traits::input_parameter< const double >::type h(hSEXP);
-    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
     Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
-    rcpp_result_gen = Rcpp::wrap(KRSmooth_matrix(yMat, h, drv, kernFcnPtr));
+    rcpp_result_gen = Rcpp::wrap(KRSmooth_matrix(yMat, h, kernFcnPtr));
     return rcpp_result_gen;
 END_RCPP
 }
 // KR_DoubleSmooth
-arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec drvVec, SEXP kernFcnPtr);
-RcppExport SEXP _DCSmooth_KR_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP drvVecSEXP, SEXP kernFcnPtrSEXP) {
+arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT);
+RcppExport SEXP _DCSmooth_KR_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP drvVecSEXP, SEXP kernFcnPtrXSEXP, SEXP kernFcnPtrTSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
-    rcpp_result_gen = Rcpp::wrap(KR_DoubleSmooth(yMat, hVec, drvVec, kernFcnPtr));
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrX(kernFcnPtrXSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrT(kernFcnPtrTSEXP);
+    rcpp_result_gen = Rcpp::wrap(KR_DoubleSmooth(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -219,8 +219,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
-    {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 4},
-    {"_DCSmooth_KR_DoubleSmooth", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth, 4},
+    {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 3},
+    {"_DCSmooth_KR_DoubleSmooth", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth, 5},
     {"_DCSmooth_kernFkt_MW320", (DL_FUNC) &_DCSmooth_kernFkt_MW320, 2},
     {"_DCSmooth_kernFkt_MW420", (DL_FUNC) &_DCSmooth_kernFkt_MW420, 2},
     {"_DCSmooth_kernFkt_MW422", (DL_FUNC) &_DCSmooth_kernFkt_MW422, 2},

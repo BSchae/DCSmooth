@@ -31,14 +31,21 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   if (bndw == "auto" && dcsOptions$pOrder == 0)
   {
     bndw = KR_bndwSelect(Y, kernelFcn, dcsOptions)
-    DCSOut = KR_DoubleSmooth2(yMat = Y, hVec = bndw, drvVec = c(0, 0), 
-                              kernFcnPtrX = kernelFcn, kernFcnPtrT = kernelFcn)
   }
   else if (bndw == "auto" && dcsOptions$pOrder > 0)
   {
     bndw = LP_bndwSelect(Y, kernelFcn, dcsOptions)
+  }
+  
+  if (dcsOptions$pOrder == 0)
+  {
+    DCSOut = KR_DoubleSmooth2(yMat = Y, hVec = bndw, drvVec = c(0, 0), 
+      kernFcnPtrX = kernelFcn, kernFcnPtrT = kernelFcn)
+  }
+  else if (dcsOptions$pOrder > 0)
+  {
     DCSOut = LP_DoubleSmooth(yMat = Y, hVec = bndw, polyOrderVec 
-                              = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
+      = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
   }
   
   return(list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw))

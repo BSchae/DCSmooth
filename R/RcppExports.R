@@ -9,12 +9,12 @@ KR_DoubleSmooth2 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
     .Call(`_DCSmooth_KR_DoubleSmooth2`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
-KRSmooth_matrix <- function(yMat, h, drv, kernFcnPtr) {
-    .Call(`_DCSmooth_KRSmooth_matrix`, yMat, h, drv, kernFcnPtr)
+KRSmooth_matrix <- function(yMat, h, kernFcnPtr) {
+    .Call(`_DCSmooth_KRSmooth_matrix`, yMat, h, kernFcnPtr)
 }
 
-KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtr) {
-    .Call(`_DCSmooth_KR_DoubleSmooth`, yMat, hVec, drvVec, kernFcnPtr)
+KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
+    .Call(`_DCSmooth_KR_DoubleSmooth`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
 kernFkt_MW320 <- function(u, q = 1) {
