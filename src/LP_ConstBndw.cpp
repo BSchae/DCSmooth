@@ -102,6 +102,3 @@ arma::mat LP_DoubleSmooth2(arma::mat yMat, arma::colvec hVec,
 
   return yMatOut.t();
 }
-
-
-

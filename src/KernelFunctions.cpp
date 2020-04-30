@@ -26,7 +26,30 @@ arma::vec kernFkt_MW210(const arma::vec& u, double q = 1)
   return n0 * ((3*q2 - 2*qVec + 1) + 2*u % (1 - 2*qVec)) % wq;
 }
 
-arma::vec kernFkt_MW220(const arma::vec& u, double q = 1)
+// [[Rcpp::export]]
+arma::vec kernFkt_MW220(const arma::vec& uVec, double q)
+{
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double q2{ q * q };
+  double q2_1{ pow(1 + q, 6) };
+  double out{ };
+  double u{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    out = (60.0/q2_1) * (u*(2 - 3*q) + (1 - 2*q + 2*q2))
+                      * (1 + u)*(1 + u)*(q - u);
+    uOut(i) = out;
+  }
+  return uOut;
+}
+
+// [[Rcpp::export]]
+arma::vec kernFkt_MW220_old(const arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
@@ -53,37 +76,58 @@ arma::vec kernFkt_MW320(const arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW420(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW420(const arma::vec& uVec, double q)
 {
-  arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
-  arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
-  arma::vec q6{ pow(qVec, 6) };
-  arma::vec q5{ pow(qVec, 5) };
-  arma::vec q4{ pow(qVec, 4) };
-  arma::vec q3{ pow(qVec, 3) };
-  arma::vec q2{ pow(qVec, 2) };
-  double n0{ 420.0/pow(q + 1, 10) };
-  arma::vec mid{ (5*q6 - 30*q5%u - 30*q5 + 54*q4%u%u + 152*q4%u + 77*q4
-                    - 30*q3%u%u%u - 240*q3%u%u - 280*q3%u - 84*q3
-                    + 120*q2%u%u%u + 300*q2%u%u + 216*q2%u + 45*q2
-                    - 90*qVec%u%u%u - 144*qVec%u%u - 70*qVec%u - 10*qVec
-                    + 12*u%u%u + 18*u%u + 8*u + 1) };
-    return (n0 * mid % wq);
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q6{ q5 * q };
+  double q10_1{ pow(1 + q, 10) };
+  double out{ };
+  double u{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    out = (420.0/q10_1) * ( u*u*u*(12 - 90*q + 120*q2 - 30*q3) 
+                  + u*u*(18 - 144*q + 300*q2 - 240*q3 + 54*q4)
+                  + u*(8 - 70*q + 216*q2 - 280*q3 + 152*q4 - 30*q5)
+                  + (1 - 10*q + 45*q2 - 84*q3 + 77*q4 - 30*q5 + 5*q6))
+                * (1 + u)*(1 + u)*(q - u);
+    uOut(i) = out;
+  }
+  return uOut;
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW422(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW422(const arma::vec& uVec, double q)
 {
-  arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
-  arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
-  arma::vec q4{ pow(qVec, 4) };
-  arma::vec q3{ pow(qVec, 3) };
-  arma::vec q2{ pow(qVec, 2) };
-  double n0{ 5040.0/pow(q + 1, 10) };
-  arma::vec mid{ (9*q4 - 61*q3%u - 40*q3 + 119*q2%u%u + 160*q2%u + 50*q2
-                 - 70*qVec%u%u%u - 182*qVec%u%u - 127*qVec%u - 24*qVec
-                 + 56*u%u%u + 77*u%u + 30*u + 3) };
-  return (n0 * mid % wq);
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q10_1{ pow(1 + q, 10) };
+  double out{ };
+  double u{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    out = (5040.0/q10_1) * ( u*u*u*(56 - 70*q) + u*u*(77 - 182*q + 119*q2)
+                         + u*(30 - 127*q + 160*q2 - 61*q3)
+                         + (3 - 24*q + 50*q2 - 40*q3 + 9*q4))
+                       * (1 + u)*(1 + u)*(q - u);
+    uOut(i) = out;
+  }
+  return uOut;
 }
 
 // [[Rcpp::export]]

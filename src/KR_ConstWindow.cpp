@@ -17,7 +17,7 @@ arma::vec kernFkt_MW220(const arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
+arma::mat KRSmooth_matrix(const arma::mat yMat, const double h
                           , SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
@@ -26,7 +26,7 @@ arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
   int windowWidth{ 2*bndw + 1 };          // width of estimation window
 
   arma::mat yMatOut(nRow, nCol);          // matrix for results
-  
+
   // enable Kernel function
   XPtr<funcPtr> xpfun(kernFcnPtr);
   funcPtr kernFcn = *xpfun;
@@ -56,7 +56,7 @@ arma::mat KRSmooth_matrix(const arma::mat yMat, const double h,
   arma::colvec  yLeft(windowWidth);
   arma::colvec  yRight(windowWidth);
   double        q;
-  
+
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {
     q = static_cast<double>(colIndex)/bndw;
@@ -83,8 +83,8 @@ arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
 {
   arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1),
     kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
-  arma::mat yMatOut{ KRSmooth_matrix(yMat, hVec(0),
+  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0),
     kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
-  
+
   return yMatOut.t();
 }

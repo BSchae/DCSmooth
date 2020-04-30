@@ -23,7 +23,7 @@ arma::mat KRSmooth_matrix2(const arma::mat yMat, const double h,
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series
-  int bndw{ static_cast<int>(h * nCol) }; // calculate absolute bandwidth, decimals will be dumped
+  int bndw{ std::max(static_cast<int>(h * nCol), 2) }; // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };          // width of estimation window
 
   arma::mat yMatOut(nRow, nCol);          // matrix for results

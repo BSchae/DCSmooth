@@ -12,20 +12,20 @@
                            # if pOrder == 0, kernel regression will be used.
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
-  inflPar   = c(1.5, 0.5)  # inflation parameters c (regression), d (2nd derivative)
-  
+  inflPar   = c(1.5, 0.5),  # inflation parameters c (regression), d (2nd derivative)
+  fast      = TRUE
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
-              inflExp = inflExp, inflPar = inflPar))
+              inflExp = inflExp, inflPar = inflPar, fast = fast))
 }
 
 #----------------------Formula for optimal bandwidths-------------------------#
 
-hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
+hOptFunction = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, n)
-  i0t = intCalc(mtt, mxx, n)
+  i0x = intCalc(mxx, mtt, nSub)
+  i0t = intCalc(mtt, mxx, nSub)
   
   hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0t)
@@ -36,10 +36,10 @@ hOptFunction = function(mxx, mtt, varCoef, n, p, kernelProp)
   return(c(hxOpt, htOpt))
 }
 
-hOptKR = function(mxx, mtt, varCoef, n, kernelProp)
+hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, n)
-  i0t = intCalc(mtt, mxx, n)
+  i0x = intCalc(mxx, mtt, nSub)
+  i0t = intCalc(mtt, mxx, nSub)
   
   hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0t)
@@ -52,11 +52,11 @@ hOptKR = function(mxx, mtt, varCoef, n, kernelProp)
 
 #---------------------Integrals over mxx^2, mtt^2-----------------------------#
 
-intCalc = function(m11, m22, n)
+intCalc = function(m11, m22, nSub)
 {
-  i11 = sum(m11 * m11)/n
-  i22 = sum(m22 * m22)/n
-  i12 = sum(m11 * m22)/n
+  i11 = sum(m11 * m11)/nSub
+  i22 = sum(m22 * m22)/nSub
+  i12 = sum(m11 * m22)/nSub
   
   iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
   

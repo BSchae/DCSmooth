@@ -1,4 +1,3 @@
-# library(mvtnorm)
 # library(rgl)
 # library(MASS)
 # library(microbenchmark)
@@ -6,7 +5,6 @@
 # ### General settings
 # n_sim = 100
 # seed = 42
-# 
 # 
 # #-----------------------------------------------------------------------------#
 # #                             Sine function                                   #
@@ -75,11 +73,10 @@
 # colnames(K_sineMult) = c("hX", "hT", "hx", "ht", "a", "b", "c", "nX", "nT",
 #                          "sd", "iter", "time")
 # set.seed(seed)
-# myOpt = setOptions(pOrder = 0)
+# myOpt = setOptions(pOrder = 0, fast = TRUE)
 # 
 # for (k in 1:n_sim)
 # {
-#   print(k)
 #   # draw random values for parameters
 #   a  = sample(1:100/20, size = 1)
 #   b  = sample(1:100/20, size = 1)
@@ -90,32 +87,28 @@
 # 
 #   K_sineMult[k, 5:10] = c(a, b, c, nX, nT, sd)
 # 
-#   hOpt = pmin(hFunc(a, b, c, nX, nT, sd), c(0.4, 0.4))
-#   bndwOpt = floor(hOpt*c(nX, nT))
-#   
+#   hOpt = hFunc(a, b, c, nX, nT, sd)
+# 
 #   K_sineMult[k, 1:2] = hOpt
 # 
 #   Y = sineMat(a, b, c, nX, nT) + matrix(rnorm(nX*nT)*sd, nrow = nX, ncol = nT)
 # 
 #   t0 = Sys.time()
-#   a = DCSmooth(Y, bndw = hOpt, dcsOptions = myOpt)
-#   K_sineMult[k, 11] = Sys.time() - t0
-#   t0 = Sys.time()
-#   b = DCS_Standard(Y, bndw = bndwOpt)
-#   K_sineMult[k, 12] = Sys.time() - t0
-#   
-#   #K_sineMult[k, 3:4] = Smooth$bndw[1:2]
-#   #K_sineMult[k, 11] = Smooth$bndw[3]
+#   Smooth = DCSmooth(Y, dcsOptions = myOpt)
+#   K_sineMult[k, 12] = difftime(Sys.time(), t0, units = "secs")
+# 
+#   K_sineMult[k, 3:4] = Smooth$bndw[1:2]
+#   K_sineMult[k, 11] = Smooth$bndw[3]
+# 
+#   print(k)
 # }
 # 
 # K = data.frame(K_sineMult)
-# n = K$nX * K$nT
-# plot(n, K[, 11])
-# points(n, K[, 12], col = 2)
-# a = -K[, 11] + K[, 12]
-# plot(n, a)
+# plot(K[, 2], K[, 4])
 # 
-# lm(a~n)
+# abline(a = 0, b= 1)
+# abline(lm(K[, 4]~K[, 2]))
+# 
 # #-----------------------------------------------------------------------------#
 # #                           Polynomial Funcion                                #
 # #-----------------------------------------------------------------------------#

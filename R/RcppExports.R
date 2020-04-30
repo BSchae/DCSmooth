@@ -17,16 +17,24 @@ KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
     .Call(`_DCSmooth_KR_DoubleSmooth`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
+kernFkt_MW220 <- function(uVec, q) {
+    .Call(`_DCSmooth_kernFkt_MW220`, uVec, q)
+}
+
+kernFkt_MW220_old <- function(u, q = 1) {
+    .Call(`_DCSmooth_kernFkt_MW220_old`, u, q)
+}
+
 kernFkt_MW320 <- function(u, q = 1) {
     .Call(`_DCSmooth_kernFkt_MW320`, u, q)
 }
 
-kernFkt_MW420 <- function(u, q = 1) {
-    .Call(`_DCSmooth_kernFkt_MW420`, u, q)
+kernFkt_MW420 <- function(uVec, q) {
+    .Call(`_DCSmooth_kernFkt_MW420`, uVec, q)
 }
 
-kernFkt_MW422 <- function(u, q = 1) {
-    .Call(`_DCSmooth_kernFkt_MW422`, u, q)
+kernFkt_MW422 <- function(uVec, q) {
+    .Call(`_DCSmooth_kernFkt_MW422`, uVec, q)
 }
 
 kernelFcn_assign <- function(fstr) {
@@ -51,17 +59,5 @@ LPSmooth_matrix <- function(yMat, h, polyOrder, drv) {
 
 LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call(`_DCSmooth_LP_DoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
-}
-
-test <- function(x, q) {
-    .Call(`_DCSmooth_test`, x, q)
-}
-
-test2 <- function(q) {
-    .Call(`_DCSmooth_test2`, q)
-}
-
-test3 <- function(colIndex, bndw) {
-    .Call(`_DCSmooth_test3`, colIndex, bndw)
 }
 
