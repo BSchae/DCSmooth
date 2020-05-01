@@ -53,7 +53,8 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 #-------------------Function for plotting smoothed surface--------------------#
 
-plotDCS = function(DCSobj, color = "Plasma", nice = TRUE)
+plotDCS = function(DCSobj, X = DCSobj$X, T = DCSobj$T,
+                   color = "Plasma", nice = TRUE)
 {
   X = DCSobj$X
   T = DCSobj$T
