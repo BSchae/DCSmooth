@@ -73,7 +73,7 @@ K_sineMult = matrix(NA, nrow = n_sim, ncol = 12)
 colnames(K_sineMult) = c("hX", "hT", "hx", "ht", "a", "b", "c", "nX", "nT",
                          "sd", "iter", "time")
 set.seed(seed)
-myOpt = setOptions(pOrder = 0, fast = TRUE)
+myOpt = setOptions(pOrder = 0, fast = FALSE)
 
 for (k in 1:n_sim)
 {
@@ -104,6 +104,7 @@ for (k in 1:n_sim)
 }
 
 K = data.frame(K_sineMult)
+write.csv(K, file = "K_SineNorm.csv", row.names = FALSE)
 plot(K[, 2], K[, 4])
 
 abline(a = 0, b= 1)
