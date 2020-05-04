@@ -7,7 +7,7 @@ using namespace Rcpp;
 // Müller-Wang kernels
 // Form is: Type_k_mu_nu
 
-arma::vec kernFkt_MW200(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW200(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec q2{ pow(qVec, 2) };
@@ -16,7 +16,7 @@ arma::vec kernFkt_MW200(const arma::vec& u, double q = 1)
   return n0 * (2*(q2 - qVec + 1) + 3*u%(1 - qVec));
 }
 
-arma::vec kernFkt_MW210(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW210(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) };
@@ -27,7 +27,7 @@ arma::vec kernFkt_MW210(const arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW220(const arma::vec& uVec, double q)
+arma::vec kernFkt_MW220(arma::vec& uVec, double q)
 {
   int nBound{ uVec.size() };
   
@@ -49,7 +49,7 @@ arma::vec kernFkt_MW220(const arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW220_old(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW220_old(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
@@ -60,7 +60,7 @@ arma::vec kernFkt_MW220_old(const arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW320(const arma::vec& u, double q = 1)
+arma::vec kernFkt_MW320(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
@@ -76,7 +76,7 @@ arma::vec kernFkt_MW320(const arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW420(const arma::vec& uVec, double q)
+arma::vec kernFkt_MW420(arma::vec& uVec, double q)
 {
   int nBound{ uVec.size() };
   
@@ -105,7 +105,7 @@ arma::vec kernFkt_MW420(const arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW422(const arma::vec& uVec, double q)
+arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 {
   int nBound{ uVec.size() };
   
@@ -149,9 +149,63 @@ XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
 }
 
 // [[Rcpp::export]]
-arma::vec kernelFcn_use(const arma::vec x, double q, SEXP xpsexp) {
+arma::vec kernelFcn_use(arma::vec x, double q, SEXP xpsexp) {
   XPtr<funcPtr> xpfun(xpsexp);
   funcPtr fun = *xpfun;
   arma::vec y = fun(x, q);
   return y;
+}
+
+
+
+
+
+/// Test
+
+// [[Rcpp::export]]
+arma::vec MWTest1(arma::vec uVec, double q)
+{
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q6{ q5 * q };
+  double q10_1{ pow(1 + q, 10) };
+  double out{ };
+  double u{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    out = (420.0/q10_1) * ( u*u*u*(12 - 90*q + 120*q2 - 30*q3) 
+      + u*u*(18 - 144*q + 300*q2 - 240*q3 + 54*q4)
+      + u*(8 - 70*q + 216*q2 - 280*q3 + 152*q4 - 30*q5)
+      + (1 - 10*q + 45*q2 - 84*q3 + 77*q4 - 30*q5 + 5*q6))
+      * (1 + u)*(1 + u)*(q - u);
+      uOut(i) = out;
+  }
+  return uOut;
+}
+
+// [[Rcpp::export]]
+double MWTest2(double u, double q)
+{
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q6{ q5 * q };
+  double q10_1{ pow(1 + q, 10) };
+  
+  double out = (420.0/q10_1) * ( u*u*u*(12 - 90*q + 120*q2 - 30*q3) 
+    + u*u*(18 - 144*q + 300*q2 - 240*q3 + 54*q4)
+    + u*(8 - 70*q + 216*q2 - 280*q3 + 152*q4 - 30*q5)
+    + (1 - 10*q + 45*q2 - 84*q3 + 77*q4 - 30*q5 + 5*q6))
+    * (1 + u)*(1 + u)*(q - u);
+  
+  return out;
 }

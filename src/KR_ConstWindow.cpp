@@ -4,11 +4,11 @@
 
 using namespace Rcpp;
 
-typedef arma::vec (*funcPtr2)(const arma::vec&, double);
+typedef arma::vec (*funcPtr2)(arma::vec&, double);
 
-arma::vec kernFkt_MW200(const arma::vec&, double);
-arma::vec kernFkt_MW210(const arma::vec&, double);
-arma::vec kernFkt_MW220(const arma::vec&, double);
+arma::vec kernFkt_MW200(arma::vec&, double);
+arma::vec kernFkt_MW210(arma::vec&, double);
+arma::vec kernFkt_MW220(arma::vec&, double);
 
 //---------------------------------------------------------------------------//
 //                    Kernel Regression Functions                            //
@@ -17,7 +17,7 @@ arma::vec kernFkt_MW220(const arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix(const arma::mat yMat, const double h
+arma::mat KRSmooth_matrix(arma::mat yMat, double h
                           , SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series

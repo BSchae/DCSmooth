@@ -4,12 +4,65 @@
 
 using namespace Rcpp;
 
-arma::vec kernFkt_MW200(const arma::vec&, double);
-arma::vec kernFkt_MW210(const arma::vec&, double);
-arma::vec kernFkt_MW220(const arma::vec&, double);
-arma::vec kernFkt_MW320(const arma::vec&, double);
-arma::vec kernFkt_MW420(const arma::vec&, double);
-arma::vec kernFkt_MW422(const arma::vec&, double);
+arma::vec kernFkt_MW200(arma::vec&, double);
+arma::vec kernFkt_MW210(arma::vec&, double);
+arma::vec kernFkt_MW220(arma::vec&, double);
+arma::vec kernFkt_MW320(arma::vec&, double);
+arma::vec kernFkt_MW420(arma::vec&, double);
+arma::vec kernFkt_MW422(arma::vec&, double);
+
+
+// Test
+// [[Rcpp::export]]
+arma::mat KRTest(arma::mat yMat, double h,
+  SEXP kernFcnPtr)
+{
+  int nRow{ yMat.n_rows };                // number of conditional Time-Series
+  int nCol{ yMat.n_cols };                // number of observations per Time-Series
+  int bndw{ std::max(static_cast<int>(h * nCol), 2) }; // calculate absolute bandwidth, decimals will be dumped
+  int windowWidth{ 2*bndw + 1 };          // width of estimation window
+
+  arma::mat yMatOut(nRow, nCol);          // matrix for results
+
+  //enable Kernel function
+  XPtr<funcPtr> xpfun(kernFcnPtr);
+  funcPtr kernFcn = *xpfun;
+  
+  // smoothing over boundaries
+  for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
+  {
+    double q = static_cast<double>(colIndex)/bndw;
+    arma::colvec  uBound(arma::regspace(colIndex, -bndw) / bndw);
+    arma::colvec  weightsBound{ kernFcn(uBound, q)*(1 + q)/uBound.n_rows };
+    
+    arma::mat     yLeftMat{ yMat.cols(0, uBound.n_rows - 1) };
+    arma::mat     yRightMat{ yMat.cols(nCol - uBound.n_rows, nCol - 1) };
+    
+    yMatOut.col(colIndex) = yLeftMat * weightsBound;
+    yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
+    
+  }
+  return yMatOut;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //---------------------------------------------------------------------------//
 //                    Kernel Regression Functions                            //
@@ -18,7 +71,7 @@ arma::vec kernFkt_MW422(const arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix2(const arma::mat yMat, const double h,
+arma::mat KRSmooth_matrix2(arma::mat yMat, double h,
                          SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
@@ -33,7 +86,7 @@ arma::mat KRSmooth_matrix2(const arma::mat yMat, const double h,
   funcPtr kernFcn = *xpfun;
 
   // smoothing over interior values
-  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * nCol) };   // vector from -1 to 1 to compute weights
+  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/bndw }; //(h * nCol) };   // vector from -1 to 1 to compute weights
   arma::colvec  weightsInterior{ kernFcn(uInterior, 1)/bndw };            // computation of weights (put in kernel-function later)
   arma::colvec  yRowInterior{ arma::zeros(windowWidth) };                           // empty vector for use inside loop
 
