@@ -8,19 +8,6 @@
 
 using namespace Rcpp;
 
-// KRTest
-arma::mat KRTest(arma::mat yMat, double h, SEXP kernFcnPtr);
-RcppExport SEXP _DCSmooth_KRTest(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
-    rcpp_result_gen = Rcpp::wrap(KRTest(yMat, h, kernFcnPtr));
-    return rcpp_result_gen;
-END_RCPP
-}
 // KRSmooth_matrix2
 arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr);
 RcppExport SEXP _DCSmooth_KRSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
@@ -243,7 +230,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_KRTest", (DL_FUNC) &_DCSmooth_KRTest, 3},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 3},
