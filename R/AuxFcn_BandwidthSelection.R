@@ -13,7 +13,7 @@
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
   inflPar   = c(1.5, 0.5),  # inflation parameters c (regression), d (2nd derivative)
-  fast      = TRUE
+  fast      = FALSE
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
@@ -89,4 +89,30 @@ inflationFcn = function(h, n, dcsOptions)
   hInfltt = pmin(hInfltt, c(0.45, 0.45))  # ensure no bandwidth > 0.5 (or 0.45)
   
   return(list(h_xx = hInflxx, h_tt = hInfltt))
+}
+
+#-------------------Function for plotting smoothed surface--------------------#
+
+.plotDCS = function(DCSobj, X = 1, T = 1, color = "Plasma", nice = TRUE,
+                    xlab = "X", ylab = "T", zlab = "Y")
+{
+  if (length(X) == 1) { X = DCSobj$X }
+  if (length(T) == 1) { T = DCSobj$T }
+  M = DCSobj$M
+  
+  if(nice == TRUE) {  colValue = plotDCScolFcn(DCSobj$M, )  }
+  else { colValue = color }
+  
+  par3d(windowRect = c(20, 30, 600, 600), viewport = c(50, 50, 500, 500))
+  view3d(userMatrix = rotationMatrix(-1.4, 14, -4.3, -5), fov = 20)
+  persp3d(X, T, M, col = colValue, xlab = xlab, ylab = ylab, zlab = zlab)
+}
+
+plotDCScolFcn = function(Y, nCol = 100)
+{
+  YCol = Y - min(Y)
+  YCol = YCol/max(YCol) * (nCol - 1) + 1
+  colorlut = hcl.colors(nCol, palette = "Plasma", rev = TRUE)
+  col = colorlut[YCol]
+  return(col)
 }

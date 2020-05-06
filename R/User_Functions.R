@@ -53,25 +53,7 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 #-------------------Function for plotting smoothed surface--------------------#
 
-plotDCS = function(DCSobj, X = DCSobj$X, T = DCSobj$T,
-                   color = "Plasma", nice = TRUE)
+plotDCS = function(DCSobj, ...)
 {
-  X = DCSobj$X
-  T = DCSobj$T
-  M = DCSobj$M
-  
-  if(nice == TRUE) {  colValue = plotDCScolFcn(DCSobj$M, )  }
-  else { colValue = color }
-  
-  view3d(userMatrix = rotationMatrix(-1.5, 1, -0.35, -0.4), fov = 20)
-  persp3d(X, T, M, col = colValue)
-}
-
-plotDCScolFcn = function(Y, nCol = 100)
-{
-  YCol = Y - min(Y)
-  YCol = YCol/max(YCol) * (nCol - 1) + 1
-  colorlut = hcl.colors(nCol, palette = "Plasma", rev = TRUE)
-  col = colorlut[YCol]
-  return(col)
+  .plotDCS(DCSobj = DCSobj, ...)
 }
