@@ -18,7 +18,7 @@ arma::mat thinnedMat(arma::mat yMat, int seed) //, int sRow, int sCol)
 {
   std::srand(seed);
 
-  int sRow{ yMat.n_rows/1000 + 1};
+  int sRow{ yMat.n_rows/1000 + 2};
   int sCol{ yMat.n_cols/1000 + 1};
 
   int nRow{ yMat.n_rows/sRow };
@@ -29,9 +29,8 @@ arma::mat thinnedMat(arma::mat yMat, int seed) //, int sRow, int sCol)
 
   int rowMark{ 0 };
   int colMark{ 0 };
-
+  
   arma::mat yMatOut(nRow, nCol);
-
 
   for (int rowIndex{ 0 }; rowIndex < nRow; ++rowIndex)
   {

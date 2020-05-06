@@ -8,19 +8,6 @@
 
 using namespace Rcpp;
 
-// KRTest
-arma::mat KRTest(arma::mat yMat, double h, SEXP kernFcnPtr);
-RcppExport SEXP _DCSmooth_KRTest(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
-    rcpp_result_gen = Rcpp::wrap(KRTest(yMat, h, kernFcnPtr));
-    return rcpp_result_gen;
-END_RCPP
-}
 // KRSmooth_matrix2
 arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr);
 RcppExport SEXP _DCSmooth_KRSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
@@ -241,9 +228,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cppSample
+int cppSample(arma::vec x);
+RcppExport SEXP _DCSmooth_cppSample(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(cppSample(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// thinnedMat
+arma::mat thinnedMat(arma::mat yMat, int seed);
+RcppExport SEXP _DCSmooth_thinnedMat(SEXP yMatSEXP, SEXP seedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(thinnedMat(yMat, seed));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DCSmooth_KRTest", (DL_FUNC) &_DCSmooth_KRTest, 3},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 3},
@@ -261,6 +270,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_LP_DoubleSmooth2", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth2, 4},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 4},
+    {"_DCSmooth_cppSample", (DL_FUNC) &_DCSmooth_cppSample, 1},
+    {"_DCSmooth_thinnedMat", (DL_FUNC) &_DCSmooth_thinnedMat, 2},
     {NULL, NULL, 0}
 };
 
