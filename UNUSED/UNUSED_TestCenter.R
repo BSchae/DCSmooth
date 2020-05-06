@@ -92,23 +92,26 @@ for (k in 1:n_sim)
   K_sineMult[k, 1:2] = hOpt
 
   Y = sineMat(a, b, c, nX, nT) + matrix(rnorm(nX*nT)*sd, nrow = nX, ncol = nT)
+  
+  if (k > 293){
 
   t0 = Sys.time()
   Smooth = DCSmooth(Y, dcsOptions = myOpt)
   K_sineMult[k, 12] = difftime(Sys.time(), t0, units = "secs")
+  
 
   K_sineMult[k, 3:4] = Smooth$bndw[1:2]
   K_sineMult[k, 11] = Smooth$iterations
-
+  }
   print(k)
 }
 
 K = data.frame(K_sineMult)
-write.csv(K, file = "K_SineNorm.csv", row.names = FALSE)
+write.csv(K, file = "", row.names = FALSE)
 plot(K[, 2], K[, 4])
 
-abline(a = 0, b= 1)
-abline(lm(K[, 4]~K[, 2]))
+abline(a = 0, b= 1, col = "red")
+
 
 #-----------------------------------------------------------------------------#
 #                           Polynomial Funcion                                #
@@ -181,7 +184,7 @@ colnames(K_PolyMult) = c("hX", "hT", "hx", "ht", "iter",
                          "nX", "nT", "pX", "pT", "sd", "Ixx", "Itt", "Ixt",
                          "IXX", "ITT", "IXT")
 set.seed(seed)
-myOpt = setOptions(inflPar = c(1, 0.5), inflExp = c(0.3, 0.5))
+myOpt = setOptions(pOrder = 0, fast = FALSE)
 
 for (s in 1:n_sim)
 {
@@ -209,7 +212,7 @@ for (s in 1:n_sim)
   # true bandwidths
   K_PolyMult[s, 1:2] = hPolyFunc(pX, pT, coefMat, nX, nT, sd)
 
-  Smooth = DCSmooth(Y)
+  Smooth = DCSmooth(Y, dcsOptions = myOpt)
   K_PolyMult[s, 3:5] = Smooth$bndw[c(1, 2, 6)]
   K_PolyMult[s, 6:7] = c(nX, nT)
   K_PolyMult[s, 8:9] = c(pX, pT)
@@ -221,3 +224,4 @@ for (s in 1:n_sim)
 ## evaluation
 
 K = data.frame(K_PolyMult[, ])
+write.csv(K, file = "K_PolyMult.csv", row.names = FALSE)
