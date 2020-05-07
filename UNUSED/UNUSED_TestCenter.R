@@ -73,7 +73,7 @@ K_sineMult = matrix(NA, nrow = n_sim, ncol = 12)
 colnames(K_sineMult) = c("hX", "hT", "hx", "ht", "a", "b", "c", "nX", "nT",
                          "sd", "iter", "time")
 set.seed(seed)
-myOpt = setOptions(pOrder = 0, fast = FALSE)
+myOpt = setOptions(pOrder = 0, fast = TRUE)
 
 for (k in 1:n_sim)
 {
@@ -184,7 +184,7 @@ colnames(K_PolyMult) = c("hX", "hT", "hx", "ht", "iter",
                          "nX", "nT", "pX", "pT", "sd", "Ixx", "Itt", "Ixt",
                          "IXX", "ITT", "IXT")
 set.seed(seed)
-myOpt = setOptions(pOrder = 0, fast = FALSE)
+myOpt = setOptions(pOrder = 0, fast = TRUE)
 
 for (s in 1:n_sim)
 {
@@ -224,4 +224,4 @@ for (s in 1:n_sim)
 ## evaluation
 
 K = data.frame(K_PolyMult[, ])
-write.csv(K, file = "K_PolyMult.csv", row.names = FALSE)
+write.csv(K, file = "K_PolyFast_v2.csv", row.names = FALSE)
