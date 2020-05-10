@@ -57,5 +57,5 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       iterate = FALSE
     }
   }
-  return(c(hOpt, iterationCount))
+  return(list(bndw = hOpt, iterations = iterationCount))
 }

@@ -30,11 +30,13 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   # bandwidth selection
   if (bndw == "auto" && dcsOptions$pOrder == 0)
   {
-    bndw = KR_bndwSelect(Y, kernelFcn, dcsOptions)
+    bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
+    bndw = bndwObj$bndw
   }
   else if (bndw == "auto" && dcsOptions$pOrder > 0)
   {
-    bndw = LP_bndwSelect(Y, kernelFcn, dcsOptions)
+    bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
+    bndw = bndwObj$bndw
   }
   
   if (dcsOptions$pOrder == 0)
