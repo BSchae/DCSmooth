@@ -52,7 +52,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                    < 0.001) && (iterationCount > 3)) || (iterationCount > 10) )
+                    < 0.001) && (iterationCount > 3)) || (iterationCount > 15) )
     {
       iterate = FALSE
     }
