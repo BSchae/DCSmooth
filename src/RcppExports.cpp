@@ -76,18 +76,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// kernFkt_MW220_old
-arma::vec kernFkt_MW220_old(arma::vec& u, double q);
-RcppExport SEXP _DCSmooth_kernFkt_MW220_old(SEXP uSEXP, SEXP qSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
-    Rcpp::traits::input_parameter< double >::type q(qSEXP);
-    rcpp_result_gen = Rcpp::wrap(kernFkt_MW220_old(u, q));
-    return rcpp_result_gen;
-END_RCPP
-}
 // kernFkt_MW320
 arma::vec kernFkt_MW320(arma::vec& u, double q);
 RcppExport SEXP _DCSmooth_kernFkt_MW320(SEXP uSEXP, SEXP qSEXP) {
@@ -258,7 +246,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 3},
     {"_DCSmooth_KR_DoubleSmooth", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth, 5},
     {"_DCSmooth_kernFkt_MW220", (DL_FUNC) &_DCSmooth_kernFkt_MW220, 2},
-    {"_DCSmooth_kernFkt_MW220_old", (DL_FUNC) &_DCSmooth_kernFkt_MW220_old, 2},
     {"_DCSmooth_kernFkt_MW320", (DL_FUNC) &_DCSmooth_kernFkt_MW320, 2},
     {"_DCSmooth_kernFkt_MW420", (DL_FUNC) &_DCSmooth_kernFkt_MW420, 2},
     {"_DCSmooth_kernFkt_MW422", (DL_FUNC) &_DCSmooth_kernFkt_MW422, 2},

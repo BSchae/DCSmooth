@@ -21,10 +21,6 @@ kernFkt_MW220 <- function(uVec, q) {
     .Call(`_DCSmooth_kernFkt_MW220`, uVec, q)
 }
 
-kernFkt_MW220_old <- function(u, q = 1) {
-    .Call(`_DCSmooth_kernFkt_MW220_old`, u, q)
-}
-
 kernFkt_MW320 <- function(u, q = 1) {
     .Call(`_DCSmooth_kernFkt_MW320`, u, q)
 }

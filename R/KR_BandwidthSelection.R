@@ -16,7 +16,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   kernFcn0 = kernelFcn_assign("MW420")
   kernFcn2 = kernelFcn_assign("MW422")
   
-  hOpt = c(1/nX, 1/nT)*10                    # initial values for h_0, arbitrary chosen
+  hOpt = c(1/nX, 1/nT)                    # initial values for h_0, arbitrary chosen
   
   iterate = TRUE                                # iteration indicator
   iterationCount = 0

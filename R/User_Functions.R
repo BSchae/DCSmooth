@@ -31,12 +31,12 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   if (bndw == "auto" && dcsOptions$pOrder == 0)
   {
     bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
-    bndw = bndwObj$bndw
+    bndw = pmin(bndwObj$bndw, c(0.45, 0.45))
   }
   else if (bndw == "auto" && dcsOptions$pOrder > 0)
   {
     bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
-    bndw = bndwObj$bndw
+    bndw = pmin(bndwObj$bndw, c(0.45, 0.45))
   }
   
   if (dcsOptions$pOrder == 0)

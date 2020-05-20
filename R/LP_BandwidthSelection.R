@@ -33,19 +33,17 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
   while(iterate)                                # loop for IPI
   {
     iterationCount = iterationCount + 1
-    hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
+    hOptTemp   = hOpt[1:2]       # store old bandwidths for breaking condition
     hInfl      = inflationFcn(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
-    hInfl$h_xx = pmin(hInfl$h_xx, c(0.45, 0.45))
-    hInfl$h_tt = pmin(hInfl$h_tt, c(0.45, 0.45))# ensure no bandwidth > 0.5 (or 0.45)
-    
+   
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = LP_DoubleSmooth(yMat = YSub, hVec = hOptTemp, polyOrderVec 
+    YSmth = LP_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, polyOrderVec 
                       = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
     
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = LP_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
+    mxx = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
            = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
-    mtt = LP_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
+    mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
            = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
     
     # calculate variance factor
@@ -61,5 +59,5 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       iterate = FALSE
     }
   }
-  return(c(hOpt, iterationCount))
+  return(list(bndw = hOpt, iterations = iterationCount))
 }
