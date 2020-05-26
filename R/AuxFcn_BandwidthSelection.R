@@ -76,7 +76,7 @@ kernelPropFcn = function(kernelFcn, nInt = 5000)
 
 #----------------bandwidth inflation for derivative estimations---------------#
 
-inflationFcn = function(h, n, dcsOptions)
+inflationFcnKR = function(h, n, dcsOptions)
 {
   Tx = 1#n[2]/sum(n)
   Tt = 1#n[1]/sum(n)
@@ -88,6 +88,18 @@ inflationFcn = function(h, n, dcsOptions)
   hInflxx = pmin(hInflxx, c(0.45, 0.45))
   hInfltt = pmin(hInfltt, c(0.45, 0.45))  # ensure no bandwidth > 0.5 (or 0.45)
   
+  return(list(h_xx = hInflxx, h_tt = hInfltt))
+}
+
+inflationFcnLP = function(h, n, dcsOptions)
+{
+  Tx = 1#n[2]/sum(n)
+  Tt = 1#n[1]/sum(n)
+  hInflxx = c(dcsOptions$inflPar[1] * Tx * (h[1]/Tx)^dcsOptions$inflExp[1],
+              dcsOptions$inflPar[2] * Tt * (h[2]/Tt)^dcsOptions$inflExp[2])
+  hInfltt = c(dcsOptions$inflPar[2] * Tx * (h[1]/Tx)^dcsOptions$inflExp[2],
+              dcsOptions$inflPar[1] * Tt * (h[2]/Tt)^dcsOptions$inflExp[1])
+
   return(list(h_xx = hInflxx, h_tt = hInfltt))
 }
 

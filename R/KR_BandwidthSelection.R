@@ -16,7 +16,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   kernFcn0 = kernelFcn_assign("MW420")
   kernFcn2 = kernelFcn_assign("MW422")
   
-  hOpt = c(1/nX, 1/nT)                    # initial values for h_0, arbitrary chosen
+  hOpt = c(0.1, 0.1) #c(1/nX, 1/nT)*10          # initial values for h_0, arbitrary chosen
   
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
@@ -24,7 +24,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   {
     iterationCount = iterationCount + 1
     hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
-    hInfl      = inflationFcn(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
+    hInfl      = inflationFcnKR(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
     
     if (dcsOptions$fast == TRUE) {
       YSub = thinnedMat(Y, sample.int(.Machine$integer.max, 1))
@@ -39,10 +39,25 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
                              kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
     
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, drvVec = c(2, 0),
+    mxx = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_xx, drvVec = c(2, 0),
                            kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
-    mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
+    mtt = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
                            kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+    
+    # # TEST: shrink mxx, mtt
+    # shrink = 0.05
+    # rowsShrink = floor(nX*shrink):ceiling(nX*(1 - shrink))
+    # colsShrink = floor(nT*shrink):ceiling(nT*(1 - shrink))
+    # mxx = mxx[rowsShrink, colsShrink]
+    # mtt = mtt[rowsShrink, colsShrink]
+    # nSub = length(rowsShrink) * length(colsShrink)
+
+    # # TEST: smooth mxx, mtt again
+    # mxx = KR_DoubleSmooth2(yMat = mxx, hVec = hOptTemp, drvVec = c(0, 0),
+    #                        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+    # mtt = KR_DoubleSmooth(yMat = mtt, hVec = hOptTemp, drvVec = c(0, 0),
+    #                        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+    
     
     # calculate variance factor
     varCoef = (sd(YSub - YSmth))^2

@@ -26,7 +26,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
   }
   
   nXSub = dim(YSub)[1]; nTSub = dim(YSub)[2]; nSub = nXSub * nTSub
-  hOpt = c(1/nXSub, 1/nTSub)                    # initial values for h_0, arbitrary chosen
+  hOpt = c(0.1, 0.1) #c(1/nXSub, 1/nTSub)                    # initial values for h_0, arbitrary chosen
 
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
@@ -34,7 +34,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
   {
     iterationCount = iterationCount + 1
     hOptTemp   = hOpt[1:2]       # store old bandwidths for breaking condition
-    hInfl      = inflationFcn(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
+    hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
    
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
     YSmth = LP_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, polyOrderVec 
@@ -45,6 +45,20 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
            = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
     mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
            = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
+    
+    # TEST: shrink mxx, mtt
+    shrink = 0.05
+    rowsShrink = floor(nX*shrink):ceiling(nX*(1 - shrink))
+    colsShrink = floor(nT*shrink):ceiling(nT*(1 - shrink))
+    mxx = mxx[rowsShrink, colsShrink]
+    mtt = mtt[rowsShrink, colsShrink]
+    nSub = length(rowsShrink) * length(colsShrink)
+    
+    # TEST: smooth mxx, mtt again
+    mxx = LP_DoubleSmooth2(yMat = mxx, hVec = hOptTemp, polyOrderVec
+                           = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
+    mtt = LP_DoubleSmooth2(yMat = mtt, hVec = hOptTemp, polyOrderVec
+                           = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
     
     # calculate variance factor
     varCoef = (sd(YSub - YSmth))^2

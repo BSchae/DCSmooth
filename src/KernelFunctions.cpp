@@ -120,6 +120,26 @@ arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
+arma::vec kernFkt_MW422_1(arma::vec& uVec)
+{
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double out{ };
+  double u{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    out = 5040.0/1024.0 * ( -14*u*u*u + 14*u*u + 2*u - 2)
+                      * (1 + u)*(1 + u)*(1 - u);
+    uOut(i) = out;
+  }
+  return uOut;
+}
+
+// [[Rcpp::export]]
 XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
   if (fstr == "MW200")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW200)));
@@ -144,10 +164,6 @@ arma::vec kernelFcn_use(arma::vec x, double q, SEXP xpsexp) {
   arma::vec y = fun(x, q);
   return y;
 }
-
-
-
-
 
 /// Test
 

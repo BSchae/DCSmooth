@@ -112,6 +112,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// kernFkt_MW422_1
+arma::vec kernFkt_MW422_1(arma::vec& uVec);
+RcppExport SEXP _DCSmooth_kernFkt_MW422_1(SEXP uVecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type uVec(uVecSEXP);
+    rcpp_result_gen = Rcpp::wrap(kernFkt_MW422_1(uVec));
+    return rcpp_result_gen;
+END_RCPP
+}
 // kernelFcn_assign
 XPtr<funcPtr> kernelFcn_assign(std::string fstr);
 RcppExport SEXP _DCSmooth_kernelFcn_assign(SEXP fstrSEXP) {
@@ -157,6 +168,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type u(uSEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
     rcpp_result_gen = Rcpp::wrap(MWTest2(u, q));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LPSmooth_matrix3
+arma::mat LPSmooth_matrix3(const arma::mat yMat, const double h, const int polyOrder, const int drv);
+RcppExport SEXP _DCSmooth_LPSmooth_matrix3(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< const double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
+    Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth_matrix3(yMat, h, polyOrder, drv));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -249,10 +274,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_kernFkt_MW320", (DL_FUNC) &_DCSmooth_kernFkt_MW320, 2},
     {"_DCSmooth_kernFkt_MW420", (DL_FUNC) &_DCSmooth_kernFkt_MW420, 2},
     {"_DCSmooth_kernFkt_MW422", (DL_FUNC) &_DCSmooth_kernFkt_MW422, 2},
+    {"_DCSmooth_kernFkt_MW422_1", (DL_FUNC) &_DCSmooth_kernFkt_MW422_1, 1},
     {"_DCSmooth_kernelFcn_assign", (DL_FUNC) &_DCSmooth_kernelFcn_assign, 1},
     {"_DCSmooth_kernelFcn_use", (DL_FUNC) &_DCSmooth_kernelFcn_use, 3},
     {"_DCSmooth_MWTest1", (DL_FUNC) &_DCSmooth_MWTest1, 2},
     {"_DCSmooth_MWTest2", (DL_FUNC) &_DCSmooth_MWTest2, 2},
+    {"_DCSmooth_LPSmooth_matrix3", (DL_FUNC) &_DCSmooth_LPSmooth_matrix3, 4},
     {"_DCSmooth_LPSmooth_matrix2", (DL_FUNC) &_DCSmooth_LPSmooth_matrix2, 4},
     {"_DCSmooth_LP_DoubleSmooth2", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth2, 4},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},

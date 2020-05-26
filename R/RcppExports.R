@@ -33,6 +33,10 @@ kernFkt_MW422 <- function(uVec, q) {
     .Call(`_DCSmooth_kernFkt_MW422`, uVec, q)
 }
 
+kernFkt_MW422_1 <- function(uVec) {
+    .Call(`_DCSmooth_kernFkt_MW422_1`, uVec)
+}
+
 kernelFcn_assign <- function(fstr) {
     .Call(`_DCSmooth_kernelFcn_assign`, fstr)
 }
@@ -47,6 +51,10 @@ MWTest1 <- function(uVec, q) {
 
 MWTest2 <- function(u, q) {
     .Call(`_DCSmooth_MWTest2`, u, q)
+}
+
+LPSmooth_matrix3 <- function(yMat, h, polyOrder, drv) {
+    .Call(`_DCSmooth_LPSmooth_matrix3`, yMat, h, polyOrder, drv)
 }
 
 LPSmooth_matrix2 <- function(yMat, h, polyOrder, drv) {
