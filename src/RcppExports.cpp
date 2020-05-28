@@ -8,6 +8,34 @@
 
 using namespace Rcpp;
 
+// KRSlow_single
+arma::rowvec KRSlow_single(arma::rowvec yVec, double h, SEXP kernFcnPtr);
+RcppExport SEXP _DCSmooth_KRSlow_single(SEXP yVecSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::rowvec >::type yVec(yVecSEXP);
+    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
+    rcpp_result_gen = Rcpp::wrap(KRSlow_single(yVec, h, kernFcnPtr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// KR_DSSlow
+arma::mat KR_DSSlow(arma::mat yMat, arma::colvec hVec, arma::colvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT);
+RcppExport SEXP _DCSmooth_KR_DSSlow(SEXP yMatSEXP, SEXP hVecSEXP, SEXP drvVecSEXP, SEXP kernFcnPtrXSEXP, SEXP kernFcnPtrTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type drvVec(drvVecSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrX(kernFcnPtrXSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtrT(kernFcnPtrTSEXP);
+    rcpp_result_gen = Rcpp::wrap(KR_DSSlow(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT));
+    return rcpp_result_gen;
+END_RCPP
+}
 // KRSmooth_matrix2
 arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr);
 RcppExport SEXP _DCSmooth_KRSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
@@ -266,6 +294,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_DCSmooth_KRSlow_single", (DL_FUNC) &_DCSmooth_KRSlow_single, 3},
+    {"_DCSmooth_KR_DSSlow", (DL_FUNC) &_DCSmooth_KR_DSSlow, 5},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 3},

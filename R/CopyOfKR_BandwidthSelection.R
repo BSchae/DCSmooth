@@ -6,7 +6,7 @@
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
+KR_bndwSelect_Slow = function(Y, kernelFcn, dcsOptions)
 {
   nX = dim(Y)[1]; nT = dim(Y)[2]
   n  = nX * nT                                  # total number of observations is needed later
@@ -35,16 +35,26 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     nXSub = dim(YSub)[1]; nTSub = dim(YSub)[2]; nSub = nXSub * nTSub
     
+    # # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+    # YSmth = KR_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, drvVec = c(0, 0),
+    #                   kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+    # 
+    # # smoothing of derivatives m(2,0) and m(0,2)
+    # mxx = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_xx, drvVec = c(2, 0),
+    #                 kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+    # mtt = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
+    #                 kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = KR_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, drvVec = c(0, 0),
-                      kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
-
+    YSmth = KR_DSSlow(yMat = YSub, hVec = hOptTemp, drvVec = c(0, 0),
+                             kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+    
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_xx, drvVec = c(2, 0),
-                    kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
-    mtt = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
-                    kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
-
+    mxx = KR_DSSlow(yMat = YSub, hVec = hInfl$h_xx, drvVec = c(2, 0),
+                           kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+    mtt = KR_DSSlow(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
+                           kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+    
     # calculate variance factor
     varCoef = (sd(YSub - YSmth))^2
     
