@@ -16,7 +16,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   kernFcn0 = kernelFcn_assign("MW420")
   kernFcn2 = kernelFcn_assign("MW422")
   
-  hOpt = c(0.1, 0.1)          # initial values for h_0, arbitrary chosen
+  hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
   
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
@@ -44,9 +44,23 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
                     kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
     mtt = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
                     kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+    
+    # # shrink mxx, mtt from boundaries
+    # delta = 0
+    # shrinkX = floor(delta*nX):ceiling((1 - delta)*nX)
+    # shrinkT = floor(delta*nT):ceiling((1 - delta)*nT)
+    # 
+    # mxx = mxx[shrinkX, shrinkT]
+    # mtt = mtt[shrinkX, shrinkT]
+    
+    # Short Memory
+    X = seq(from = 0, to = 1, length.out = nX)
+    T = seq(from = 0, to = 1, length.out = nT)
+    order.arma = c(2, 2, 2, 2)
+    varCoef = DCS.cf(Y - YSmth, X, T, order.arma)$cf_out
 
-    # calculate variance factor
-    varCoef = (sd(YSub - YSmth))^2
+    # # calculate variance factor
+    # varCoef = (sd(YSub - YSmth))^2
     
     # calculate optimal bandwidths for next step
     hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)
