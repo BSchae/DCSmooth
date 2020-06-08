@@ -53,14 +53,12 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     # mxx = mxx[shrinkX, shrinkT]
     # mtt = mtt[shrinkX, shrinkT]
     
-    # Short Memory
-    X = seq(from = 0, to = 1, length.out = nX)
-    T = seq(from = 0, to = 1, length.out = nT)
-    order.arma = c(2, 2, 2, 2)
-    varCoef = DCS.cf(Y - YSmth, X, T, order.arma)$cf_out
+    # # Short Memory
+    # order.arma = list(ARMAx = c(1, 1), ARMAt = c(1, 1))
+    # varCoef = DCS.cf(Y - YSmth, order.arma)$cfOut
 
-    # # calculate variance factor
-    # varCoef = (sd(YSub - YSmth))^2
+    # calculate variance factor
+    varCoef = (sd(YSub - YSmth))^2
     
     # calculate optimal bandwidths for next step
     hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)

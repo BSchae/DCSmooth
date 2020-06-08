@@ -131,45 +131,32 @@ plotDCScolFcn = function(Y, myColor, nColor = 100)
 
 #-------------------------Estimation of cf (temporary)------------------------#
 
-DCS.cf = function(Y_0, X, T, order.arma) {
-  n_x = length(X)
-  n_t = length(T)
+DCS.cf = function(Y0, orderARMA) {
+  nX = dim(Y0)[1]
+  nT = dim(Y0)[2]
   
-  Y_vec_x = c(Y_0)
-  Y_vec_t = c(t(Y_0))
+  ordX = orderARMA$ARMAx
+  ordT = orderARMA$ARMAt
+  
+  YVec_x = c(Y0)
+  YVec_t = c(t(Y0))
   
   # Estimation of ARMA in X direction
-  BIC_x = matrix(NA, nrow = (order.arma[1] + 1), ncol = (order.arma[3] + 1))
-  for (p in 0:order.arma[1]) {
-    for (q in 0:order.arma[3]) {
-      arma.est = arima(Y_vec_x, order = c(p, 0, q))
-      BIC_x[p + 1, q + 1] = -2 * arma.est$loglik + log(n_x*n_t) * (p + q)
-    }
-  }
-  order.opt_x = which(BIC_x == min(BIC_x), arr.ind = TRUE) - 1
-  ARMA_x = arima(Y_vec_x, order = c(order.opt_x[1], 0, order.opt_x[2]))
+  estARMA_x = arima(YVec_x, order = c(ordX[1], 0, ordX[2]))
   
   # Store sum of coefficients
-  sc.AR_x = ifelse(order.opt_x[1] != 0, sum(ARMA_x$coef[1:order.opt_x[1]]), 0)
-  sc.MA_x = ifelse(order.opt_x[2] != 0, sum(ARMA_x$coef[(order.opt_x[1] + 1):
-                                                          (order.opt_x[1] + order.opt_x[2])]), 0)
+  scAR_x = ifelse(ordX[1] != 0, sum(estARMA_x$coef[1:ordX[1]]), 0)
+  scMA_x = ifelse(ordX[2] != 0, sum(estARMA_x$coef[(ordX[1] + 1):
+                                                   (ordX[1] + ordX[2])]), 0)
   
   # Estimation of ARMA in T direction
-  BIC_t = matrix(NA, nrow = (order.arma[2] + 1), ncol = (order.arma[4] + 1))
-  for (p in 0:order.arma[2]) {
-    for (q in 0:order.arma[4]) {
-      arma.est = arima(Y_vec_t, order = c(p, 0, q))
-      BIC_t[p + 1, q + 1] = -2 * arma.est$loglik + log(n_x*n_t) * (p + q)
-    }
-  }
-  order.opt_t = which(BIC_t == min(BIC_t), arr.ind = TRUE) - 1
-  ARMA_t = arima(Y_vec_t, order = c(order.opt_t[1], 0, order.opt_t[2]))
+  estARMA_t = arima(YVec_t, order = c(ordT[1], 0, ordT[2]))
   
-  sc.AR_t = ifelse(order.opt_t[1] != 0, sum(ARMA_t$coef[1:order.opt_t[1]]), 0)
-  sc.MA_t = ifelse(order.opt_t[2] != 0, sum(ARMA_t$coef[(order.opt_t[1] + 1):
-                                                          (order.opt_t[1] + order.opt_t[2])]), 0)
+  scAR_t = ifelse(ordT[1] != 0, sum(estARMA_t$coef[1:ordT[1]]), 0)
+  scMA_t = ifelse(ordT[2] != 0, sum(estARMA_t$coef[(ordT[1] + 1):
+                                                   (ordT[1] + ordT[2])]), 0)
   
-  fraction_MA_AR = (((1 + sc.MA_x)*(1 + sc.MA_t)) / ((1 - sc.AR_x)*(1 - sc.AR_t)))
-  cf_out = fraction_MA_AR^2 * sqrt(ARMA_x$sigma2 * ARMA_t$sigma2)
-  return(list(cf_out = cf_out, arma_x = order.opt_x, arma_t = order.opt_t))
+  frac_MA_AR = (((1 + scMA_x)*(1 + scMA_t)) / ((1 - scAR_x)*(1 - scAR_t)))
+  cfOut = frac_MA_AR^2 * sqrt(estARMA_x$sigma2 * estARMA_t$sigma2)
+  return(list(cfOut = cfOut))
 }
