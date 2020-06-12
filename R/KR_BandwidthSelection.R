@@ -25,40 +25,38 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     iterationCount = iterationCount + 1
     hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
     hInfl  = inflationFcnKR(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
- 
-    
-    if (dcsOptions$fast == TRUE) {
-      YSub = thinnedMat(Y, sample.int(.Machine$integer.max, 1))
-    } else {
-      YSub = Y
-    }
-    
-    nXSub = dim(YSub)[1]; nTSub = dim(YSub)[2]; nSub = nXSub * nTSub
     
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = KR_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, drvVec = c(0, 0),
+    YSmth = KR_DoubleSmooth2(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
                       kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
 
     # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_xx, drvVec = c(2, 0),
+    mxx = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, drvVec = c(2, 0),
                     kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
-    mtt = KR_DoubleSmooth2(yMat = YSub, hVec = hInfl$h_tt, drvVec = c(0, 2),
+    mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
                     kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
     
-    # # shrink mxx, mtt from boundaries
-    # delta = 0
-    # shrinkX = floor(delta*nX):ceiling((1 - delta)*nX)
-    # shrinkT = floor(delta*nT):ceiling((1 - delta)*nT)
-    # 
-    # mxx = mxx[shrinkX, shrinkT]
-    # mtt = mtt[shrinkX, shrinkT]
-    
+    # shrink mxx, mtt from boundaries
+    if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
+    {
+      shrinkX = floor(dcsOptions$delta[1]*nX):
+                      ceiling((1 - dcsOptions$delta[1])*nX)
+      shrinkT = floor(dcsOptions$delta[2]*nT):
+                      ceiling((1 - dcsOptions$delta[2])*nT)
+  
+      mxx = mxx[shrinkX, shrinkT]
+      mtt = mtt[shrinkX, shrinkT]
+      nSub = dim(mxx)[1]*dim(mxx)[2]
+    } else {
+      nSub = n
+    }
+      
     # # Short Memory
     # order.arma = list(ARMAx = c(1, 1), ARMAt = c(1, 1))
     # varCoef = DCS.cf(Y - YSmth, order.arma)$cfOut
 
     # calculate variance factor
-    varCoef = (sd(YSub - YSmth))^2
+    varCoef = (sd(Y - YSmth))^2
     
     # calculate optimal bandwidths for next step
     hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)

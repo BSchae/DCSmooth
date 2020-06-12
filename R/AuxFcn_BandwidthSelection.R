@@ -12,17 +12,17 @@
                            # if pOrder == 0, kernel regression will be used.
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
-  inflPar   = c(2, 1), # inflation parameters c (regression), d (2nd derivative)
-  fast      = FALSE
+  inflPar   = c(2, 1),     # inflation parameters c (regression), d (2nd derivative)
+  delta     = 0.05         # parameter for shrinking the derivatives
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
-              inflExp = inflExp, inflPar = inflPar, fast = fast))
+              inflExp = inflExp, inflPar = inflPar, delta = delta))
 }
 
 #----------------------Formula for optimal bandwidths-------------------------#
 
-hOptFunction = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
+hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 {
   i0x = intCalc(mxx, mtt, nSub)
   i0t = intCalc(mtt, mxx, nSub)
