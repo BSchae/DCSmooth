@@ -30,20 +30,21 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     YSmth = KR_DoubleSmooth2(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
                       kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
 
-    # smoothing of derivatives m(2,0) and m(0,2)
+        # smoothing of derivatives m(2,0) and m(0,2)
     mxx = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, drvVec = c(2, 0),
-                    kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+                           kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+
     mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
                     kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
-    
+
     # shrink mxx, mtt from boundaries
     if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
     {
-      shrinkX = floor(dcsOptions$delta[1]*nX):
-                      ceiling((1 - dcsOptions$delta[1])*nX)
-      shrinkT = floor(dcsOptions$delta[2]*nT):
-                      ceiling((1 - dcsOptions$delta[2])*nT)
-  
+      shrinkX = ceiling(dcsOptions$delta[1]*nX):
+                      floor((1 - dcsOptions$delta[1])*nX)
+      shrinkT = ceiling(dcsOptions$delta[2]*nT):
+                      floor((1 - dcsOptions$delta[2])*nT)
+
       mxx = mxx[shrinkX, shrinkT]
       mtt = mtt[shrinkX, shrinkT]
       nSub = dim(mxx)[1]*dim(mxx)[2]

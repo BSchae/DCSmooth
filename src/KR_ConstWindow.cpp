@@ -18,8 +18,8 @@ arma::vec kernFkt_MW422(arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix(arma::mat yMat, double h
-                          , SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
+arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
+                          SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series
@@ -52,13 +52,20 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h
   arma::mat    yRightMat{ yMat.cols(nCol - windowWidth, nCol - 1) };
   arma::colvec uBound(windowWidth);
   arma::colvec weightsBound(windowWidth);
-  
+
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {
     double q = static_cast<double>(colIndex)/bndw;
-    uBound = arma::regspace(colIndex, -(windowWidth - 1 - colIndex)) / ((2 - q) * bndw);
-    weightsBound = kernFcn(uBound, q)/((2 - q) * bndw);
-    
+    uBound = arma::linspace(q, -1, windowWidth);
+
+    weightsBound = kernFcn(uBound, q);
+    // if (drv ==  0)
+    // {
+    //   weightsBound = weightsBound/sum(weightsBound);
+    // } else {
+      weightsBound = weightsBound * (1.0 + q)/static_cast<double>(windowWidth);
+    // }
+
     yMatOut.col(colIndex) = yLeftMat * weightsBound;
     yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
   }
@@ -74,11 +81,10 @@ arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
 {
   // Smoothing over cond. on rows first (e.g. over single days).
   // Thus, drv and order is (1) instead of (0) here (depending on t)
-  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1),
-                                       kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
+  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1), kernFcnPtrT) };
   // Smoothing over cols, drv and order is (0) (depending on x)
-  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0),
-                                      kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
+  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(1),
+                                        kernFcnPtrX) };
 
   return yMatOut.t();
 }

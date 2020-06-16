@@ -17,8 +17,8 @@ KR_DoubleSmooth2 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
     .Call(`_DCSmooth_KR_DoubleSmooth2`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
-KRSmooth_matrix <- function(yMat, h, kernFcnPtr) {
-    .Call(`_DCSmooth_KRSmooth_matrix`, yMat, h, kernFcnPtr)
+KRSmooth_matrix <- function(yMat, h, drv, kernFcnPtr) {
+    .Call(`_DCSmooth_KRSmooth_matrix`, yMat, h, drv, kernFcnPtr)
 }
 
 KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {

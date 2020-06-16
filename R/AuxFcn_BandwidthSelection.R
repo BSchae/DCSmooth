@@ -13,7 +13,7 @@
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
   inflPar   = c(2, 1),     # inflation parameters c (regression), d (2nd derivative)
-  delta     = 0.05         # parameter for shrinking the derivatives
+  delta     = c(0.0, 0.0)         # parameter for shrinking the derivatives
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
@@ -38,15 +38,15 @@ hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 
 hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, nSub)
-  i0t = intCalc(mtt, mxx, nSub)
+  i0x = intCalc(mxx, mtt, nSub)[1]
+  i0t = intCalc(mtt, mxx, nSub)[1]
   
   hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0t)
   
   hxOpt = hxOpt^(1/6)
   htOpt = htOpt^(1/6)
-  
+
   return(c(hxOpt, htOpt))
 }
 
@@ -57,10 +57,11 @@ intCalc = function(m11, m22, nSub)
   i11 = sum(m11 * m11)/nSub
   i22 = sum(m22 * m22)/nSub
   i12 = sum(m11 * m22)/nSub
+  #print(c(i11, i22, i12))
   
   iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
   
-  return(iOut)
+  return(c(iOut, i11/i22))
 }
 
 #------------------------Kernel property calculation--------------------------#

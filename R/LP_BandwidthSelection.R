@@ -11,22 +11,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
   
   kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
   
-  if (dcsOptions$fast == TRUE) {
-    sX = floor(nX/1000) + 1
-    sT = floor(nT/1000) + 1
-    
-    xValues = 1:(nX/sX)*sX
-    tValues = 1:(nT/sT)*sT
-    
-    YSub = Y[xValues, tValues]
-  }
-  else
-  {
-    YSub = Y
-  }
-  
-  nXSub = dim(YSub)[1]; nTSub = dim(YSub)[2]; nSub = nXSub * nTSub
-  hOpt = c(0.1, 0.1) #c(1/nXSub, 1/nTSub)                    # initial values for h_0, arbitrary chosen
+  hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
 
   iterate = TRUE                                # iteration indicator
   iterationCount = 0
@@ -37,7 +22,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
    
     # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = LP_DoubleSmooth2(yMat = YSub, hVec = hOptTemp, polyOrderVec 
+    YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
                       = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
     
     # smoothing of derivatives m(2,0) and m(0,2)
@@ -46,19 +31,20 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
            = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
     
-    # TEST: shrink mxx, mtt
-    shrink = 0.05
-    rowsShrink = floor(nX*shrink):ceiling(nX*(1 - shrink))
-    colsShrink = floor(nT*shrink):ceiling(nT*(1 - shrink))
-    mxx = mxx[rowsShrink, colsShrink]
-    mtt = mtt[rowsShrink, colsShrink]
-    nSub = length(rowsShrink) * length(colsShrink)
-    
-    # TEST: smooth mxx, mtt again
-    mxx = LP_DoubleSmooth2(yMat = mxx, hVec = hOptTemp, polyOrderVec
-                           = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
-    mtt = LP_DoubleSmooth2(yMat = mtt, hVec = hOptTemp, polyOrderVec
-                           = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
+    # shrink mxx, mtt from boundaries
+    if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
+    {
+      shrinkX = ceiling(dcsOptions$delta[1]*nX):
+        floor((1 - dcsOptions$delta[1])*nX)
+      shrinkT = ceiling(dcsOptions$delta[2]*nT):
+        floor((1 - dcsOptions$delta[2])*nT)
+      
+      mxx = mxx[shrinkX, shrinkT]
+      mtt = mtt[shrinkX, shrinkT]
+      nSub = dim(mxx)[1]*dim(mxx)[2]
+    } else {
+      nSub = n
+    }
     
     # calculate variance factor
     varCoef = (sd(YSub - YSmth))^2
