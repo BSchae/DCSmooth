@@ -119,26 +119,6 @@ arma::vec kernFkt_MW422(arma::vec& uVec, double q)
   return uOut;
 }
 
-// [[Rcpp::export]]
-arma::vec kernFkt_MW422_1(arma::vec& uVec)
-{
-  int nBound{ uVec.size() };
-  
-  arma::vec uOut(nBound);
-  
-  double out{ };
-  double u{ };
-  
-  for (int i{ 0 }; i < nBound; ++i)
-  {
-    u   = uVec(i);
-    out = 5040.0/1024.0 * ( -14*u*u*u + 14*u*u + 2*u - 2)
-                      * (1 + u)*(1 + u)*(1 - u);
-    uOut(i) = out;
-  }
-  return uOut;
-}
-
 // Truncated Kernels
 // Form is 
 
