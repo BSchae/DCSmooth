@@ -46,6 +46,8 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
     yMatInterior = yMat.cols(colIndex - bndw, colIndex + bndw);
     yMatOut.col(colIndex) = yMatInterior * weightsInterior;
   }
+  
+  yMatOut = yMatOut;
 
   // smoothing over boundaries
   arma::mat    yLeftMat{ yMat.cols(0, windowWidth - 1) };
@@ -55,21 +57,15 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
 
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {
-    double q = (colIndex - 1.0)/(2*bndw - colIndex + 1.0);
+    double q = static_cast<double>(colIndex)/(windowWidth - colIndex - 1);
     uBound = arma::linspace(q, -1, windowWidth);
-
-    weightsBound = kernFcn(uBound, q);
-    // if (drv ==  0)
-    // {
-    //   weightsBound = weightsBound/sum(weightsBound);
-    // } else {
-      weightsBound = weightsBound * (1.0 + q)/static_cast<double>(windowWidth - 1);
-    // }
+    weightsBound = kernFcn(uBound, q) / (windowWidth - colIndex - 1);
+  
     yMatOut.col(colIndex) = yLeftMat * weightsBound;
     yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
   }
   
-  return yMatOut;
+  return yMatOut / pow(h, drv);
 }
 
 //---------------------------------------------------------------------------//
@@ -82,7 +78,7 @@ arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
   // Thus, drv and order is (1) instead of (0) here (depending on t)
   arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1), kernFcnPtrT) };
   // Smoothing over cols, drv and order is (0) (depending on x)
-  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(1),
+  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(0),
                                         kernFcnPtrX) };
 
   return yMatOut.t();

@@ -13,11 +13,13 @@
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
   inflPar   = c(2, 1),     # inflation parameters c (regression), d (2nd derivative)
-  delta     = c(0.0, 0.0)         # parameter for shrinking the derivatives
+  delta     = c(0.0, 0.0),         # parameter for shrinking the derivatives
+  constWindow = FALSE
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
-              inflExp = inflExp, inflPar = inflPar, delta = delta))
+              inflExp = inflExp, inflPar = inflPar, delta = delta, 
+              constWindow = constWindow))
 }
 
 #----------------------Formula for optimal bandwidths-------------------------#

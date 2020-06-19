@@ -26,16 +26,30 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
     hInfl  = inflationFcnKR(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
     
-    # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = KR_DoubleSmooth(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
-                      kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+    if (dcsOptions$constWindow == TRUE)
+    {
+      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      YSmth = KR_DoubleSmooth(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
+                        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
 
-        # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = KR_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
+      # smoothing of derivatives m(2,0) and m(0,2)
+      mxx = KR_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
                            kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
 
-    mtt = KR_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
+      mtt = KR_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
                     kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+    } else {
+      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      YSmth = KR_DoubleSmooth2(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
+        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+
+      # smoothing of derivatives m(2,0) and m(0,2)
+      mxx = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
+        kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+
+      mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
+        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+    }
 
     # shrink mxx, mtt from boundaries
     if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)

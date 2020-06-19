@@ -94,6 +94,40 @@ arma::vec kernFkt_MW420(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
+arma::vec kernFkt_MW421(arma::vec& uVec, double q)
+{
+  int nBound{ uVec.size() };
+  
+  arma::vec uOut(nBound);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q10_1{ pow(1 + q, 10) };
+  double out{ };
+  double u{ };
+  double u2{ };
+  double u3{ };
+  
+  for (int i{ 0 }; i < nBound; ++i)
+  {
+    u   = uVec(i);
+    u2  = u * u;
+    u3  = u2 * u;
+    
+    out = 840*(q - u)*(u + 1)*(u + 1) * ( -15*q5 +
+             q4*(97*u + 76) -
+             q3*(183*u2 + 344*u + 140) +
+             q2*(105*u3 + 480*u2 + 444*u + 108) -
+             q *(210*u3 + 381*u2 + 212*u + 35) +
+                (63*u3 + 90*u2 + 37*u + 4)) / q10_1;
+      uOut(i) = out;
+  }
+  return uOut;
+}
+
+// [[Rcpp::export]]
 arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 {
   int nBound{ uVec.size() };

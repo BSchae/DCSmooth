@@ -37,12 +37,12 @@ kernFkt_MW420 <- function(uVec, q) {
     .Call(`_DCSmooth_kernFkt_MW420`, uVec, q)
 }
 
-kernFkt_MW422 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_MW422`, uVec, q)
+kernFkt_MW421 <- function(uVec, q) {
+    .Call(`_DCSmooth_kernFkt_MW421`, uVec, q)
 }
 
-kernFkt_MW422_1 <- function(uVec) {
-    .Call(`_DCSmooth_kernFkt_MW422_1`, uVec)
+kernFkt_MW422 <- function(uVec, q) {
+    .Call(`_DCSmooth_kernFkt_MW422`, uVec, q)
 }
 
 kernFkt_TR420 <- function(uVec, q) {

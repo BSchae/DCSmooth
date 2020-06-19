@@ -129,6 +129,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// kernFkt_MW421
+arma::vec kernFkt_MW421(arma::vec& uVec, double q);
+RcppExport SEXP _DCSmooth_kernFkt_MW421(SEXP uVecSEXP, SEXP qSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type uVec(uVecSEXP);
+    Rcpp::traits::input_parameter< double >::type q(qSEXP);
+    rcpp_result_gen = Rcpp::wrap(kernFkt_MW421(uVec, q));
+    return rcpp_result_gen;
+END_RCPP
+}
 // kernFkt_MW422
 arma::vec kernFkt_MW422(arma::vec& uVec, double q);
 RcppExport SEXP _DCSmooth_kernFkt_MW422(SEXP uVecSEXP, SEXP qSEXP) {
@@ -138,17 +150,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type uVec(uVecSEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
     rcpp_result_gen = Rcpp::wrap(kernFkt_MW422(uVec, q));
-    return rcpp_result_gen;
-END_RCPP
-}
-// kernFkt_MW422_1
-arma::vec kernFkt_MW422_1(arma::vec& uVec);
-RcppExport SEXP _DCSmooth_kernFkt_MW422_1(SEXP uVecSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type uVec(uVecSEXP);
-    rcpp_result_gen = Rcpp::wrap(kernFkt_MW422_1(uVec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -304,8 +305,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_kernFkt_MW220", (DL_FUNC) &_DCSmooth_kernFkt_MW220, 2},
     {"_DCSmooth_kernFkt_MW320", (DL_FUNC) &_DCSmooth_kernFkt_MW320, 2},
     {"_DCSmooth_kernFkt_MW420", (DL_FUNC) &_DCSmooth_kernFkt_MW420, 2},
+    {"_DCSmooth_kernFkt_MW421", (DL_FUNC) &_DCSmooth_kernFkt_MW421, 2},
     {"_DCSmooth_kernFkt_MW422", (DL_FUNC) &_DCSmooth_kernFkt_MW422, 2},
-    {"_DCSmooth_kernFkt_MW422_1", (DL_FUNC) &_DCSmooth_kernFkt_MW422_1, 1},
     {"_DCSmooth_kernFkt_TR420", (DL_FUNC) &_DCSmooth_kernFkt_TR420, 2},
     {"_DCSmooth_kernFkt_TR422", (DL_FUNC) &_DCSmooth_kernFkt_TR422, 2},
     {"_DCSmooth_kernelFcn_assign", (DL_FUNC) &_DCSmooth_kernelFcn_assign, 1},
