@@ -63,9 +63,8 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
     // {
     //   weightsBound = weightsBound/sum(weightsBound);
     // } else {
-      weightsBound = weightsBound * (1.0 + q)/static_cast<double>(windowWidth);
+      weightsBound = weightsBound * (1.0 + q)/static_cast<double>(windowWidth - 1);
     // }
-
     yMatOut.col(colIndex) = yLeftMat * weightsBound;
     yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
   }

@@ -36,7 +36,7 @@ arma::mat KRSmooth_matrix2(arma::mat yMat, double h,
   arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * nCol) }; // vector from -1 to 1 to compute weights
   arma::colvec  weightsInterior{ kernFcn(uInterior, 1)/bndw };              // computation of weights (put in kernel-function later)
   arma::mat     yMatInterior(nRow, windowWidth);                            // empty matrix for use inside loop
-
+  
   // Loops smooth over the columns, conditional on rows. That is, every row is
   // consiedered to be an individual time series. To speed up computation, the
   // smoothing order is inverted (computing of weights only once per column, as
@@ -52,7 +52,7 @@ arma::mat KRSmooth_matrix2(arma::mat yMat, double h,
   {
     double q = static_cast<double>(colIndex)/bndw;
     arma::colvec  uBound(arma::regspace(colIndex, -bndw) / bndw);
-    arma::colvec  weightsBound{ kernFcn(uBound, q)/bndw };
+    arma::colvec  weightsBound{ kernFcn(uBound, q) / bndw };
     
     arma::mat     yLeftMat{ yMat.cols(0, uBound.n_rows - 1) };
     arma::mat     yRightMat{ yMat.cols(nCol - uBound.n_rows, nCol - 1) };
