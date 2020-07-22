@@ -8,7 +8,7 @@
 
 .setOptions = function(    # inside function with default values in arguments
   kernPar   = c(2, 2),     # choose a kernel function with mu = 2, 
-  pOrder    = 0,           # choose order of polynomials for X-/T-smoothing
+  pOrder    = 1,           # choose order of polynomials for X-/T-smoothing
                            # if pOrder == 0, kernel regression will be used.
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
@@ -26,8 +26,8 @@
 
 hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, nSub)
-  i0t = intCalc(mtt, mxx, nSub)
+  i0x = intCalc(mxx, mtt, nSub)[1]
+  i0t = intCalc(mtt, mxx, nSub)[1]
   
   hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0t)

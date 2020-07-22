@@ -21,16 +21,24 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     hOptTemp   = hOpt[1:2]       # store old bandwidths for breaking condition
     hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
    
-    # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-    YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
-                      = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0, 0))
+    if (dcsOptions$constWindow == TRUE)
+    {
+      
+    } else {
+      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
+              = c(dcsOptions$pOrder, dcsOptions$pOrder), 
+              drvVec = c(0, 0), kernelFcn)
     
-    # smoothing of derivatives m(2,0) and m(0,2)
-    mxx = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
-           = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0))
-    mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
-           = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2))
-    
+      # smoothing of derivatives m(2,0) and m(0,2)
+      mxx = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
+            = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
+            kernelFcn)
+      mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
+            = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
+            kernelFcn)
+    }
+      
     # shrink mxx, mtt from boundaries
     if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
     {
@@ -47,10 +55,10 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
     
     # calculate variance factor
-    varCoef = (sd(YSub - YSmth))^2
+    varCoef = (sd(Y - YSmth))^2
     
     # calculate optimal bandwidths for next step
-    hOpt = hOptFunction(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)
+    hOpt = hOptLP(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
