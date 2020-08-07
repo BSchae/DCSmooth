@@ -55,14 +55,29 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
     
     # calculate variance factor
-    varCoef = (sd(Y - YSmth))^2
+    if (dcsOptions$varEst == "iid")
+    {
+      varCoef = (sd(Y - YSmth))^2
+    }
+    else if (dcsOptions$varEst == "qarma")
+    {
+      if (exists("model", dcsOptions))
+      {
+        model = dcsOptions$model
+      } else {
+        model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1)
+      }
+      
+      varCoef = QARMA.cf(Y - YSmth)
+    }
+    
     
     # calculate optimal bandwidths for next step
     hOpt = hOptLP(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                                               < 0.001)) || iterationCount > 10)
+                    < 0.001) && (iterationCount > 2)) || iterationCount > 10)
     {
       iterate = FALSE
     }
