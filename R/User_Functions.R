@@ -50,7 +50,8 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
       = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0))
   }
   
-  return(list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw, iterations = bndwObj$iterations))
+  return(list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw,
+              iterations = bndwObj$iterations, dcsOptions = dcsOptions))
 }
 
 #-------------------Function for plotting smoothed surface--------------------#

@@ -66,12 +66,22 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       nSub = n
     }
       
-    # # Short Memory
-    # order.arma = list(ARMAx = c(1, 1), ARMAt = c(1, 1))
-    # varCoef = DCS.cf(Y - YSmth, order.arma)$cfOut
-
     # calculate variance factor
-    varCoef = (sd(Y - YSmth))^2
+    if (dcsOptions$varEst == "iid")
+    {
+      varCoef = (sd(Y - YSmth))^2
+    }
+    else if (dcsOptions$varEst == "qarma")
+    {
+      if (exists("model", dcsOptions))
+      {
+        model = dcsOptions$model
+      } else {
+        model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1)
+      }
+      
+      varCoef = QARMA.cf(Y - YSmth, model = model)
+    }
     
     # calculate optimal bandwidths for next step
     hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)

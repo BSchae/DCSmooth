@@ -96,7 +96,7 @@ QARMA.est = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
 
 #----------------------Calculation of cf coefficient--------------------------#
 
-QARMA.cf = function(E, model = list(ar_x = 2, ar_t = 2, ma_x = 1, ma_t = 1))
+QARMA.cf = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
 {
   # estimation of qarma model
   qarma_model = QARMA.est(E, model = model)

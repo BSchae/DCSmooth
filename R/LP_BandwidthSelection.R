@@ -31,10 +31,10 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
               drvVec = c(0, 0), kernelFcn)
     
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_xx, polyOrderVec 
+      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec 
             = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
             kernelFcn)
-      mtt = LP_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, polyOrderVec 
+      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec 
             = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
             kernelFcn)
     }
@@ -68,7 +68,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
         model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1)
       }
       
-      varCoef = QARMA.cf(Y - YSmth)
+      varCoef = QARMA.cf(Y - YSmth, model = model)
     }
     
     
