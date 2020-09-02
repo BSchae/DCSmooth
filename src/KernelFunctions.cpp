@@ -16,6 +16,7 @@ arma::vec kernFkt_MW200(arma::vec& u, double q = 1)
   return n0 * (2*(q2 - qVec + 1) + 3*u%(1 - qVec));
 }
 
+// [[Rcpp::export]]
 arma::vec kernFkt_MW210(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };

@@ -13,8 +13,8 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   
   kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
   
-  kernFcn0 = kernelFcn_assign("MW420")
-  kernFcn2 = kernelFcn_assign("MW422")
+  kernFcn0 = kernelFcn_assign("MW420")          # assign kernel for regression surface
+  kernFcn2 = kernelFcn_assign("MW422")          # assign kernel for 2nd derivative (needed in )
   
   hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
   
@@ -93,5 +93,5 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       iterate = FALSE
     }
   }
-  return(list(bndw = hOpt, iterations = iterationCount))
+  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef))
 }

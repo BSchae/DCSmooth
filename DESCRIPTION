@@ -1,13 +1,22 @@
 Package: DCSmooth
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Nonparametric regression and bandwidth selection for spatial models.
+Version: 0.3.3
 Date: 2020-03-31
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
-Imports: 
-    Rcpp
+Author: Bastian Sch\u0080fer
+Maintainer: Bastian Sch\u0080fer <bastian.schaefer@uni-paderborn.de>
+Description: This package provides nonparametric smoothing techniques for
+    data on a lattice and functional time series. Smoothing is done via
+    kernel regression or local polynomial regression, a bandwidth selection
+    procedure based on an iterative plug-in algorithm is implemented. This
+    package allows for modeling a dependency structure of the error terms
+    of the nonparametric regression model.
+License: GPL-3
+LazyData: true
+Imports: Rcpp, rgl
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen
 RoxygenNote: 7.1.0
+Encoding: UTF-8
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)

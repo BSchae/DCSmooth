@@ -45,7 +45,7 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
   // calculate weights
   arma::colvec  uVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol, 
                                      static_cast<double>(polyOrder + 1)) }; // vector from -1 to 1 to compute weights
-  arma::colvec  weightsVec{ kernFcn(uVec, 1) };         // computation of weights (put in kernel-function later)
+  arma::colvec  weightsVec{ sqrt(kernFcn(uVec, 1)) };         // computation of weights (put in kernel-function later)
   
   // smoothing over boundaries
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)

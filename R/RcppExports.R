@@ -2,78 +2,90 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 KRSmooth_matrix2 <- function(yMat, h, kernFcnPtr) {
-    .Call(`_DCSmooth_KRSmooth_matrix2`, yMat, h, kernFcnPtr)
+    .Call('_DCSmooth_KRSmooth_matrix2', PACKAGE = 'DCSmooth', yMat, h, kernFcnPtr)
 }
 
 KR_DoubleSmooth2 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
-    .Call(`_DCSmooth_KR_DoubleSmooth2`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
+    .Call('_DCSmooth_KR_DoubleSmooth2', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
 KRSmooth_matrix <- function(yMat, h, drv, kernFcnPtr) {
-    .Call(`_DCSmooth_KRSmooth_matrix`, yMat, h, drv, kernFcnPtr)
+    .Call('_DCSmooth_KRSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, drv, kernFcnPtr)
 }
 
 KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
-    .Call(`_DCSmooth_KR_DoubleSmooth`, yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
+    .Call('_DCSmooth_KR_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
+}
+
+kernFkt_MW210 <- function(u, q = 1) {
+    .Call('_DCSmooth_kernFkt_MW210', PACKAGE = 'DCSmooth', u, q)
 }
 
 kernFkt_MW220 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_MW220`, uVec, q)
+    .Call('_DCSmooth_kernFkt_MW220', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernFkt_MW320 <- function(u, q = 1) {
-    .Call(`_DCSmooth_kernFkt_MW320`, u, q)
+    .Call('_DCSmooth_kernFkt_MW320', PACKAGE = 'DCSmooth', u, q)
 }
 
 kernFkt_MW420 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_MW420`, uVec, q)
+    .Call('_DCSmooth_kernFkt_MW420', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernFkt_MW421 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_MW421`, uVec, q)
+    .Call('_DCSmooth_kernFkt_MW421', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernFkt_MW422 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_MW422`, uVec, q)
+    .Call('_DCSmooth_kernFkt_MW422', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernFkt_TR420 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_TR420`, uVec, q)
+    .Call('_DCSmooth_kernFkt_TR420', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernFkt_TR422 <- function(uVec, q) {
-    .Call(`_DCSmooth_kernFkt_TR422`, uVec, q)
+    .Call('_DCSmooth_kernFkt_TR422', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 kernelFcn_assign <- function(fstr) {
-    .Call(`_DCSmooth_kernelFcn_assign`, fstr)
+    .Call('_DCSmooth_kernelFcn_assign', PACKAGE = 'DCSmooth', fstr)
 }
 
 kernelFcn_use <- function(x, q, xpsexp) {
-    .Call(`_DCSmooth_kernelFcn_use`, x, q, xpsexp)
+    .Call('_DCSmooth_kernelFcn_use', PACKAGE = 'DCSmooth', x, q, xpsexp)
 }
 
 LPSmooth_matrix2 <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
-    .Call(`_DCSmooth_LPSmooth_matrix2`, yMat, h, polyOrder, drv, kernFcnPtr)
+    .Call('_DCSmooth_LPSmooth_matrix2', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
 }
 
 LP_DoubleSmooth2 <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr) {
-    .Call(`_DCSmooth_LP_DoubleSmooth2`, yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
+    .Call('_DCSmooth_LP_DoubleSmooth2', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
+}
+
+weightMatrix <- function(weights, matrix) {
+    .Call('_DCSmooth_weightMatrix', PACKAGE = 'DCSmooth', weights, matrix)
+}
+
+xMatrix <- function(xVector, polyOrder) {
+    .Call('_DCSmooth_xMatrix', PACKAGE = 'DCSmooth', xVector, polyOrder)
 }
 
 LPSmooth_matrix <- function(yMat, h, polyOrder, drv) {
-    .Call(`_DCSmooth_LPSmooth_matrix`, yMat, h, polyOrder, drv)
+    .Call('_DCSmooth_LPSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv)
 }
 
 LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
-    .Call(`_DCSmooth_LP_DoubleSmooth`, yMat, hVec, polyOrderVec, drvVec)
+    .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec)
 }
 
 cppSample <- function(x) {
-    .Call(`_DCSmooth_cppSample`, x)
+    .Call('_DCSmooth_cppSample', PACKAGE = 'DCSmooth', x)
 }
 
 thinnedMat <- function(yMat, seed) {
-    .Call(`_DCSmooth_thinnedMat`, yMat, seed)
+    .Call('_DCSmooth_thinnedMat', PACKAGE = 'DCSmooth', yMat, seed)
 }
 

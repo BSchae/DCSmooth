@@ -82,5 +82,5 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       iterate = FALSE
     }
   }
-  return(list(bndw = hOpt, iterations = iterationCount))
+  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef))
 }

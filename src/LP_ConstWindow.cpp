@@ -7,6 +7,7 @@ using namespace Rcpp;
 
 //---------------------------------------------------------------------------//
 
+// [[Rcpp::export]]
 arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 {
   arma::mat matrixOut{ arma::mat(matrix.n_rows, matrix.n_cols) };
@@ -21,6 +22,8 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 //---------------------------------------------------------------------------//
 
 // rewrite x-Vector as x-Matrix for lm model, x can be a vector before this function
+
+// [[Rcpp::export]]
 arma::mat xMatrix(arma::colvec xVector, int polyOrder)
 {
   arma::mat returnMatrix{ arma::ones(xVector.n_rows, polyOrder + 1) };
@@ -66,7 +69,7 @@ arma::mat LPSmooth_matrix(const arma::mat yMat, const double h,
   arma::mat     coefMat(polyOrder, 1);                                              // empty matrix for lm results
   arma::mat     xMatInterior{ xMatrix(arma::linspace(-bndw, bndw,
                                     windowWidth)/bndw, polyOrder) };                // compute x-matrix for lm-regression
-  xMatInterior  = weightMatrix(weightsInterior, xMatInterior);
+  xMatInterior  = weightMatrix(sqrt(weightsInterior), xMatInterior);
   arma::mat     xMatSolved{ arma::inv(xMatInterior.t() * xMatInterior)
                           * xMatInterior.t() };                                     // compute inv(X*X)*X only once here
 

@@ -1,0 +1,19 @@
+---
+title: "DCSmooth"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DCSmooth}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(DCSmooth)
+```

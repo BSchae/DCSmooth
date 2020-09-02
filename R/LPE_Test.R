@@ -4,12 +4,40 @@
 #                                                                             #
 ###############################################################################
 
+LPSmooth = function(X, Y, p, nu, h) {  #
+  n = length(X)     # 
+  ord = order(X)    # 
+  X = X[ord]        #  
+  Y = Y[ord]        # 
+  Ye.LP = (1:n)*0   # 
+  
+  for(i in 1:n) {
+    X0 = X[i]                  # 
+    Xi = X[abs(X-X0)<h] - X0   # 
+    Yi = Y[abs(X-X0)<h]        # 
+    u  = Xi/h                  # 
+    WK = kernFkt_MW220(u, 1)   # 
+    
+    # 
+    if(p == 0) { Ye.LP[i] = sum(Yi*WK)/sum(WK) }
+    if(p == 1) { Ye.LP[i] = (lm(Yi~Xi, weights=WK)$coefficients[nu+1])*factorial(nu) }
+    if(p == 2) { Ye.LP[i] = (lm(Yi~Xi+I(Xi^2), weights=WK)$coefficients[nu+1])*factorial(nu) }
+    if(p == 3) { Ye.LP[i] = (lm(Yi~Xi+I(Xi^2)+I(Xi^3), weights=WK)$coefficients[nu+1])*factorial(nu) }
+    if(p == 4) { Ye.LP[i] = (lm(Yi~Xi+I(Xi^2)+I(Xi^3)+I(Xi^4), weights=WK)$coefficients[nu+1])*factorial(nu) }
+  }
+  
+  # 
+  results=list(X=X, Y=Y, Ye.LP=Ye.LP)
+  #   
+  return(results)
+}
+
 LPE_test = function(Y, drvVec, hVec)
 {
   nX = dim(Y)[1]
   nT = dim(Y)[2]
   
-  hVec = hVec/3
+  #hVec = hVec/3
   
   M = M2 = Y*NA
   
@@ -18,12 +46,12 @@ LPE_test = function(Y, drvVec, hVec)
   
   for (i in 1:nX)
   {
-    M[i, ] = locpoly(T, Y[i, ], drv = drvVec[2], bandwidth = hVec[2], gridsize = nT)$y
+    M[i, ] = LPSmooth(T, Y[i, ], p = drvVec[2] + 2, nu = drvVec[2], h = hVec[2])$Ye.LP
   }
   
   for (j in 1:nT)
   {
-    M2[, j] = locpoly(X, M[, j], drv = drvVec[1], bandwidth = hVec[1], gridsize = nX)$y
+    M2[, j] = LPSmooth(X, t(M[, j]), p = drvVec[1] + 2, nu = drvVec[1], h = hVec[1])$Ye.LP
   }
   
   return(M2)
