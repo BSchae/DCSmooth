@@ -1,5 +1,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppEigen)]]
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include "DCSmooth_types.h"
 
 using namespace Rcpp;

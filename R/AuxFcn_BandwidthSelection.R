@@ -165,3 +165,30 @@ DCS.cf = function(Y0, orderARMA) {
   cfOut = frac_MA_AR^2 * sqrt(estARMA_x$sigma2 * estARMA_t$sigma2)
   return(list(cfOut = cfOut))
 }
+
+#------------------------Check correct given bndw-----------------------------#
+
+# This function checks, if a given bandwidth is suitable for smoothing.
+
+checkBndw = function(bndw, dcsOptions)
+{
+  check = TRUE
+  
+  if ((length(bndw) != 2) && !is.numeric(bndw) && any(bndw <= 0))
+  {
+    check = FALSE
+  }
+  
+  if (any(bndw > 0.45) && dcsOptions$pOrder == 0)
+  {
+    check = FALSE
+  }
+  
+  if (any(bndw > 0.5))
+  {
+    warning("Your bandwidth(s) seem(s) unusually large.")
+  }
+  
+  return(check)
+
+}

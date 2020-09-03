@@ -39,10 +39,10 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' expectation surface of a functional time series or a random field on a
 #' lattice. Bandwidth selection is done via an iterative plug-in method.
 #' 
-#' @section Usage
+#' @section Usage:
 #' \code{DCSmooth(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())}
 #' 
-#' @section Details
+#' @section Details:
 #' Blafasel
 #' 
 #' @param Y A numeric matrix that contains the observations of the random field
@@ -60,12 +60,13 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' 
 #' @return \code{DCSmooth} returns an object of class "dcs".
 #' 
-#' @section Details
+#' @section Details:
 #' The function \code{summary}
 #' 
-#' @example 
+#' @export
+#' 
 
-DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
+dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 {
   # set up vectors for X and T
   if (length(X) == 1 && length(T) == 1)
@@ -78,16 +79,25 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   nameKernFcn = paste0("MW", dcsOptions$kernPar[1], dcsOptions$kernPar[2], "0")
   kernelFcn  = kernelFcn_assign(nameKernFcn) # set kernel Function to use in optimization
 
-  # bandwidth selection process
-  if (bndw == "auto" && dcsOptions$pOrder == 0)
-  {
-    # kernel regression
-    bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
-    bndw = pmin(bndwObj$bndw, c(0.45, 0.45)) # KR cannot handle larger bndws.
-  } else if (bndw == "auto" && dcsOptions$pOrder > 0) {
-    # local polynomial regression
-    bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
-    bndw = bndwObj$bndw
+  # check for given bandwidths
+  if (bndw == "auto") {
+    bndwAuto = "auto"
+  
+    # bandwidth selection process
+    if (dcsOptions$pOrder == 0)
+    {
+      # kernel regression
+      bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
+      bndw = pmin(bndwObj$bndw, c(0.45, 0.45)) # KR cannot handle larger bndws.
+    } else if (dcsOptions$pOrder > 0) {
+      # local polynomial regression
+      bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
+      bndw = bndwObj$bndw
+    } else {
+      stop("Polynomial order not supported.")
+    }
+  } else if (checkBndw(bndw) == TRUE) {
+    bndwAuto = FALSE
   }
   
   # estimation of resulting surface
@@ -107,9 +117,9 @@ DCSmooth = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
                  dcsOptions = dcsOptions)
   
   # apply class to output object (not finished)
-  new("DCSmooth", DCS_out)
+  class(DCS_out) = "dcs"
   
-  #return(DCS_out)
+  return(DCS_out)
 }
 
 #-------------------Function for plotting smoothed surface--------------------#
