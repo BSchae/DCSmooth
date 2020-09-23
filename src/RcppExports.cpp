@@ -267,29 +267,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cppSample
-int cppSample(arma::vec x);
-RcppExport SEXP _DCSmooth_cppSample(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(cppSample(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// thinnedMat
-arma::mat thinnedMat(arma::mat yMat, int seed);
-RcppExport SEXP _DCSmooth_thinnedMat(SEXP yMatSEXP, SEXP seedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type yMat(yMatSEXP);
-    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(thinnedMat(yMat, seed));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
@@ -312,8 +289,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 4},
-    {"_DCSmooth_cppSample", (DL_FUNC) &_DCSmooth_cppSample, 1},
-    {"_DCSmooth_thinnedMat", (DL_FUNC) &_DCSmooth_thinnedMat, 2},
     {NULL, NULL, 0}
 };
 

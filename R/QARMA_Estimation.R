@@ -7,10 +7,13 @@
 
 #----------------------------Estimation Function------------------------------#
 
-QARMA.est = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
+QARMA.est = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
 {
-  nX = dim(E)[1]; nT = dim(E)[2]
+  # estimate mean of Y and calculate demeaned values E
+  mu = mean(Y)
+  E = Y - mu
   
+  nX = dim(E)[1]; nT = dim(E)[2]
   u_est = E*0
   
   # set up matrices for lag estimation
@@ -18,6 +21,8 @@ QARMA.est = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
   totalLag_ma = (model$ma_x + 1) * (model$ma_t + 1)
   totalLag_x = max(model$ar_x, model$ma_x)
   totalLag_t = max(model$ar_t, model$ma_t)
+  maxLag_ar = max(model$ar_x, model$ar_t)
+  maxLag_ma = max(model$ma_x, model$ma_t)
   lag_E = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
                   ncol = totalLag_ar)
   lag_u = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
@@ -31,8 +36,8 @@ QARMA.est = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
     {
       indexX = (totalLag_x - i + 2):(nX - i + 1)
       indexT = (totalLag_t - j + 2):(nT - j + 1)
-      lag_E[, (i - 1)*(totalLag_t + 1) + j] = as.vector(E[indexX, indexT])
-      lagNames_ar[(i - 1)*(totalLag_t + 1) + j] = paste0("lag", i - 1, j - 1)
+      lag_E[, (i - 1)*(maxLag_ar + 1) + j] = as.vector(E[indexX, indexT])
+      lagNames_ar[(i - 1)*(maxLag_ar + 1) + j] = paste0("lag", i - 1, j - 1)
     }
   }
   colnames(lag_E) = lagNames_ar
@@ -89,17 +94,17 @@ QARMA.est = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
   # preparation of output
   beta_est[model$ar_x + 1, model$ar_t + 1] = -1
   alpha_est[model$ma_x + 1, model$ma_t + 1] = 1
-  coefOut = list(beta = beta_est, alpha = alpha_est, estInnov = u_est)
+  coefOut = list(mu = mu, beta = beta_est, alpha = alpha_est, estInnov = u_est)
   
   return(coefOut)
 }
 
 #----------------------Calculation of cf coefficient--------------------------#
 
-QARMA.cf = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
+QARMA.cf = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
 {
   # estimation of qarma model
-  qarma_model = QARMA.est(E, model = model)
+  qarma_model = QARMA.est(Y, model = model)
   
   # get variance of error terms
   sigma_sq = sd(qarma_model$estInnov)^2
@@ -110,18 +115,36 @@ QARMA.cf = function(E, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
   return(cf_out)
 }
 
+QARMA.spec = function(Y, alpha, beta, sigmaSq, omega)
+{
+  lagAR = dim(beta) - 1; lagMA = dim(alpha) - 1
+  z1 = complex(argument = omega[1]); z2 = complex(argument = omega[2])
+ 
+  g00 = sd(Y)^2
+   
+  betaSum = Re(sum(beta * (z1^(lagAR[1]:0)) %*% t(z2^(lagAR[2]:0))) * 
+    sum(beta * ((1/z1)^(lagAR[1]:0)) %*% t((1/z2)^(lagAR[2]:0))))
+  alphaSum = Re(sum(alpha * (z1^(lagMA[1]:0)) %*% t(z2^(lagMA[2]:0))) * 
+                 sum(alpha * ((1/z1)^(lagMA[1]:0)) %*% t((1/z2)^(lagMA[2]:0))))
+  
+  specDensOut = sigmaSq * betaSum/alphaSum
+  
+  return(specDensOut)
+}
+
 #----------------------------Simulation Function------------------------------#
 
 QARMA.sim = function(nX, nT, model = list(alpha, beta, stdev))
 {
+  alpha = as.matrix(model$alpha); beta = as.matrix(model$beta)
   ar_x = dim(beta)[1] - 1; ar_t = dim(beta)[2] - 1
-  ma_x = dim(alpha)[1] - 1; ma_t = dim(beta)[2] - 1
+  ma_x = dim(alpha)[1] - 1; ma_t = dim(alpha)[2] - 1
   xInit = max(ar_x, ma_x) + 1
   tInit = max(ar_t, ma_t) + 1
   
   # check matrices alpha, beta
-  alpha[ma_x + 1, ma_t + 1] = 1
-  beta[ar_x + 1, ar_t + 1] = 0
+  alpha[ma_x + 1, ma_t + 1] = 1 # MA-coefficients
+  beta[ar_x + 1, ar_t + 1] = 0  # AR-coefficients
   
   errorMat = matrix(rnorm(4*nX*nT), nrow = 2*nX, ncol = 2*nT) * model$stdev
   armaMat = errorMat

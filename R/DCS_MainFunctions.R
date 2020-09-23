@@ -39,12 +39,6 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' expectation surface of a functional time series or a random field on a
 #' lattice. Bandwidth selection is done via an iterative plug-in method.
 #' 
-#' @section Usage:
-#' \code{DCSmooth(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())}
-#' 
-#' @section Details:
-#' Blafasel
-#' 
 #' @param Y A numeric matrix that contains the observations of the random field
 #'   or functional time-series.
 #' @param X An optional numeric vector containing the exogenous covariates
@@ -60,14 +54,26 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' 
 #' @return \code{DCSmooth} returns an object of class "dcs".
 #' 
+#' @section Usage:
+#' \code{DCSmooth(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())}
+#' 
 #' @section Details:
 #' The function \code{summary}
+#' 
+#' @examples
+#' y = y.norm1 + rnorm(100^2)
+#' dcs(y)
 #' 
 #' @export
 #' 
 
 dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 {
+  # check for correct inputs of data and options
+  .dcsCheck_Y(Y)
+  .dcsCheck_bndw(bndw, dcsOptions)
+  .dcsCheck_options(dcsOptions)
+  
   # set up vectors for X and T
   if (length(X) == 1 && length(T) == 1)
   {
@@ -80,8 +86,8 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   kernelFcn  = kernelFcn_assign(nameKernFcn) # set kernel Function to use in optimization
 
   # check for given bandwidths
-  if (bndw == "auto") {
-    bndwAuto = "auto"
+  if (bndw[1] == "auto") {
+    bndwAuto = TRUE
   
     # bandwidth selection process
     if (dcsOptions$pOrder == 0)
@@ -93,10 +99,8 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
       # local polynomial regression
       bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
       bndw = bndwObj$bndw
-    } else {
-      stop("Polynomial order not supported.")
-    }
-  } else if (checkBndw(bndw) == TRUE) {
+    } 
+  } else {
     bndwAuto = FALSE
   }
   
@@ -112,13 +116,26 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
       kernFcnPtr = kernelFcn)
   }
   
-  DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, bndw = bndw,
-                 varCoef = bndwObj$varCoef, iterations = bndwObj$iterations,
-                 dcsOptions = dcsOptions)
+  # calculate residuals
+  R = Y - DCSOut
   
-  # apply class to output object (not finished)
+  if (bndwAuto == TRUE)
+  {
+    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
+                   varCoef = bndwObj$varCoef, iterations = bndwObj$iterations,
+                   dcsOptions = dcsOptions)
+    attr(DCS_out, "bndwAuto") = bndwAuto
+  } else if (bndwAuto == FALSE) {
+    # probably unadvised, that the dcs object differs according to the type
+    # of bndw selection
+    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R, ?bndw = bndw,
+                   dcsOptions = dcsOptions)
+    attr(DCS_out, "bndwAuto") = bndwAuto
+  }
+  
+  # apply class to output object
   class(DCS_out) = "dcs"
-  
+
   return(DCS_out)
 }
 
@@ -126,5 +143,5 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 plotDCS = function(DCSobj, ...)
 {
-  .plotDCS(DCSobj = DCSobj, ...)
+  .persp3d(DCSobj = DCSobj, ...)
 }

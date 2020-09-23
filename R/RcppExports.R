@@ -81,11 +81,3 @@ LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec)
 }
 
-cppSample <- function(x) {
-    .Call('_DCSmooth_cppSample', PACKAGE = 'DCSmooth', x)
-}
-
-thinnedMat <- function(yMat, seed) {
-    .Call('_DCSmooth_thinnedMat', PACKAGE = 'DCSmooth', yMat, seed)
-}
-
