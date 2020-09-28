@@ -127,7 +127,7 @@ QARMA.spec = function(Y, alpha, beta, sigmaSq, omega)
   alphaSum = Re(sum(alpha * (z1^(lagMA[1]:0)) %*% t(z2^(lagMA[2]:0))) * 
                  sum(alpha * ((1/z1)^(lagMA[1]:0)) %*% t((1/z2)^(lagMA[2]:0))))
   
-  specDensOut = sigmaSq * betaSum/alphaSum
+  specDensOut = sigmaSq/g00 * betaSum/alphaSum
   
   return(specDensOut)
 }
@@ -214,4 +214,20 @@ QARMA.auxF = function(z1c, z2c, beta)
   out = t(zx_vec) %*% beta %*% zt_vec
   
   return(out)
+}
+
+qarmaSSDE = function(Y, alpha, beta, sigmaSq)
+{
+  X = T = seq(from = -pi, to = pi, length.out = 100)
+  ySpectrum = matrix(NA, nrow = 100, ncol = 100)
+  
+  for (i in 1:100)
+  {
+    for (j in 1:100)
+    {
+      omega = c(X[i], T[j])
+      ySpectrum[i, j] = QARMA.spec(Y, alpha, beta, sigmaSq, omega)
+    }
+  }
+  return(ySpectrum)
 }

@@ -173,7 +173,7 @@ globalBndwEst = function(acfMat, hLag)
   return(hLag)
 }
 
-#-----------------------Estimation of Variance Factor--------------------------#
+#----------------------Estimation of Spectral Density--------------------------#
 
 specDens = function(Y, omega)
 {
@@ -202,4 +202,46 @@ specDens = function(Y, omega)
   specDensOut = specDensEst(acfMat, drv = c(0, 0), hLag = hOpt, omega = omega)
   
   return(list(specDens = specDensOut, cf = specDensOut*(2*pi)^2, h = hOpt))
+}
+
+#--------------------------------Full SSDE-------------------------------------#
+
+matrixSSDE = function(Y)
+{
+  # Preperations
+  nx = dim(as.matrix(Y))[1]; nt = dim(as.matrix(Y))[2]
+  acfMat = acfMatrix(as.matrix(Y))
+  
+  # Pre-Estimation of global bandwidth (not depending on omega)
+  hVec = matrix(NA, 21, 2)
+  hVec[1, ] = trunc(0.5*c(nx, nt))
+  
+  for (g in 2:21)
+  {
+    hVecInfl = hVec[g - 1, ] / c(nx^(2/21), nt^(2/21))
+    hVecInfl = trunc(hVecInfl) + 1
+    hVec[g, ] = globalBndwEst(acfMat, hVecInfl)
+    if (all(hVec[g, ] == hVec[g - 1, ])) { break() }
+  }
+  
+  # Set up matrices for estimation of spectrum from -pi to pi
+  X = T = seq(from = -pi, to = pi, length.out = 100)
+  ySpectrum = matrix(NA, nrow = 100, ncol = 100)
+  
+  for (i in 1:100)
+  {
+    for (j in 1:100)
+    {
+      omega = c(X[i], T[j])
+      
+      # estimation of local bandwidth at omega
+      hVecInfl = hVec[g, ] / c(nx^(2/21), nt^(2/21))
+      hVecInfl = trunc(hVecInfl) + 1
+      hOpt = localBndwEst(acfMat, hVecInfl, omega)
+      
+      ySpectrum[i, j] = specDensEst(acfMat, drv = c(0, 0), 
+                                hLag = hOpt, omega = omega)
+    }
+  }
+  return(ySpectrum)
 }
