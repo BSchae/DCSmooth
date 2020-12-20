@@ -1,6 +1,6 @@
 ################################################################################
 #                                                                              #
-#                 DCSmooth Package: stimation of QARMA for cf                  #
+#           DCSmooth Package: Spectral Density Estimation via Buehlmann        #
 #                                                                              #
 ################################################################################
 
