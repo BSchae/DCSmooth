@@ -1,103 +1,10 @@
-###############################################################################
-#                                                                             #
-#                DCSmooth Package: stimation of QARMA for cf                  #
-#                                                                             #
-###############################################################################
+################################################################################
+#                                                                              #
+#                DCSmooth Package: estimation of QARMA for cf                  #
+#                                                                              #
+################################################################################
 
-
-#----------------------------Estimation Function------------------------------#
-
-QARMA.est = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
-{
-  # estimate mean of Y and calculate demeaned values E
-  mu = mean(Y)
-  E = Y - mu
-  
-  nX = dim(E)[1]; nT = dim(E)[2]
-  u_est = E*0
-  
-  # set up matrices for lag estimation
-  totalLag_ar = (model$ar_x + 1) * (model$ar_t + 1)
-  totalLag_ma = (model$ma_x + 1) * (model$ma_t + 1)
-  totalLag_x = max(model$ar_x, model$ma_x)
-  totalLag_t = max(model$ar_t, model$ma_t)
-  maxLag_ar = max(model$ar_x, model$ar_t)
-  maxLag_ma = max(model$ma_x, model$ma_t)
-  lag_E = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
-                  ncol = totalLag_ar)
-  lag_u = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
-                  ncol = totalLag_ma)
-  
-  # fill AR-lag matrix
-  lagNames_ar = 1:totalLag_ar*NA
-  for (i in 1:(model$ar_x + 1))
-  {
-    for (j in 1:(model$ar_t + 1))
-    {
-      indexX = (totalLag_x - i + 2):(nX - i + 1)
-      indexT = (totalLag_t - j + 2):(nT - j + 1)
-      lag_E[, (i - 1)*(maxLag_ar + 1) + j] = as.vector(E[indexX, indexT])
-      lagNames_ar[(i - 1)*(maxLag_ar + 1) + j] = paste0("lag", i - 1, j - 1)
-    }
-  }
-  colnames(lag_E) = lagNames_ar
-  
-  #backcasting iteration
-  for(s in 1:3)
-  {
-    # fill MA-lag matrix
-    lagNames_ma = 1:totalLag_ma*NA
-    for (i in 1:(model$ma_x+ 1))
-    {
-      for (j in 1:(model$ma_t + 1))
-      {
-        indexX = (totalLag_x - i + 2):(nX - i + 1)
-        indexT = (totalLag_t - j + 2):(nT - j + 1)
-        lag_u[,(i - 1)*(model$ma_t + 1) + j] = as.vector(u_est[indexX, indexT])
-        lagNames_ma[(i - 1)*(model$ma_t + 1) + j] = paste0(i - 1, ",", j - 1)
-      }
-    }
-    colnames(lag_u) = lagNames_ma
-    
-    # preparing for backcasting
-    coefs = lm(lag_E[, 1] ~ lag_E[, totalLag_ar:2] +
-                            lag_u[, totalLag_ma:2] + 0)$coef
-    coefs[which(is.na(coefs))] = 0
-    beta_est = matrix(c(coefs[1:(totalLag_ar - 1)], 0), 
-                  nrow = (model$ar_x + 1), ncol = (model$ar_t + 1), byrow = TRUE)
-    alpha_est = t(matrix(c(coefs[totalLag_ar:(totalLag_ar +
-                  totalLag_ma - 2)], 0), nrow = (model$ma_x + 1),
-                  ncol = (model$ma_t + 1)))
-    
-    if (s != 3)
-    {
-      # backcasting of ARMA process
-      for (i in (totalLag_x + 1):nX)
-      {
-        for (j in (totalLag_t + 1):nT)
-        {
-          u_est[i, j] = E[i, j] - sum(beta_est * E[(i - model$ar_x):i,
-                                        (j - model$ar_t):j]) -
-                        sum(alpha_est * u_est[(i - model$ma_x):i,
-                                        (j - model$ma_t):j])
-        }
-      }
-    }
-    
-    # check stationarity
-    statTest = QARMA.statTest(beta_est)
-    if (statTest == FALSE)
-    {
-      stop("QARMA model not stationary, try another order for the AR-parts.")
-    }
-  }
-  # preparation of output
-  beta_est[model$ar_x + 1, model$ar_t + 1] = -1
-  alpha_est[model$ma_x + 1, model$ma_t + 1] = 1
-  coefOut = list(mu = mu, beta = beta_est, alpha = alpha_est, estInnov = u_est)
-  
-  return(coefOut)
-}
+### Part A: Estimation Functions
 
 #----------------------Calculation of cf coefficient--------------------------#
 
@@ -115,21 +22,105 @@ QARMA.cf = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
   return(cf_out)
 }
 
-QARMA.spec = function(Y, alpha, beta, sigmaSq, omega)
+#-------------------------------Model Selection--------------------------------#
+
+#QARMA.order = 
+
+#-----------------------------Estimation Function------------------------------#
+
+QARMA.est = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
 {
-  lagAR = dim(beta) - 1; lagMA = dim(alpha) - 1
-  z1 = complex(argument = omega[1]); z2 = complex(argument = omega[2])
- 
-  g00 = sd(Y)^2
-   
-  betaSum = Re(sum(beta * (z1^(lagAR[1]:0)) %*% t(z2^(lagAR[2]:0))) * 
-    sum(beta * ((1/z1)^(lagAR[1]:0)) %*% t((1/z2)^(lagAR[2]:0))))
-  alphaSum = Re(sum(alpha * (z1^(lagMA[1]:0)) %*% t(z2^(lagMA[2]:0))) * 
-                 sum(alpha * ((1/z1)^(lagMA[1]:0)) %*% t((1/z2)^(lagMA[2]:0))))
+  # estimate mean of Y and calculate demeaned values E
+  mu = mean(Y)
+  E = Y - mu
   
-  specDensOut = sigmaSq/g00 * betaSum/alphaSum
+  nX = dim(E)[1]; nT = dim(E)[2]
+  u_est = E*0
   
-  return(specDensOut)
+  ### set up matrices and parameters for lag estimation
+  totalLag_ar = (model$ar_x + 1) * (model$ar_t + 1) 
+                            # number of total lags (including 0) for the AR part
+  totalLag_ma = (model$ma_x + 1) * (model$ma_t + 1)
+                            # number of total lags (including 0) for the MA part
+  maxLag_x = max(model$ar_x, model$ma_x)  # maximum lag in x-direction
+  maxLag_t = max(model$ar_t, model$ma_t)  # maximum lag in t-direction
+  maxLag_ar = max(model$ar_x, model$ar_t) # maximum AR-lag
+  maxLag_ma = max(model$ma_x, model$ma_t) # maximum MA-lag
+  
+  lag_E = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
+                 ncol = totalLag_ar)  # lag matrix for observations
+  lag_u = matrix(NA, nrow = (nX - totalLag_x) * (nT - totalLag_t),
+                 ncol = totalLag_ma)  # lag matrix for innovations
+  
+  ### fill AR-lag matrix
+  lagNames_ar = 1:totalLag_ar*NA # names for matrix
+  for (i in 1:(model$ar_x + 1))
+  {
+    for (j in 1:(model$ar_t + 1))
+    {
+      indexX = (totalLag_x - i + 2):(nX - i + 1)
+      indexT = (totalLag_t - j + 2):(nT - j + 1)
+      lag_E[, (i - 1)*(maxLag_ar + 1) + j] = as.vector(E[indexX, indexT])
+      lagNames_ar[(i - 1)*(maxLag_ar + 1) + j] = paste0("lag", i - 1, j - 1)
+    }
+  }
+  colnames(lag_E) = lagNames_ar
+  
+  ### auxiliary regression for calculation of innovations (from residuals)
+  aux_coefs = lm(lag_E[, 1] ~ lag_E[, totalLag_ar:2] + 0)$coef
+  aux_coefs[which(is.na(aux_coefs))] = 0
+  aux_beta = matrix(c(aux_coefs[1:(totalLag_ar - 1)], 0), 
+                nrow = (model$ar_x + 1), ncol = (model$ar_t + 1), byrow = TRUE)
+  
+  # backcasting of ARMA process
+  for (i in (maxLag_x + 1):nX)
+  {
+    for (j in (maxLag_t + 1):nT)
+    {
+      u_est[i, j] = E[i, j] - sum(aux_beta * E[(i - model$ar_x):i,
+                                               (j - model$ar_t):j])
+    }
+  }
+  
+  # fill MA-lag matrix
+  lagNames_ma = 1:totalLag_ma*NA
+  for (i in 1:(model$ma_x + 1))
+  {
+    for (j in 1:(model$ma_t + 1))
+    {
+      indexX = (totalLag_x - i + 2):(nX - i + 1)
+      indexT = (totalLag_t - j + 2):(nT - j + 1)
+      lag_u[,(i - 1)*(model$ma_t + 1) + j] = as.vector(u_est[indexX, indexT])
+      lagNames_ma[(i - 1)*(model$ma_t + 1) + j] = paste0("lag", i - 1, j - 1)
+    }
+  }
+  colnames(lag_u) = lagNames_ma
+  
+  # Parameter Estimation
+  if (totalLag_ar == 1 && totalLag_ma > 1) {
+    coefs = lm((lag_E[, 1] - lag_u[, 1]) ~ lag_u[, totalLag_ma:2] + 0)$coef
+  } else if (totalLag_ar > 1 && totalLag_ma == 1) {
+    coefs = lm((lag_E[, 1] - lag_u[, 1]) ~ lag_E[, totalLag_ar:2] + 0)$coef
+  } else if (totalLag_ar > 1 && totalLag_ma > 1) {
+    coefs = lm((lag_E[, 1] - lag_u[, 1])~ lag_E[, totalLag_ar:2] +
+                 lag_u[, totalLag_ma:2] + 0)$coef
+  } else {
+    coefs = 0
+  }
+  
+  # check stationarity
+  statTest = QARMA.statTest(beta_est)
+  if (statTest == FALSE)
+  {
+    stop("QARMA model not stationary, try another order for the AR-parts.")
+  }
+  
+  # preparation of output
+  beta_est[model$ar_x + 1, model$ar_t + 1] = -1
+  alpha_est[model$ma_x + 1, model$ma_t + 1] = 1
+  coefOut = list(mu = mu, beta = beta_est, alpha = alpha_est, estInnov = u_est)
+  
+  return(coefOut)
 }
 
 #----------------------------Simulation Function------------------------------#
@@ -162,7 +153,7 @@ QARMA.sim = function(nX, nT, model = list(alpha, beta, stdev))
   errorOut = errorMat[(nX + 1):(2 * nX), (nT + 1):(2 * nT)]
   
   listOut = list(qarma.ts = armaOut, innov = errorOut,
-                  alpha = alpha, beta = beta, sd = sd)
+                  alpha = alpha, beta = beta, stdev = model$stdev)
   return(listOut)
 }
 
@@ -230,4 +221,23 @@ qarmaSSDE = function(Y, alpha, beta, sigmaSq)
     }
   }
   return(ySpectrum)
+}
+
+#----------------------Calculation of spectral density-------------------------#
+
+QARMA.spec = function(Y, alpha, beta, sigmaSq, omega)
+{
+  lagAR = dim(beta) - 1; lagMA = dim(alpha) - 1
+  z1 = complex(argument = omega[1]); z2 = complex(argument = omega[2])
+  
+  g00 = sd(Y)^2
+  
+  betaSum = Re(sum(beta * (z1^(lagAR[1]:0)) %*% t(z2^(lagAR[2]:0))) * 
+                 sum(beta * ((1/z1)^(lagAR[1]:0)) %*% t((1/z2)^(lagAR[2]:0))))
+  alphaSum = Re(sum(alpha * (z1^(lagMA[1]:0)) %*% t(z2^(lagMA[2]:0))) * 
+                  sum(alpha * ((1/z1)^(lagMA[1]:0)) %*% t((1/z2)^(lagMA[2]:0))))
+  
+  specDensOut = sigmaSq/g00 * betaSum/alphaSum
+  
+  return(specDensOut)
 }
