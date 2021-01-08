@@ -66,7 +66,8 @@ QARMA.est = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
   colnames(lag_E) = lagNames_ar
   
   # backcasting iteration
-  for(s in 1:3)
+  max_iter = 10
+  for(s in 1:max_iter)
   {
     # estimation of coefficients
     if (totalLag_ar == 1 && totalLag_ma > 1) {                  # QMA process
@@ -110,7 +111,7 @@ QARMA.est = function(Y, model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1))
     }
     
     # backcasting procedure (not needed in the last iteration for s = 3)
-    if (s != 3)
+    if (s != max_iter)
     {
       # backcasting of QARMA process in matrix form
       for (i in (totalLag_x + 1):nX)
