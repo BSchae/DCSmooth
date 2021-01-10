@@ -60,6 +60,7 @@ QARMA.est = function(Y, order_x = c(1, 1), order_t = c(1, 1))
     }
   }
   
+<<<<<<< HEAD
   # linear regression with AR-part only
   aux_reg = lm(lag_ar_00 ~ . + 0, data = matrix_aux)
   residuals_arma = matrix(0, nrow = nX, ncol = nT)
@@ -72,14 +73,24 @@ QARMA.est = function(Y, order_x = c(1, 1), order_t = c(1, 1))
   
   # iteration loop (number of iterations might increase the precision)
   for (loop in 1:5)
+=======
+  # backcasting iteration
+  max_iter = 10
+  for(s in 1:max_iter)
+>>>>>>> 268812d37b76dc16f472f22cdccf0cd5bf43a15d
   {
     ### build nX*nT matrix of residuals
     residuals_arma[(max_lag_x + 1):nX, (max_lag_t + 1):nT] = 
       matrix(aux_reg$residuals, nrow = (nX - max_lag_x),
              ncol = (nT - max_lag_t))
     
+<<<<<<< HEAD
     ### fill matrix_arma with lagged residuals
     for (i in 0:order_x[2]) # use lag orders as loop indices
+=======
+    # backcasting procedure (not needed in the last iteration for s = 3)
+    if (s != max_iter)
+>>>>>>> 268812d37b76dc16f472f22cdccf0cd5bf43a15d
     {
       for (j in 0:order_t[2])
       {
