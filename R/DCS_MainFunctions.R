@@ -128,7 +128,7 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   } else if (bndwAuto == FALSE) {
     # probably unadvised, that the dcs object differs according to the type
     # of bndw selection
-    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R, ?bndw = bndw,
+    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R, bndw = bndw,
                    dcsOptions = dcsOptions)
     attr(DCS_out, "bndwAuto") = bndwAuto
   }
@@ -143,5 +143,5 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 plotDCS = function(DCSobj, ...)
 {
-  .persp3d(DCSobj = DCSobj, ...)
+  persp3d(DCSobj = DCSobj, ...)
 }

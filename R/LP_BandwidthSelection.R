@@ -63,12 +63,12 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     {
       if (exists("model", dcsOptions))
       {
-        model = dcsOptions$model
+        model_order = dcsOptions$model_order
       } else {
-        model = list(ar_x = 1, ar_t = 1, ma_x = 1, ma_t = 1)
+        model_order = list(ar = c(1, 1), ma = c(1, 1))
       }
       
-      varCoef = QARMA.cf(Y - YSmth, model = model)
+      varCoef = QARMA.cf((Y - YSmth), model_order = model_order)
     }
     
     
