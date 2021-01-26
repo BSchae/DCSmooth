@@ -16,12 +16,14 @@
   # d (2nd derivative)
   delta     = c(0.0, 0.0), # parameter for shrinking the derivatives
   constWindow = FALSE,
-  varEst    = "iid"
+  varEst    = "iid",
+  modelOrder = list(ar = c(1, 1), ma = c(1, 1))
 )
 {
   return(list(kernPar = kernPar, pOrder = pOrder,
               inflExp = inflExp, inflPar = inflPar, delta = delta, 
-              constWindow = constWindow, varEst = varEst))
+              constWindow = constWindow, varEst = varEst,
+              modelOrder = modelOrder))
 }
 
 #--------------------Function for color ramping for plots----------------------#

@@ -61,16 +61,8 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
     else if (dcsOptions$varEst == "qarma")
     {
-      if (exists("model", dcsOptions))
-      {
-        model_order = dcsOptions$model_order
-      } else {
-        model_order = list(ar = c(1, 1), ma = c(1, 1))
-      }
-      
-      varCoef = QARMA.cf((Y - YSmth), model_order = model_order)
+      varCoef = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
     }
-    
     
     # calculate optimal bandwidths for next step
     hOpt = hOptLP(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)

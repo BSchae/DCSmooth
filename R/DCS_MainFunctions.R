@@ -122,7 +122,7 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   if (bndwAuto == TRUE)
   {
     DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
-                   varCoef = bndwObj$varCoef, iterations = bndwObj$iterations,
+                   cf = bndwObj$varCoef, iterations = bndwObj$iterations,
                    dcsOptions = dcsOptions)
     attr(DCS_out, "bndwAuto") = bndwAuto
   } else if (bndwAuto == FALSE) {
