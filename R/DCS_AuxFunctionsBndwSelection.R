@@ -9,8 +9,8 @@
 # Local Polynomial Regression
 hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, nSub)[1]
-  i0t = intCalc(mtt, mxx, nSub)[1]
+  i0x = intCalcLP(mxx, mtt, p, nSub)[1]
+  i0t = intCalcLP(mtt, mxx, p, nSub)[1]
   
   hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0t)
@@ -24,8 +24,8 @@ hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
 # Kernel Regression
 hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
 {
-  i0x = intCalc(mxx, mtt, nSub)[1]
-  i0t = intCalc(mtt, mxx, nSub)[1]
+  i0x = intCalcKR(mxx, mtt, nSub)[1]
+  i0t = intCalcKR(mtt, mxx, nSub)[1]
   
   hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0x)
   htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0t)
@@ -38,7 +38,7 @@ hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
 
 #----------------------Integrals over mxx^2, mtt^2-----------------------------#
 
-intCalc = function(m11, m22, nSub)
+intCalcKR = function(m11, m22, nSub)
 {
   i11 = sum(m11 * m11)/nSub
   i22 = sum(m22 * m22)/nSub
@@ -46,6 +46,18 @@ intCalc = function(m11, m22, nSub)
   #print(c(i11, i22, i12))
   
   iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
+  
+  return(c(iOut, i11/i22))
+}
+
+intCalcLP = function(m11, m22, p, nSub)
+{
+  i11 = sum(m11 * m11)/nSub
+  i22 = sum(m22 * m22)/nSub
+  i12 = sum(m11 * m22)/nSub
+  #print(c(i11, i22, i12))
+  
+  iOut = (i11/i22)^(1/(2*p + 2)) * (2*i11 + sqrt(i11 / i22) + i12)
   
   return(c(iOut, i11/i22))
 }

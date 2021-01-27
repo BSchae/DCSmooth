@@ -58,9 +58,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     if (dcsOptions$varEst == "iid")
     {
       varCoef = (sd(Y - YSmth))^2
-    }
-    else if (dcsOptions$varEst == "qarma")
-    {
+    } else if (dcsOptions$varEst == "qarma") {
       varCoef = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
     }
     

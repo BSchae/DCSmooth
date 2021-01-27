@@ -126,6 +126,26 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   # linear regression & prepare output
   arma_lm = lm(lag_ar_00 ~ . + 0, data = arma_lm_matrix)
   
+  improve = FALSE
+  if (improve == TRUE)
+  {
+    # byrow = TRUE and reverse needed as lm order is 01,10,11...
+    ar_mat = matrix(c(arma_lm$coef[total_lag_ar:1], -1), byrow = TRUE,
+                    nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
+    ar_mat[model_order$ar[1] + 1, model_order$ar[2] + 1] = -1
+    ma_mat = matrix(c(arma_lm$coef[(total_lag_ar + total_lag_ma):
+                                    (total_lag_ar + 1)], 1), byrow = TRUE,
+                    nrow = (model_order$ma[1] + 1), ncol =
+                      (model_order$ma[2] + 1))
+    ma_mat[model_order$ma[1] + 1, model_order$ma[2] + 1] = 1
+    innov = matrix(arma_lm$residuals, nrow = nX - m1_ar - max_lag_x,
+                  ncol = nT - m2_ar - max_lag_t)
+    stdev = sqrt(sum(innov^2)/((nX - m1_ar - model_order$ma[1]) * 
+                                        (nX - m1_ar - model_order$ma[1])))
+    
+    arma_lm$coef = qarma.est.3rdstep(Y, ar_mat, ma_mat, model_order) + arma_lm$coef
+  }
+  
   # byrow = TRUE and reverse needed as lm order is 01,10,11...
   ar_mat = matrix(c(arma_lm$coef[total_lag_ar:1], -1), byrow = TRUE,
                   nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
@@ -138,8 +158,9 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   innov = matrix(arma_lm$residuals, nrow = nX - m1_ar - max_lag_x,
                  ncol = nT - m2_ar - max_lag_t)
   stdev = sqrt(sum(innov^2)/((nX - m1_ar - model_order$ma[1]) * 
-                                      (nX - m1_ar - model_order$ma[1])))
- 
+                               (nX - m1_ar - model_order$ma[1])))
+  # end 3rd step
+  
   # check stationarity
   statTest = qarma.statTest(ar_mat)
   if (statTest == FALSE)
@@ -157,80 +178,83 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 ### 3rd step of Hannen-Rissanen algorithm, does not seem to provide improved
 ### results (probably not correct implemnted)
 
-# qarma.est.3rdstep = function(Y, ar_mat, ma_mat, model_order)
-# {
-#   nX = dim(Y)[1]; nT = dim(Y)[2]
-#   
-#   # value (x,t) of ma_mat has to be zero
-#   ma_mat_0 = ma_mat; ma_mat_0[model_order$ma[1], model_order$ma[2]] = 0
-#   
-#   # calculate ARMA-orders for different purposes
-#   max_lag_x = max(model_order$ar[1], model_order$ma[1])
-#   max_lag_t = max(model_order$ar[2], model_order$ma[2])
-# 
-#   z_matrix = matrix(0, nrow = nX, ncol = nT)
-#   v_matrix = w_matrix = z_matrix
-#   
-#   for (i in (max_lag_x + 1):nX)
-#   {
-#     for (j in (max_lag_t + 1):nT)
-#     {
-#       ind_ar_x = (i - model_order$ar[1]):i
-#       ind_ar_t = (j - model_order$ar[2]):j
-#       ind_ma_x = (i - model_order$ma[1]):i
-#       ind_ma_t = (j - model_order$ma[2]):j
-# 
-#       # "-" below is due to definition of ar_mat
-#       z_matrix[i, j] = sum(-ar_mat * Y[ind_ar_x, ind_ar_t]) +
-#                        sum(ma_mat_0 * z_matrix[ind_ma_x, ind_ma_t])
-#       v_matrix[i, j] = sum(-ar_mat * v_matrix[ind_ar_x, ind_ar_t]) +
-#                        z_matrix[i, j]
-#       w_matrix[i, j] = sum(-ma_mat * w_matrix[ind_ar_x, ind_ar_t]) +
-#                        z_matrix[i, j]
-#     }
-#   }
-#   
-#   zvw_lm_matrix = data.frame(matrix(NA,
-#                                 nrow = (nX - max_lag_x) * (nT - max_lag_t), 
-#                                 ncol = total_lag_ar + total_lag_ma + 1))
-#   zvw_lm_matrix[, 1] =
-#     as.vector(z_matrix[(max_lag_x + 1):nX, (max_lag_t + 1):nT])
-#   names(zvw_lm_matrix)[1] = "Z"
-#   
-#   for (i in 0:model_order$ar[1])
-#   {
-#     for (j in 0:model_order$ar[2])
-#     {
-#       if (!(i == 0 && j == 0))
-#       {
-#         zvw_lm_matrix[, i*(model_order$ar[1] + 1) + j + 1] = 
-#           as.vector(v_matrix[(max_lag_x + 1):nX - i, (max_lag_t + 1):nT - j])
-#         names(zvw_lm_matrix)[i*(model_order$ar[1] + 1) + j + 1] = 
-#           paste0("V_", i, j)
-#       }
-#     }
-#   }
-#   for (i in 0:model_order$ma[1])
-#   {
-#     for (j in 0:model_order$ma[2])
-#     {
-#       if (!(i == 0 && j == 0))
-#       {
-#         zvw_lm_matrix[, total_lag_ar + i*(model_order$ma[1] + 1) + j + 1] = 
-#           as.vector(w_matrix[(max_lag_x + 1):nX - i, (max_lag_t + 1):nT - j])
-#         names(zvw_lm_matrix)[total_lag_ar + i*(model_order$ar[1] + 1) + j + 1] = 
-#           paste0("W_", i, j)
-#       }
-#     }
-#   }
-#   
-#   names(zvw_lm_matrix)
-#   
-#   # linear regression
-#   zvw_lm = lm(Z ~ . + 0, data = zvw_lm_matrix)
-# 
-#   return(zvw_lm$coef)
-# }
+qarma.est.3rdstep = function(Y, ar_mat, ma_mat, model_order)
+{
+  nX = dim(Y)[1]; nT = dim(Y)[2]
+
+  # value (x,t) of ma_mat has to be zero
+  ma_mat_0 = ma_mat; ma_mat_0[model_order$ma[1] + 1, model_order$ma[2] + 1] = 0
+  ar_mat_0 = ar_mat; ar_mat_0[model_order$ar[1] + 1, model_order$ar[2] + 1] = 0
+
+  # calculate ARMA-orders for different purposes
+  max_lag_x = max(model_order$ar[1], model_order$ma[1])
+  max_lag_t = max(model_order$ar[2], model_order$ma[2])
+  total_lag_ar = (model_order$ar[1] + 1) * (model_order$ar[2] + 1) - 1
+  total_lag_ma = (model_order$ma[1] + 1) * (model_order$ma[2] + 1) - 1
+  #max_lag_ar = max(model_order$ar)
+  #max_lag_ma = max(model_order$ma)
+
+  z_matrix = matrix(0, nrow = nX, ncol = nT)
+  v_matrix = w_matrix = z_matrix
+
+  for (i in (max_lag_x + 1):nX)
+  {
+    for (j in (max_lag_t + 1):nT)
+    {
+      ind_ar_x = (i - model_order$ar[1]):i
+      ind_ar_t = (j - model_order$ar[2]):j
+      ind_ma_x = (i - model_order$ma[1]):i
+      ind_ma_t = (j - model_order$ma[2]):j
+
+      # "-" below is due to definition of ar_mat
+      z_matrix[i, j] = sum(-ar_mat * Y[ind_ar_x, ind_ar_t]) -
+                       sum(ma_mat_0 * z_matrix[ind_ma_x, ind_ma_t])
+      v_matrix[i, j] = sum(ar_mat_0 * v_matrix[ind_ar_x, ind_ar_t]) +
+                       z_matrix[i, j]
+      w_matrix[i, j] = sum(-ma_mat_0 * w_matrix[ind_ma_x, ind_ma_t]) +
+                       z_matrix[i, j]
+    }
+  }
+
+  zvw_lm_matrix = data.frame(matrix(NA,
+                                nrow = (nX - max_lag_x) * (nT - max_lag_t),
+                                ncol = total_lag_ar + total_lag_ma + 1))
+  zvw_lm_matrix[, 1] =
+    as.vector(z_matrix[(max_lag_x + 1):nX, (max_lag_t + 1):nT])
+  names(zvw_lm_matrix)[1] = "Z"
+
+  for (i in 0:model_order$ar[1])
+  {
+    for (j in 0:model_order$ar[2])
+    {
+      if (!(i == 0 && j == 0))
+      {
+        zvw_lm_matrix[, i*(model_order$ar[2] + 1) + j + 1] =
+          as.vector(v_matrix[(max_lag_x + 1):nX - i, (max_lag_t + 1):nT - j])
+        names(zvw_lm_matrix)[i*(model_order$ar[2] + 1) + j + 1] =
+          paste0("V_", i, j)
+      }
+    }
+  }
+  for (i in 0:model_order$ma[1])
+  {
+    for (j in 0:model_order$ma[2])
+    {
+      if (!(i == 0 && j == 0))
+      {
+        zvw_lm_matrix[, total_lag_ar + i*(model_order$ma[2] + 1) + j + 1] =
+          as.vector(w_matrix[(max_lag_x + 1):nX - i, (max_lag_t + 1):nT - j])
+        names(zvw_lm_matrix)[total_lag_ar + i*(model_order$ma[2] + 1) + j + 1] =
+          paste0("W_", i, j)
+      }
+    }
+  }
+
+  # linear regression
+  zvw_lm = lm(Z ~ . + 0, data = zvw_lm_matrix)
+
+  return(zvw_lm$coef)
+}
 
 #-------------------Yule-Walker-Estimation Function for AR---------------------#
 
