@@ -267,6 +267,61 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// seqCpp
+arma::vec seqCpp(int from, int to);
+RcppExport SEXP _DCSmooth_seqCpp(SEXP fromSEXP, SEXP toSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< int >::type to(toSEXP);
+    rcpp_result_gen = Rcpp::wrap(seqCpp(from, to));
+    return rcpp_result_gen;
+END_RCPP
+}
+// factorialCpp
+int factorialCpp(int k);
+RcppExport SEXP _DCSmooth_factorialCpp(SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(factorialCpp(k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gsmoothCalcCpp
+arma::vec gsmoothCalcCpp(arma::vec y, int v, int p, int mu, double b, int bb);
+RcppExport SEXP _DCSmooth_gsmoothCalcCpp(SEXP ySEXP, SEXP vSEXP, SEXP pSEXP, SEXP muSEXP, SEXP bSEXP, SEXP bbSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< int >::type bb(bbSEXP);
+    rcpp_result_gen = Rcpp::wrap(gsmoothCalcCpp(y, v, p, mu, b, bb));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gsmoothCalc2Cpp
+List gsmoothCalc2Cpp(arma::vec y, int v, int p, int mu, double b, int bb);
+RcppExport SEXP _DCSmooth_gsmoothCalc2Cpp(SEXP ySEXP, SEXP vSEXP, SEXP pSEXP, SEXP muSEXP, SEXP bSEXP, SEXP bbSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< int >::type bb(bbSEXP);
+    rcpp_result_gen = Rcpp::wrap(gsmoothCalc2Cpp(y, v, p, mu, b, bb));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
@@ -289,6 +344,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
     {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
     {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 4},
+    {"_DCSmooth_seqCpp", (DL_FUNC) &_DCSmooth_seqCpp, 2},
+    {"_DCSmooth_factorialCpp", (DL_FUNC) &_DCSmooth_factorialCpp, 1},
+    {"_DCSmooth_gsmoothCalcCpp", (DL_FUNC) &_DCSmooth_gsmoothCalcCpp, 6},
+    {"_DCSmooth_gsmoothCalc2Cpp", (DL_FUNC) &_DCSmooth_gsmoothCalc2Cpp, 6},
     {NULL, NULL, 0}
 };
 

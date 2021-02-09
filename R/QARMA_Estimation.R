@@ -18,14 +18,15 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   qarma_model = qarma.est(Y, model_order = model_order)
 
   # get fractions for spectral density
-  cf_out = sum(qarma_model$ma)^2/sum(qarma_model$ar)^2 * qarma_model$sigma^2
+  cf = sum(qarma_model$ma)^2/sum(qarma_model$ar)^2 * qarma_model$sigma^2
+  return_list = list(cf = cf, qarma_model = qarma_model)
   
-  return(cf_out)
+  return(return_list)
 }
 
 #-------------------------------Model Selection--------------------------------#
 
-qarma.order = function(Y, order_max = list(ar = c(4, 4), ma = c(1, 1)))
+qarma.order = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n = prod(dim(Y))
   ar_matrix = expand.grid(0:order_max$ar[1], 0:order_max$ar[2])
@@ -57,9 +58,186 @@ qarma.order = function(Y, order_max = list(ar = c(4, 4), ma = c(1, 1)))
 
 #------------------------Estimation Function for QARMA-------------------------#
 
+qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
+{
+  nX = dim(Y)[1]; nT = dim(Y)[2]
+  
+  # calculate ARMA-orders for different purposes
+  max_lag_x = max(model_order$ar[1], model_order$ma[1])
+  max_lag_t = max(model_order$ar[2], model_order$ma[2])
+  total_lag_ar = (model_order$ar[1] + 1) * (model_order$ar[2] + 1) - 1
+  total_lag_ma = (model_order$ma[1] + 1) * (model_order$ma[2] + 1) - 1
+  max_lag_ar = max(model_order$ar)
+  max_lag_ma = max(model_order$ma)
+  
+  ### AR-only auxiliary estimation model ###
+  
+  matrix_aux = .qarma.fill_lag_matrix(Y, lag_x = model_order$ar[1],
+                                      lag_t = model_order$ar[2], include_00 = TRUE,
+                                      name_prefix = "ar")
+  aux_reg = lm(ar_00 ~ . + 0, data = matrix_aux)
+  residuals_aux = matrix(aux_reg$residuals, nrow = nX - model_order$ar[1], 
+                         ncol = nT - model_order$ar[2])
+  
+  if (total_lag_ma > 0)
+  {
+    # set up submatrices of Y, res for use in fill_matrix procedure
+    Y_mat = Y[(max_lag_x + 1):nX, (max_lag_t + 1):nT]
+    residuals_mat = residuals_aux[(max_lag_x - model_order$ma[1] + 1):
+                                    (nX - model_order$ar[1]),
+                                  (max_lag_t - model_order$ma[2] + 1):
+                                    (nT - model_order$ar[2])]
+    
+    # set up matrix for complete arma (dimension (nX - ar_x)*(nT - ar_t))
+    matrix_arma = cbind(.qarma.fill_lag_matrix(Y_mat, lag_x = model_order$ar[1],
+                                lag_t = model_order$ar[2], include_00 = TRUE,
+                                name_prefix = "ar"),
+                        .qarma.fill_lag_matrix(residuals_mat, lag_x = model_order$ma[1],
+                                lag_t = model_order$ma[2], include_00 = FALSE,
+                                name_prefix = "ma"))
+    
+    # regression for QARMA model
+    arma_reg = lm(ar_00 ~ . + 0, data = matrix_arma)
+    
+    # fill ar and ma matrices
+    ar_mat = matrix(c(arma_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
+                    nrow = (model_order$ar[1] + 1), 
+                    ncol = (model_order$ar[2] + 1))
+    ma_mat = matrix(c(arma_reg$coef[(total_lag_ar + total_lag_ma):
+                                      (total_lag_ar + 1)], 1), byrow = TRUE,
+                    nrow = (model_order$ma[1] + 1),
+                    ncol = (model_order$ma[2] + 1))
+  } else {
+    arma_reg = aux_reg
+    
+    # fill ar matrix (and ma matrix)
+    ar_mat = matrix(c(aux_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
+                    nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
+    ma_mat = matrix(1)
+  }
+  
+  innov = arma_reg$residuals #residuals_mat
+  
+  # check stationarity
+  statTest = qarma.statTest(ar_mat)
+  if (statTest == FALSE)
+  {
+    stop("QARMA model not stationary, try another order for the AR-parts.")
+  }
+  
+  # preparation of output
+  stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
+                               (nT - max_lag_t - model_order$ar[2])))
+  coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov)
+  return(coef_out)
+}
+
+qarma.est1 = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
+{
+  nX = dim(Y)[1]; nT = dim(Y)[2]
+  
+  # calculate ARMA-orders for different purposes
+  max_lag_x = max(model_order$ar[1], model_order$ma[1])
+  max_lag_t = max(model_order$ar[2], model_order$ma[2])
+  total_lag_ar = (model_order$ar[1] + 1) * (model_order$ar[2] + 1) - 1
+  total_lag_ma = (model_order$ma[1] + 1) * (model_order$ma[2] + 1) - 1
+  max_lag_ar = max(model_order$ar)
+  max_lag_ma = max(model_order$ma)
+  
+  ### AR-only auxiliary estimation model
+  matrix_aux = data.frame(matrix(NA, nrow = (nX - max_lag_x) * (nT - max_lag_t),
+                                 ncol = total_lag_ar + 1))       # +1 is to include lag_ar_00
+  
+  for (i in 0:model_order$ar[1]) # use lag orders as loop indices
+  {
+    for (j in 0:model_order$ar[2])
+    {
+      index_x = (max_lag_x - i + 1):(nX - i)
+      index_t = (max_lag_t - j + 1):(nT - j)
+      matrix_aux[, (j + 1) + i * (model_order$ar[2] + 1)] =  # over colums first (inner loop)
+        as.vector(Y[index_x, index_t])
+      names(matrix_aux)[(j + 1) + i * (model_order$ar[2] + 1)] =
+        paste0("lag_ar_", i, j)
+    }
+  }
+  
+  # linear regression with AR-part only
+  aux_reg = lm(lag_ar_00 ~ . + 0, data = matrix_aux)
+  residuals_arma = matrix(0, nrow = nX, ncol = nT)
+  
+  # set up matrix for complete arma
+  matrix_arma = data.frame(matrix(NA, nrow = (nX - max_lag_x) *
+                    (nT - max_lag_t), ncol = total_lag_ar + total_lag_ma + 1))
+  matrix_arma[, 1:(total_lag_ar + 1)] = matrix_aux
+  names(matrix_arma)[1:(total_lag_ar + 1)] = names(matrix_aux)
+  
+  ### iteration loop (number of iterations might increase the precision)
+  if (total_lag_ma > 0)
+  {
+    for (loop in 1:3)
+    {
+      ### fill matrix_arma with lagged residuals
+      for (i in 0:model_order$ma[1]) # use lag orders as loop indices
+      {
+        for (j in 0:model_order$ma[2])
+        {
+          if (!(i == 0 && j == 0))  # lag_ma_00 is not needed (new residuals)
+          {
+            index_x = (max_lag_x - i + 1):(nX - i)
+            index_t = (max_lag_t - j + 1):(nT - j)
+            matrix_arma[, total_lag_ar + (j + 1) + i *
+                          (model_order$ma[2] + 1)] =
+              as.vector(residuals_arma[index_x, index_t])
+            names(matrix_arma)[total_lag_ar + (j + 1) + i *
+                                 (model_order$ma[2] + 1)] =
+              paste0("lag_ma_", i, j)
+          }
+        }
+      }
+      
+      # regression for iterated estimation of residuals
+      aux_reg = lm(lag_ar_00 ~ . + 0, data = matrix_arma)
+      
+      # build nX*nT matrix of residuals
+      residuals_arma[(max_lag_x + 1):nX, (max_lag_t + 1):nT] =
+        matrix(aux_reg$residuals, nrow = (nX - max_lag_x),
+               ncol = (nT - max_lag_t))
+    }
+  }
+  else {
+    ### build nX*nT matrix of residuals
+    residuals_arma[(max_lag_x + 1):nX, (max_lag_t + 1):nT] =
+      matrix(aux_reg$residuals, nrow = (nX - max_lag_x),
+             ncol = (nT - max_lag_t))
+  }
+  
+  # byrow = TRUE and reverse needed as lm order is 01,10,11...
+  ar_mat = matrix(c(aux_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
+                  nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
+  ar_mat[model_order$ar[1] + 1, model_order$ar[2] + 1] = -1
+  ma_mat = matrix(c(aux_reg$coef[(total_lag_ar + total_lag_ma):
+                                   (total_lag_ar + 1)], 1), byrow = TRUE,
+                  nrow = (model_order$ma[1] + 1), ncol =
+                    (model_order$ma[2] + 1))
+  ma_mat[model_order$ma[1] + 1, model_order$ma[2] + 1] = 1
+  innov = residuals_arma
+  
+  # check stationarity
+  statTest = qarma.statTest(ar_mat)
+  if (statTest == FALSE)
+  {
+    stop("QARMA model not stationary, try another order for the AR-parts.")
+  }
+  
+  # preparation of output
+  stdev = sd(innov)
+  coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov)
+  return(coef_out)
+}
+
 # Estimation function using the Hannan-Rissanen Algorithm
 
-qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
+qarma.est2 = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   nX = dim(Y)[1]; nT = dim(Y)[2]
 
@@ -126,7 +304,7 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   # linear regression & prepare output
   arma_lm = lm(lag_ar_00 ~ . + 0, data = arma_lm_matrix)
   
-  improve = FALSE
+  improve = TRUE
   if (improve == TRUE)
   {
     # byrow = TRUE and reverse needed as lm order is 01,10,11...
@@ -256,6 +434,38 @@ qarma.est.3rdstep = function(Y, ar_mat, ma_mat, model_order)
   return(zvw_lm$coef)
 }
 
+#-----------------------------Auxiliary Functions------------------------------#
+
+.qarma.fill_lag_matrix = function(Y, lag_x, lag_t, include_00 = TRUE, name_prefix)
+{
+  nX = dim(Y)[1]; nT = dim(Y)[2]
+  lag_obs = (nX - lag_x) * (nT - lag_t)
+  lag_n = (lag_x + 1) * (lag_t + 1)
+  
+  matrix_out = data.frame(matrix(NA, nrow = lag_obs, ncol = lag_n))
+  
+  for (i in 0:lag_x) # use lag orders as loop indices
+  {
+    for (j in 0:lag_t)
+    {
+      index_x = (lag_x - i + 1):(nX - i)
+      index_t = (lag_t - j + 1):(nT - j)
+      matrix_out[, (j + 1) + i * (lag_t + 1)] = as.vector(Y[index_x, index_t])
+      colnames(matrix_out)[(j + 1) + i * (lag_t + 1)] = 
+        paste0(name_prefix, "_", i, j)
+    }
+  }
+  
+  if (include_00 == FALSE && lag_n > 1)
+  {
+    matrix_out = matrix_out[2:lag_n]
+  } else if (include_00 == FALSE && lag_n == 1) {
+    matrix_out = matrix_out * 0
+  }
+  
+  return(matrix_out)
+}
+
 #-------------------Yule-Walker-Estimation Function for AR---------------------#
 
 qarma.yw_matrix = function(Y, ar_order = c(1, 1))
@@ -325,116 +535,11 @@ qarma.yw_matrix = function(Y, ar_order = c(1, 1))
   Y1 = Y[(s + 1):n[1], 1:(n[2] - t)]
   acf_out = sum(Y0 * Y1)
   return(acf_out)
-}                     
-                     
-# QARMA.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
-# {
-#   #Y = matrix(rnorm(10000), 100, 100)
-# 
-#   nX = dim(Y)[1]; nT = dim(Y)[2]
-# 
-#   # calculate ARMA-orders for different purposes
-#   max_lag_x = max(model_order$ar[1], model_order$ma[1])
-#   max_lag_t = max(model_order$ar[2], model_order$ma[2])
-#   total_lag_ar = (model_order$ar[1] + 1) * (model_order$ar[2] + 1) - 1
-#   total_lag_ma = (model_order$ma[1] + 1) * (model_order$ma[2] + 1) - 1
-#   max_lag_ar = max(model_order$ar)
-#   max_lag_ma = max(model_order$ma)
-# 
-#   ### auxiliary estimation model
-#   matrix_aux = data.frame(matrix(NA, nrow = (nX - max_lag_x) * (nT - max_lag_t),
-#                     ncol = total_lag_ar + 1))       # +1 is to include lag_ar_00
-# 
-#   for (i in 0:model_order$ar[1]) # use lag orders as loop indices
-#   {
-#     for (j in 0:model_order$ar[2])
-#     {
-#       index_x = (max_lag_x - i + 1):(nX - i)
-#       index_t = (max_lag_t - j + 1):(nT - j)
-#       matrix_aux[, (j + 1) + i * (model_order$ar[2] + 1)] =  # over colums first (inner loop)
-#         as.vector(Y[index_x, index_t])
-#       names(matrix_aux)[(j + 1) + i * (model_order$ar[2] + 1)] =
-#         paste0("lag_ar_", i, j)
-#     }
-#   }
-# 
-#   # linear regression with AR-part only
-#   aux_reg = lm(lag_ar_00 ~ . + 0, data = matrix_aux)
-#   residuals_arma = matrix(0, nrow = nX, ncol = nT)
-# 
-#   # set up matrix for complete arma
-#   matrix_arma = data.frame(matrix(NA, nrow = (nX - max_lag_x) *
-#                     (nT - max_lag_t), ncol = total_lag_ar + total_lag_ma + 1))
-#   matrix_arma[, 1:(total_lag_ar + 1)] = matrix_aux
-#   names(matrix_arma)[1:(total_lag_ar + 1)] = names(matrix_aux)
-# 
-#   # iteration loop (number of iterations might increase the precision)
-#   if (total_lag_ma > 0)
-#   {
-#     for (loop in 1:3)
-#     {
-#       ### build nX*nT matrix of residuals
-#       residuals_arma[(max_lag_x + 1):nX, (max_lag_t + 1):nT] =
-#         matrix(aux_reg$residuals, nrow = (nX - max_lag_x),
-#               ncol = (nT - max_lag_t))
-# 
-# 
-#       ### fill matrix_arma with lagged residuals
-#       for (i in 0:model_order$ma[1]) # use lag orders as loop indices
-#       {
-#         for (j in 0:model_order$ma[2])
-#         {
-#           if (!(i == 0 && j == 0))  # lag_ma_00 is not needed (new residuals)
-#           {
-#             index_x = (max_lag_x - i + 1):(nX - i)
-#             index_t = (max_lag_t - j + 1):(nT - j)
-#             matrix_arma[, total_lag_ar + (j + 1) + i *
-#                           (model_order$ma[2] + 1)] =
-#               as.vector(residuals_arma[index_x, index_t])
-#             names(matrix_arma)[total_lag_ar + (j + 1) + i *
-#                                 (model_order$ma[2] + 1)] =
-#               paste0("lag_ma_", i, j)
-#           }
-#         }
-#       }
-# 
-#       # regression for iterated estimation of residuals
-#       aux_reg = lm(lag_ar_00 ~ . + 0, data = matrix_arma)
-#     }
-#   }
-#   else {
-#     ### build nX*nT matrix of residuals
-#     residuals_arma[(max_lag_x + 1):nX, (max_lag_t + 1):nT] =
-#       matrix(aux_reg$residuals, nrow = (nX - max_lag_x),
-#              ncol = (nT - max_lag_t))
-#   }
-# 
-#   # byrow = TRUE and reverse needed as lm order is 01,10,11...
-#   ar_mat = matrix(c(aux_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
-#                 nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
-#   ar_mat[model_order$ar[1] + 1, model_order$ar[2] + 1] = -1
-#   ma_mat = matrix(c(aux_reg$coef[(total_lag_ar + total_lag_ma):
-#                   (total_lag_ar + 1)], 1), byrow = TRUE,
-#                   nrow = (model_order$ma[1] + 1), ncol =
-#                     (model_order$ma[2] + 1))
-#   ma_mat[model_order$ma[1] + 1, model_order$ma[2] + 1] = 1
-#   innov = residuals_arma
-# 
-#   # check stationarity
-#   statTest = QARMA.statTest(ar_mat)
-#   if (statTest == FALSE)
-#   {
-#     stop("QARMA model not stationary, try another order for the AR-parts.")
-#   }
-# 
-#   # preparation of output
-#   coef_out = list(ar = ar_mat, ma = ma_mat, innov = innov)
-#   return(coef_out)
-# }
+}
 
 #----------------------------Simulation Function------------------------------#
 
-qarma.sim = function(nX, nT, model = list(ar, ma, stdev))
+qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
 {
   ar_mat = as.matrix(model$ar); ma_mat = as.matrix(model$ma)
   ar_x = dim(ar_mat)[1] - 1; ar_t = dim(ar_mat)[2] - 1
@@ -448,7 +553,7 @@ qarma.sim = function(nX, nT, model = list(ar, ma, stdev))
   
   nMat = floor(1.25 * c(nX, nT))
   errorMat = matrix(rnorm(prod(nMat)), nrow = nMat[1], ncol = nMat[2]) *
-    model$stdev
+    model$sigma
   armaMat = errorMat
   
   for (i in xInit:nMat[1])
@@ -464,7 +569,7 @@ qarma.sim = function(nX, nT, model = list(ar, ma, stdev))
   errorOut = errorMat[(nMat[1] - nX + 1):nMat[1], (nMat[2] - nT + 1):nMat[2]]
   
   listOut = list(Y = armaOut, innov = errorOut,
-                  ar = ar_mat, ma = ma_mat, stdev = model$stdev)
+                  ar = ar_mat, ma = ma_mat, sigma = model$sigma)
   return(listOut)
 }
 

@@ -81,3 +81,19 @@ LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
     .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec)
 }
 
+seqCpp <- function(from, to) {
+    .Call('_DCSmooth_seqCpp', PACKAGE = 'DCSmooth', from, to)
+}
+
+factorialCpp <- function(k) {
+    .Call('_DCSmooth_factorialCpp', PACKAGE = 'DCSmooth', k)
+}
+
+gsmoothCalcCpp <- function(y, v, p, mu, b, bb) {
+    .Call('_DCSmooth_gsmoothCalcCpp', PACKAGE = 'DCSmooth', y, v, p, mu, b, bb)
+}
+
+gsmoothCalc2Cpp <- function(y, v, p, mu, b, bb) {
+    .Call('_DCSmooth_gsmoothCalc2Cpp', PACKAGE = 'DCSmooth', y, v, p, mu, b, bb)
+}
+

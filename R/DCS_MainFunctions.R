@@ -123,7 +123,7 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   {
     DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
                    cf = bndwObj$varCoef, iterations = bndwObj$iterations,
-                   dcsOptions = dcsOptions)
+                   qarma_model = bndwObj$qarma_model, dcsOptions = dcsOptions)
     attr(DCS_out, "bndwAuto") = bndwAuto
   } else if (bndwAuto == FALSE) {
     # probably unadvised, that the dcs object differs according to the type

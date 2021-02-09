@@ -12,8 +12,9 @@ hOptLP = function(mxx, mtt, varCoef, n, nSub, p, kernelProp)
   i0x = intCalcLP(mxx, mtt, p, nSub)[1]
   i0t = intCalcLP(mtt, mxx, p, nSub)[1]
   
-  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * n * kernelProp$mu^2 * i0t)
+  # change nSub to n back later?
+  hxOpt = (kernelProp$R^2 * varCoef)/((p + 1) * nSub * kernelProp$mu^2 * i0x)
+  htOpt = (kernelProp$R^2 * varCoef)/((p + 1) * nSub * kernelProp$mu^2 * i0t)
   
   hxOpt = hxOpt^(1/(2*p + 4))
   htOpt = htOpt^(1/(2*p + 4))

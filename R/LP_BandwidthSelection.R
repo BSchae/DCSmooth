@@ -25,18 +25,31 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     {
       
     } else {
+      # # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      # YSmth = LP_Smooth_test(yMat = Y, hVec = hOptTemp, polyOrderVec
+      #         = c(dcsOptions$pOrder, dcsOptions$pOrder),
+      #         drvVec = c(0, 0), kernelFcn)
+      # 
+      # # smoothing of derivatives m(2,0) and m(0,2)
+      # mxx = LP_Smooth_test(yMat = Y, hVec = hInfl$h_xx, polyOrderVec
+      #       = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
+      #       kernelFcn)
+      # mtt = LP_Smooth_test(yMat = Y, hVec = hInfl$h_tt, polyOrderVec
+      #       = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
+      #       kernelFcn)
+      
       # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
-      YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec 
-              = c(dcsOptions$pOrder, dcsOptions$pOrder), 
-              drvVec = c(0, 0), kernelFcn)
-    
+      YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec
+                               = c(dcsOptions$pOrder, dcsOptions$pOrder),
+                               drvVec = c(0, 0), kernelFcn)
+
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec 
-            = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
-            kernelFcn)
-      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec 
-            = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
-            kernelFcn)
+      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec
+                             = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
+                             kernelFcn)
+      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec
+                             = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
+                             kernelFcn)
     }
       
     # shrink mxx, mtt from boundaries
@@ -50,17 +63,43 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       mxx = mxx[shrinkX, shrinkT]
       mtt = mtt[shrinkX, shrinkT]
       nSub = dim(mxx)[1]*dim(mxx)[2]
+      
+      # calculate variance factor
+      if (dcsOptions$varEst == "iid")
+      {
+        varCoef = (sd((Y - YSmth)[shrinkX, shrinkT]))^2
+        qarma_model = NA
+      } else if (dcsOptions$varEst == "qarma") {
+        cf_est = qarma.cf((Y - YSmth)[shrinkX, shrinkT],
+                          model_order = dcsOptions$modelOrder)
+        varCoef = cf_est$cf
+        qarma_model = cf_est$qarma_model
+      }
     } else {
       nSub = n
+      
+      # calculate variance factor
+      if (dcsOptions$varEst == "iid")
+      {
+        varCoef = (sd(Y - YSmth))^2
+        qarma_model = NA
+      } else if (dcsOptions$varEst == "qarma") {
+        cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
+        varCoef = cf_est$cf
+        qarma_model = cf_est$qarma_model
+      }
     }
     
-    # calculate variance factor
-    if (dcsOptions$varEst == "iid")
-    {
-      varCoef = (sd(Y - YSmth))^2
-    } else if (dcsOptions$varEst == "qarma") {
-      varCoef = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
-    }
+    # # calculate variance factor
+    # if (dcsOptions$varEst == "iid")
+    # {
+    #   varCoef = (sd(Y - YSmth))^2
+    #   qarma_model = NA
+    # } else if (dcsOptions$varEst == "qarma") {
+    #   cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
+    #   varCoef = cf_est$cf
+    #   qarma_model = cf_est$qarma_model
+    # }
     
     # calculate optimal bandwidths for next step
     hOpt = hOptLP(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)
@@ -72,5 +111,6 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       iterate = FALSE
     }
   }
-  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef))
+  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef,
+              qarma_model = qarma_model))
 }
