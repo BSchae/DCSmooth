@@ -118,18 +118,24 @@ plot.dcs = function(object, color = c("#444C5C", "#78A5A3", "#E1B16A",
        xlab = "T", ylab = "X", main = "Contour plot")
 }
 
-#' @export
+#' #' Perspective 3d plot of smoothed surface
+#' #'
+#' #' @export
+#' 
+#' persp3d.dcs = function(DCSobj, X = 1, T = 1, color = c("#000000", "#FFFFFF"),
+#'                     xlab = "X", ylab = "T", zlab = "Y")
+#' {
+#'   if (length(X) == 1) { X = DCSobj$X }
+#'   if (length(T) == 1) { T = DCSobj$T }
+#'   M = DCSobj$M
+#' 
+#'   colValue = plotDCScolFcn(DCSobj$M, myColor = color)
+#' 
+#'   rgl::par3d(windowRect = c(20, 30, 600, 600), viewport = c(50, 50, 500, 500))
+#'   rgl::view3d(userMatrix = rgl::rotationMatrix(-1.4, 14, -4.3, -5), fov = 20)
+#'   rgl::persp3d(X, T, M, col = colValue, xlab = xlab, ylab = ylab, zlab = zlab)
+#' }
+#' 
 
-persp3d.dcs = function(DCSobj, X = 1, T = 1, color = c("#000000", "#FFFFFF"),
-                    xlab = "X", ylab = "T", zlab = "Y")
-{
-  if (length(X) == 1) { X = DCSobj$X }
-  if (length(T) == 1) { T = DCSobj$T }
-  M = DCSobj$M
-  
-  colValue = plotDCScolFcn(DCSobj$M, myColor = color)
-  
-  rgl::par3d(windowRect = c(20, 30, 600, 600), viewport = c(50, 50, 500, 500))
-  rgl::view3d(userMatrix = rgl::rotationMatrix(-1.4, 14, -4.3, -5), fov = 20)
-  rgl::persp3d(X, T, M, col = colValue, xlab = xlab, ylab = ylab, zlab = zlab)
-}
+# neccessary from H. Wickhams best practices
+.onUnload <- function(libpath) { library.dynam.unload("DCSmooth", libpath) }

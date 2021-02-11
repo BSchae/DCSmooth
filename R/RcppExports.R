@@ -49,6 +49,7 @@ kernFkt_TR422 <- function(uVec, q) {
     .Call('_DCSmooth_kernFkt_TR422', PACKAGE = 'DCSmooth', uVec, q)
 }
 
+#' @export
 kernelFcn_assign <- function(fstr) {
     .Call('_DCSmooth_kernelFcn_assign', PACKAGE = 'DCSmooth', fstr)
 }
@@ -65,35 +66,11 @@ LP_DoubleSmooth2 <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr) {
     .Call('_DCSmooth_LP_DoubleSmooth2', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
 }
 
-weightMatrix <- function(weights, matrix) {
-    .Call('_DCSmooth_weightMatrix', PACKAGE = 'DCSmooth', weights, matrix)
+LPSmooth_matrix <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
+    .Call('_DCSmooth_LPSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
 }
 
-xMatrix <- function(xVector, polyOrder) {
-    .Call('_DCSmooth_xMatrix', PACKAGE = 'DCSmooth', xVector, polyOrder)
-}
-
-LPSmooth_matrix <- function(yMat, h, polyOrder, drv) {
-    .Call('_DCSmooth_LPSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv)
-}
-
-LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec) {
-    .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec)
-}
-
-seqCpp <- function(from, to) {
-    .Call('_DCSmooth_seqCpp', PACKAGE = 'DCSmooth', from, to)
-}
-
-factorialCpp <- function(k) {
-    .Call('_DCSmooth_factorialCpp', PACKAGE = 'DCSmooth', k)
-}
-
-gsmoothCalcCpp <- function(y, v, p, mu, b, bb) {
-    .Call('_DCSmooth_gsmoothCalcCpp', PACKAGE = 'DCSmooth', y, v, p, mu, b, bb)
-}
-
-gsmoothCalc2Cpp <- function(y, v, p, mu, b, bb) {
-    .Call('_DCSmooth_gsmoothCalc2Cpp', PACKAGE = 'DCSmooth', y, v, p, mu, b, bb)
+LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr) {
+    .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
 }
 

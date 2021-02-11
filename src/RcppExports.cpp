@@ -215,33 +215,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// weightMatrix
-arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
-RcppExport SEXP _DCSmooth_weightMatrix(SEXP weightsSEXP, SEXP matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::colvec >::type weights(weightsSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type matrix(matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(weightMatrix(weights, matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// xMatrix
-arma::mat xMatrix(arma::colvec xVector, int polyOrder);
-RcppExport SEXP _DCSmooth_xMatrix(SEXP xVectorSEXP, SEXP polyOrderSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::colvec >::type xVector(xVectorSEXP);
-    Rcpp::traits::input_parameter< int >::type polyOrder(polyOrderSEXP);
-    rcpp_result_gen = Rcpp::wrap(xMatrix(xVector, polyOrder));
-    return rcpp_result_gen;
-END_RCPP
-}
 // LPSmooth_matrix
-arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv);
-RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP) {
+arma::mat LPSmooth_matrix(const arma::mat yMat, const double h, const int polyOrder, const int drv, SEXP kernFcnPtr);
+RcppExport SEXP _DCSmooth_LPSmooth_matrix(SEXP yMatSEXP, SEXP hSEXP, SEXP polyOrderSEXP, SEXP drvSEXP, SEXP kernFcnPtrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -249,13 +225,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type h(hSEXP);
     Rcpp::traits::input_parameter< const int >::type polyOrder(polyOrderSEXP);
     Rcpp::traits::input_parameter< const int >::type drv(drvSEXP);
-    rcpp_result_gen = Rcpp::wrap(LPSmooth_matrix(yMat, h, polyOrder, drv));
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
+    rcpp_result_gen = Rcpp::wrap(LPSmooth_matrix(yMat, h, polyOrder, drv, kernFcnPtr));
     return rcpp_result_gen;
 END_RCPP
 }
 // LP_DoubleSmooth
-arma::mat LP_DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec);
-RcppExport SEXP _DCSmooth_LP_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP) {
+arma::mat LP_DoubleSmooth(arma::mat yMat, arma::colvec hVec, arma::icolvec polyOrderVec, arma::icolvec drvVec, SEXP kernFcnPtr);
+RcppExport SEXP _DCSmooth_LP_DoubleSmooth(SEXP yMatSEXP, SEXP hVecSEXP, SEXP polyOrderVecSEXP, SEXP drvVecSEXP, SEXP kernFcnPtrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -263,62 +240,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::colvec >::type hVec(hVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type polyOrderVec(polyOrderVecSEXP);
     Rcpp::traits::input_parameter< arma::icolvec >::type drvVec(drvVecSEXP);
-    rcpp_result_gen = Rcpp::wrap(LP_DoubleSmooth(yMat, hVec, polyOrderVec, drvVec));
-    return rcpp_result_gen;
-END_RCPP
-}
-// seqCpp
-arma::vec seqCpp(int from, int to);
-RcppExport SEXP _DCSmooth_seqCpp(SEXP fromSEXP, SEXP toSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type from(fromSEXP);
-    Rcpp::traits::input_parameter< int >::type to(toSEXP);
-    rcpp_result_gen = Rcpp::wrap(seqCpp(from, to));
-    return rcpp_result_gen;
-END_RCPP
-}
-// factorialCpp
-int factorialCpp(int k);
-RcppExport SEXP _DCSmooth_factorialCpp(SEXP kSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    rcpp_result_gen = Rcpp::wrap(factorialCpp(k));
-    return rcpp_result_gen;
-END_RCPP
-}
-// gsmoothCalcCpp
-arma::vec gsmoothCalcCpp(arma::vec y, int v, int p, int mu, double b, int bb);
-RcppExport SEXP _DCSmooth_gsmoothCalcCpp(SEXP ySEXP, SEXP vSEXP, SEXP pSEXP, SEXP muSEXP, SEXP bSEXP, SEXP bbSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< int >::type v(vSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type b(bSEXP);
-    Rcpp::traits::input_parameter< int >::type bb(bbSEXP);
-    rcpp_result_gen = Rcpp::wrap(gsmoothCalcCpp(y, v, p, mu, b, bb));
-    return rcpp_result_gen;
-END_RCPP
-}
-// gsmoothCalc2Cpp
-List gsmoothCalc2Cpp(arma::vec y, int v, int p, int mu, double b, int bb);
-RcppExport SEXP _DCSmooth_gsmoothCalc2Cpp(SEXP ySEXP, SEXP vSEXP, SEXP pSEXP, SEXP muSEXP, SEXP bSEXP, SEXP bbSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< int >::type v(vSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type b(bSEXP);
-    Rcpp::traits::input_parameter< int >::type bb(bbSEXP);
-    rcpp_result_gen = Rcpp::wrap(gsmoothCalc2Cpp(y, v, p, mu, b, bb));
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
+    rcpp_result_gen = Rcpp::wrap(LP_DoubleSmooth(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -340,14 +263,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_kernelFcn_use", (DL_FUNC) &_DCSmooth_kernelFcn_use, 3},
     {"_DCSmooth_LPSmooth_matrix2", (DL_FUNC) &_DCSmooth_LPSmooth_matrix2, 5},
     {"_DCSmooth_LP_DoubleSmooth2", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth2, 5},
-    {"_DCSmooth_weightMatrix", (DL_FUNC) &_DCSmooth_weightMatrix, 2},
-    {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
-    {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 4},
-    {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 4},
-    {"_DCSmooth_seqCpp", (DL_FUNC) &_DCSmooth_seqCpp, 2},
-    {"_DCSmooth_factorialCpp", (DL_FUNC) &_DCSmooth_factorialCpp, 1},
-    {"_DCSmooth_gsmoothCalcCpp", (DL_FUNC) &_DCSmooth_gsmoothCalcCpp, 6},
-    {"_DCSmooth_gsmoothCalc2Cpp", (DL_FUNC) &_DCSmooth_gsmoothCalc2Cpp, 6},
+    {"_DCSmooth_LPSmooth_matrix", (DL_FUNC) &_DCSmooth_LPSmooth_matrix, 5},
+    {"_DCSmooth_LP_DoubleSmooth", (DL_FUNC) &_DCSmooth_LP_DoubleSmooth, 5},
     {NULL, NULL, 0}
 };
 

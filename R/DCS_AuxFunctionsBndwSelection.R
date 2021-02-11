@@ -65,6 +65,7 @@ intCalcLP = function(m11, m22, p, nSub)
 
 #-------------------------Kernel property calculation--------------------------#
 
+#' @export
 kernelPropFcn = function(kernelFcn, nInt = 5000)
 {
   uSeq  = seq(from = -1, to = 1, length.out = (2 * nInt + 1))

@@ -143,5 +143,5 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 plotDCS = function(DCSobj, ...)
 {
-  persp3d(DCSobj = DCSobj, ...)
+  .persp3ddcs(DCSobj = DCSobj, ...)
 }

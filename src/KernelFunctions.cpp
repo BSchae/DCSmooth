@@ -253,6 +253,7 @@ arma::vec kernFkt_TR422(arma::vec& uVec, double q)
   return uOut;
 }
 
+//' @export
 // [[Rcpp::export]]
 XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
   if (fstr == "MW200")

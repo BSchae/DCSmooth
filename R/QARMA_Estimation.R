@@ -26,37 +26,87 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 
 #-------------------------------Model Selection--------------------------------#
 
-qarma.order = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
-{
-  n = prod(dim(Y))
-  ar_matrix = expand.grid(0:order_max$ar[1], 0:order_max$ar[2])
-  names(ar_matrix) = NULL
-  ma_matrix = expand.grid(0:order_max$ma[1], 0:order_max$ma[2])
-  names(ma_matrix) = NULL
-  bic_matrix = matrix(NA, nrow = dim(ar_matrix)[1], ncol = dim(ma_matrix)[1])
-  
-  for (i in 1:dim(ar_matrix)[1])
-  {
-    for (j in 1:dim(ma_matrix)[1])
-    {
-      print(c(i, j))
-      model_order = list(ar = as.numeric(ar_matrix[i, ]),
-                         ma = as.numeric(ma_matrix[j, ]))
-      qarma_model = qarma.est(Y, model_order = model_order)
-      log_L = -n/2 * log(2*pi*qarma_model$sigma^2) -
-              sum(qarma_model$innov^2)/(2*qarma_model$sigma^2)
-      bic_matrix[i, j] = -2*log_L + sum(unlist(model_order)) * log(n)
-    }
-  }
-  
-  opt_index = which(bic_matrix == min(bic_matrix, na.rm = TRUE), arr.ind = TRUE)
-  model_order_opt = list(ar = as.numeric(ar_matrix[opt_index[, 1], ]),
-                         ma = as.numeric(ma_matrix[opt_index[, 2], ]))
-  
-  return(model_order_opt)
-}
+# not working yet
+
+# qarma.order = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
+# {
+#   n = prod(dim(Y))
+#   ar_matrix = expand.grid(0:order_max$ar[1], 0:order_max$ar[2])
+#   names(ar_matrix) = NULL
+#   ma_matrix = expand.grid(0:order_max$ma[1], 0:order_max$ma[2])
+#   names(ma_matrix) = NULL
+#   bic_matrix = matrix(NA, nrow = dim(ar_matrix)[1], ncol = dim(ma_matrix)[1])
+#   
+#   for (i in 1:dim(ar_matrix)[1])
+#   {
+#     for (j in 1:dim(ma_matrix)[1])
+#     {
+#       print(c(i, j))
+#       model_order = list(ar = as.numeric(ar_matrix[i, ]),
+#                          ma = as.numeric(ma_matrix[j, ]))
+#       qarma_model = qarma.est(Y, model_order = model_order)
+#       log_L = -n/2 * log(2*pi*qarma_model$sigma^2) -
+#               sum(qarma_model$innov^2)/(2*qarma_model$sigma^2)
+#       bic_matrix[i, j] = -2*log_L + sum(unlist(model_order)) * log(n)
+#     }
+#   }
+#   
+#   opt_index = which(bic_matrix == min(bic_matrix, na.rm = TRUE), arr.ind = TRUE)
+#   model_order_opt = list(ar = as.numeric(ar_matrix[opt_index[, 1], ]),
+#                          ma = as.numeric(ma_matrix[opt_index[, 2], ]))
+#   
+#   return(model_order_opt)
+# }
 
 #------------------------Estimation Function for QARMA-------------------------#
+
+#' Parametric Estimation of a \eqn{QARMA(p, q)}-process on a lattice.
+#' 
+#' The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
+#' using the Hannen-Rissanen Algorithm (Hannen-Rissanen ???). The lag-orders of 
+#' the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
+#' (p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
+#' rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation
+#' process is based on the model
+#' \deqn{\phi(B_{1}B_{2})X_{i,j} = \theta(B_{1}B_{2})u_{i,j}}{\phi(B1 B2)
+#' X[i,j] = \theta(B1 B2)u[i,j]}
+#' 
+#' @param Y A numeric matrix that contains the demeaned observations of the
+#'   random field or functional time-series.
+#' @param model_order A list containing the orders of the QARMA model in the
+#'   form \code{model_order = list(ar = c(p1, p2), ma = c(q1, q2))}. Default
+#'   value is a \eqn{QARMA((1, 1), (1, 1))} model.
+#' 
+#' @return The function returns a list including
+#' 
+#' \describe{
+#' \item{ar}{A \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
+#' containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. The
+#' \eqn{[i, j]}th entry is the \eqn{(p_1 + 1 - i, p_2 + 1 - j)}th lag with the
+#' \eqn{[p_1 + 1, p_2 + 1]}th entry being 1.}
+#' \item{ma}{A \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
+#' containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. The
+#' \eqn{[i, j]}th entry is the \eqn{(q_1 + 1 - i, q_2 + 1 - j)}th lag with the 
+#' \eqn{[q_1 + 1, q_2 + 1]}th entry being 1.}
+#' \item{sigma}{The estimated standard deviation \eqn{\sigma} of the QARMA-model.}
+#' \item{innov}{The matrix of innovations resulting from the QARMA estimation. 
+#' The initial values (from \eqn{i = 1,...,p_1}{i = 1,...,p1} and
+#' \eqn{j = 1,...,p_2}{j = 1,...,p2}) are set to zero.} 
+#' }
+#' 
+#' @section Usage:
+#' \code{qarma(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))}
+#' 
+#' @section Details:
+#' ???
+#' 
+#' @examples
+#' qarma.example1
+#' qarma.example2
+#' qarma.est(qarma.example1)
+#' qarma.est(qarma.example2, model_order = list(ar = c(1, 1), ma = c(0, 0))
+#' 
+#' @export
 
 qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
@@ -131,6 +181,8 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov)
   return(coef_out)
 }
+
+#------------------Unused Estimations using Hannen-Rissanen--------------------#
 
 qarma.est1 = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
@@ -436,7 +488,8 @@ qarma.est.3rdstep = function(Y, ar_mat, ma_mat, model_order)
 
 #-----------------------------Auxiliary Functions------------------------------#
 
-.qarma.fill_lag_matrix = function(Y, lag_x, lag_t, include_00 = TRUE, name_prefix)
+.qarma.fill_lag_matrix = function(Y, lag_x, lag_t, include_00 = TRUE,
+                                  name_prefix)
 {
   nX = dim(Y)[1]; nT = dim(Y)[2]
   lag_obs = (nX - lag_x) * (nT - lag_t)
@@ -537,7 +590,55 @@ qarma.yw_matrix = function(Y, ar_order = c(1, 1))
   return(acf_out)
 }
 
-#----------------------------Simulation Function------------------------------#
+#----------------------------Simulation Function-------------------------------#
+
+#' Simulation of a \eqn{QARMA(p, q)}-process on a lattice.
+#' 
+#' The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
+#' using the Hannen-Rissanen Algorithm (Hannen-Rissanen ???). The lag-orders of 
+#' the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
+#' (p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
+#' rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation
+#' process is based on the model
+#' \deqn{\phi(B_{1}B_{2})X_{i,j} = \theta(B_{1}B_{2})u_{i,j}}{\phi(B1 B2)
+#' X[i,j] = \theta(B1 B2)u[i,j]}
+#' 
+#' @param Y A numeric matrix that contains the demeaned observations of the
+#'   random field or functional time-series.
+#' @param model_order A list containing the orders of the QARMA model in the
+#'   form \code{model_order = list(ar = c(p1, p2), ma = c(q1, q2))}. Default
+#'   value is a \eqn{QARMA((1, 1), (1, 1))} model.
+#' 
+#' @return The function returns a list including
+#' 
+#' \describe{
+#' \item{ar}{A \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
+#' containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. The
+#' \eqn{[i, j]}th entry is the \eqn{(p_1 + 1 - i, p_2 + 1 - j)}th lag with the
+#' \eqn{[p_1 + 1, p_2 + 1]}th entry being 1.}
+#' \item{ma}{A \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
+#' containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. The
+#' \eqn{[i, j]}th entry is the \eqn{(q_1 + 1 - i, q_2 + 1 - j)}th lag with the 
+#' \eqn{[q_1 + 1, q_2 + 1]}th entry being 1.}
+#' \item{sigma}{The estimated standard deviation \eqn{\sigma} of the QARMA-model.}
+#' \item{innov}{The matrix of innovations resulting from the QARMA estimation. 
+#' The initial values (from \eqn{i = 1,...,p_1}{i = 1,...,p1} and
+#' \eqn{j = 1,...,p_2}{j = 1,...,p2}) are set to zero.} 
+#' }
+#' 
+#' @section Usage:
+#' \code{qarma(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))}
+#' 
+#' @section Details:
+#' ???
+#' 
+#' @examples
+#' qarma.example1
+#' qarma.example2
+#' qarma.est(qarma.example1)
+#' qarma.est(qarma.example2, model_order = list(ar = c(1, 1), ma = c(0, 0))
+#' 
+#' @export
 
 qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
 {
@@ -573,7 +674,7 @@ qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
   return(listOut)
 }
 
-#-------------------------Test for QARMA stationarity-------------------------#
+#-------------------------Test for QARMA stationarity--------------------------#
 
 qarma.statTest = function(ar)
 {
@@ -608,7 +709,7 @@ qarma.statTest = function(ar)
   return(outValue)
 }
 
-#-----------------------Characteristic Function of AR Part--------------------#
+#-----------------------Characteristic Function of AR Part---------------------#
 
 qarma.auxF = function(z1c, z2c, ar)
 {
@@ -653,7 +754,7 @@ qarma.spec = function(Y, ar, ma, stdev, omega)
   maSum = Re(sum(ma * (z1^(lagMA[1]:0)) %*% t(z2^(lagMA[2]:0))) * 
                   sum(ma * ((1/z1)^(lagMA[1]:0)) %*% t((1/z2)^(lagMA[2]:0))))
   
-  specDensOut = stdev^2/g00 * maSum/arSum # check this again ???
+  specDensOut = stdev^2/g00 * maSum/arSum
   
   return(specDensOut)
 }

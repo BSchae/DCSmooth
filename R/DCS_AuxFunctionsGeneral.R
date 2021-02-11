@@ -37,3 +37,21 @@ plotDCScolFcn = function(Y, myColor, nColor = 100)
   col = matrix(colorGrad[YCol])
   return(col)
 }
+
+#---------------------------Function for 3d plots------------------------------#
+
+# Function should be a S3 method, not working currently
+
+.persp3ddcs = function(DCSobj, X = 1, T = 1, color = c("#000000", "#FFFFFF"),
+                    xlab = "X", ylab = "T", zlab = "Y")
+{
+  if (length(X) == 1) { X = DCSobj$X }
+  if (length(T) == 1) { T = DCSobj$T }
+  M = DCSobj$M
+
+  colValue = plotDCScolFcn(DCSobj$M, myColor = color)
+
+  rgl::par3d(windowRect = c(20, 30, 600, 600), viewport = c(50, 50, 500, 500))
+  rgl::view3d(userMatrix = rgl::rotationMatrix(-1.4, 14, -4.3, -5), fov = 20)
+  rgl::persp3d(X, T, M, col = colValue, xlab = xlab, ylab = ylab, zlab = zlab)
+}
