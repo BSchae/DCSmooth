@@ -12,7 +12,7 @@
   # if pOrder == 0, kernel regression will be used.
   # (orders have to be the same in both directions)
   inflExp   = c(0.5, 0.5), # inflation exponent
-  inflPar   = c(2, 1),     # inflation parameters c (regression),
+  inflPar   = c(3, 1),     # inflation parameters c (regression),
   # d (2nd derivative)
   delta     = c(0.0, 0.0), # parameter for shrinking the derivatives
   constWindow = FALSE,

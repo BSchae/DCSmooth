@@ -6,38 +6,21 @@
 
 using namespace Rcpp;
 
-arma::vec kernFkt_MW200(arma::vec&, double);
-arma::vec kernFkt_MW210(arma::vec&, double);
-arma::vec kernFkt_MW220(arma::vec&, double);
-arma::vec kernFkt_MW320(arma::vec&, double);
-arma::vec kernFkt_MW420(arma::vec&, double);
-arma::vec kernFkt_MW422(arma::vec&, double);
-
-//---------------------------------------------------------------------------//
-
-arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
-
-//---------------------------------------------------------------------------//
-
-// rewrite x-Vector as x-Matrix for lm model, x can be a vector before this function
-arma::mat xMatrix(arma::colvec xVector, int polyOrder);
-
-//---------------------------------------------------------------------------//
-
-int factorialFunction(int value);
-
 //---------------------------------------------------------------------------//
 
 // [[Rcpp::export]]
 arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
                            const int polyOrder, const int drv, SEXP kernFcnPtr)
 {
-  int nRow{ yMat.n_rows };    // number of conditional Time-Series
-  int nCol{ yMat.n_cols };    // number of observations per Time-Series
+  // get additional information on nX, nT, bndw etc.
+  int nRow{ yMat.n_rows };
+  int nCol{ yMat.n_cols };
   int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) }; 
                         // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };  // width of estimation window
-  arma::mat yMatOut(nRow, nCol);  // matrix for results
+  
+  // result matrix
+  arma::mat yMatOut(nRow, nCol);
   
   // enable Kernel function
   XPtr<funcPtr> xpfun(kernFcnPtr);
@@ -49,7 +32,9 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
   arma::colvec  xVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol, 
                         static_cast<double>(polyOrder + 1)) }; // vector from -1 to 1 to compute weights
   arma::colvec  weightsVec{ (kernFcn(uVec, 1)) };         // computation of weights // sqrt removed
-
+  //arma::vec lWeights{ lejWeights(arma::vec u, int p, int drv, SEXP kernFcnPtr) };
+  //weightsVec = weightsVec % lWeights;
+  
   // smoothing over boundaries
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {

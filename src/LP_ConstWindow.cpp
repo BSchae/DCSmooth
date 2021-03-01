@@ -6,53 +6,6 @@
 
 using namespace Rcpp;
 
-arma::vec kernFkt_MW200(arma::vec&, double);
-arma::vec kernFkt_MW210(arma::vec&, double);
-arma::vec kernFkt_MW220(arma::vec&, double);
-arma::vec kernFkt_MW320(arma::vec&, double);
-arma::vec kernFkt_MW420(arma::vec&, double);
-arma::vec kernFkt_MW422(arma::vec&, double);
-
-//---------------------------------------------------------------------------//
-
-arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
-{
-  arma::mat matrixOut{ arma::mat(matrix.n_rows, matrix.n_cols) };
-  for (int j{ 0 }; j < matrix.n_cols; ++j)
-  {
-    matrixOut.col(j) = weights % matrix.col(j);
-  }
-
-  return matrixOut;
-}
-
-//---------------------------------------------------------------------------//
-
-// rewrite x-Vector as x-Matrix for lm model, x can be a vector before this function
-
-arma::mat xMatrix(arma::colvec xVector, int polyOrder)
-{
-  arma::mat returnMatrix{ arma::ones(xVector.n_rows, polyOrder + 1) };
-
-  // put powers of x into matrix depending on order (local linear: order = 1)
-  for (int indexOrder{ 0 }; indexOrder < polyOrder; ++indexOrder)
-    returnMatrix.col(indexOrder + 1) = pow(xVector, indexOrder + 1);
-
-  return returnMatrix;
-}
-
-//---------------------------------------------------------------------------//
-
-int factorialFunction(int value)
-{
-  int outValue{ 1 };
-
-  for(int count{ 1 }; count <= value; ++count)
-    outValue *= count;
-
-  return outValue;
-}
-
 //---------------------------------------------------------------------------//
 
 // function smoothes over the rows of a matrix yMat, conditional on columns

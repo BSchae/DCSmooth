@@ -8,6 +8,44 @@
 
 using namespace Rcpp;
 
+// xMatrix
+arma::mat xMatrix(arma::colvec xVector, int polyOrder);
+RcppExport SEXP _DCSmooth_xMatrix(SEXP xVectorSEXP, SEXP polyOrderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec >::type xVector(xVectorSEXP);
+    Rcpp::traits::input_parameter< int >::type polyOrder(polyOrderSEXP);
+    rcpp_result_gen = Rcpp::wrap(xMatrix(xVector, polyOrder));
+    return rcpp_result_gen;
+END_RCPP
+}
+// npMatrix
+arma::mat npMatrix(SEXP kernFcnPtr, int p, int n);
+RcppExport SEXP _DCSmooth_npMatrix(SEXP kernFcnPtrSEXP, SEXP pSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type kernFcnPtr(kernFcnPtrSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(npMatrix(kernFcnPtr, p, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mWeights
+arma::vec mWeights(arma::mat npMatrix, arma::vec u, int drv);
+RcppExport SEXP _DCSmooth_mWeights(SEXP npMatrixSEXP, SEXP uSEXP, SEXP drvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type npMatrix(npMatrixSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type u(uSEXP);
+    Rcpp::traits::input_parameter< int >::type drv(drvSEXP);
+    rcpp_result_gen = Rcpp::wrap(mWeights(npMatrix, u, drv));
+    return rcpp_result_gen;
+END_RCPP
+}
 // KRSmooth_matrix2
 arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr);
 RcppExport SEXP _DCSmooth_KRSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
@@ -247,6 +285,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
+    {"_DCSmooth_npMatrix", (DL_FUNC) &_DCSmooth_npMatrix, 3},
+    {"_DCSmooth_mWeights", (DL_FUNC) &_DCSmooth_mWeights, 3},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 4},

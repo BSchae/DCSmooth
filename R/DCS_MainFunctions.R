@@ -69,6 +69,8 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 
 dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 {
+  time_start = Sys.time() # get starting time for performance measuring
+  
   # check for correct inputs of data and options
   .dcsCheck_Y(Y)
   .dcsCheck_bndw(bndw, dcsOptions)
@@ -119,17 +121,21 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   # calculate residuals
   R = Y - DCSOut
   
+  time_end = Sys.time()
+  
   if (bndwAuto == TRUE)
   {
     DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
                    cf = bndwObj$varCoef, iterations = bndwObj$iterations,
-                   qarma_model = bndwObj$qarma_model, dcsOptions = dcsOptions)
+                   qarma_model = bndwObj$qarma_model, dcsOptions = dcsOptions,
+                   timeUsed = difftime(time_end, time_start, units = "secs"))
     attr(DCS_out, "bndwAuto") = bndwAuto
   } else if (bndwAuto == FALSE) {
     # probably unadvised, that the dcs object differs according to the type
     # of bndw selection
     DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R, bndw = bndw,
-                   dcsOptions = dcsOptions)
+                   dcsOptions = dcsOptions,
+                   timeUsed = difftime(time_end, time_start, units = "secs"))
     attr(DCS_out, "bndwAuto") = bndwAuto
   }
   

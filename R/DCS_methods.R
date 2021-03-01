@@ -30,6 +30,7 @@ summary.dcs = function(object)
     cat("Inflation Parameters\t", object$dcsOptions$inflPar, "\n")
     cat("Const. Window\t\t", object$dcsOptions$constWindow, "\n")
     cat("Shrink Parameter:\t", object$dcsOptions$delta, "\n")
+    cat("Time used (seconds):\t", object$timeUsed, "\n")
     cat("---------------------------------------------", "\n")
   
   # when given bandwidths are used.
