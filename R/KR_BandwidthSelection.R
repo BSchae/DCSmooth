@@ -75,6 +75,9 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
       varCoef = cf_est$cf
       qarma_model = cf_est$qarma_model
+    } else if (dcsOptions$varEst == "np") {
+      cf_est = specDens((Y - YSmth), omega = c(0, 0))
+      varCoef = cf_est$cf
     }
     
     # calculate optimal bandwidths for next step

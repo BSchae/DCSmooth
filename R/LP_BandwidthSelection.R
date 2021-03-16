@@ -1,53 +1,54 @@
-###############################################################################
-#                                                                             #
-#         DCSmooth Package: R-Functions for LP Bandwidth Selection            #
-#                                                                             #
-###############################################################################
+################################################################################
+#                                                                              #
+#          DCSmooth Package: R-Functions for LP Bandwidth Selection            #
+#                                                                              #
+################################################################################
 
 LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
 {
   nX = dim(Y)[1]; nT = dim(Y)[2]
-  n  = nX * nT                                  # total number of observations is needed later
+  n  = nX * nT              # total number of observations is needed later
+  pOrder = dcsOptions$pOrder
+  drvVec = dcsOptions$drv
   
-  kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
-  
-  hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
+  hOpt = c(0.1, 0.1)        # initial values for h_0, arbitrary chosen
 
-  iterate = TRUE                                # iteration indicator
+  iterate = TRUE            # iteration indicator
   iterationCount = 0
-  while(iterate)                                # loop for IPI
+  while(iterate)            # loop for IPI
   {
     iterationCount = iterationCount + 1
-    hOptTemp   = hOpt[1:2]       # store old bandwidths for breaking condition
-    hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
+    hOptTemp   = hOpt[1:2]      # store old bandwidths for breaking condition
+    hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  
+                                # inflation of bandwidths for drv estimation
    
     if (dcsOptions$constWindow == TRUE)
     {
-      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      # smoothing of Y for variance factor estimation
       YSmth = LP_DoubleSmooth(yMat = Y, hVec = hOptTemp, polyOrderVec
-                               = c(dcsOptions$pOrder, dcsOptions$pOrder),
-                               drvVec = c(0, 0), kernelFcn)
+               = pOrder, drvVec = drvVec, kernelFcn)
       
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, polyOrderVec
-                             = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
-                             kernelFcn)
-      mtt = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_tt, polyOrderVec
-                             = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
-                             kernelFcn)
+      # needs update for p even.
+      mxx = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, polyOrderVec = 
+                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2] + 2), drvVec =
+                c(pOrder[1] + 1, drvVec[2]), kernelFcn)
+      mtt = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
+                c(pOrder[1], 2*pOrder - drvVec[2] + 1), drvVec =
+                c(drvVec[1], pOrder[2] + 1), kernelFcn)
     } else {
-      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      # smoothing of Y for variance factor estimation
       YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec
-                               = c(dcsOptions$pOrder, dcsOptions$pOrder),
-                               drvVec = c(0, 0), kernelFcn)
-
+                              = pOrder, drvVec = drvVec, kernelFcn)
+      
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec
-                             = c(dcsOptions$pOrder + 2, dcsOptions$pOrder), drvVec = c(2, 0),
-                             kernelFcn)
-      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec
-                             = c(dcsOptions$pOrder, dcsOptions$pOrder + 2), drvVec = c(0, 2),
-                             kernelFcn)
+      # needs update for p even.
+      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec = 
+                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2]), drvVec =
+                c(pOrder[1] + 1, drvVec[2]), kernelFcn)
+      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
+                c(pOrder[1], 2*pOrder - drvVec[2] + 1), drvVec =
+                c(drvVec[1], pOrder[2] + 1), kernelFcn)
     }
       
     # shrink mxx, mtt from boundaries
@@ -62,17 +63,6 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       mtt = mtt[shrinkX, shrinkT]
       nSub = dim(mxx)[1]*dim(mxx)[2]
       
-      # calculate variance factor
-      if (dcsOptions$varEst == "iid")
-      {
-        varCoef = (sd((Y - YSmth)[shrinkX, shrinkT]))^2
-        qarma_model = NA
-      } else if (dcsOptions$varEst == "qarma") {
-        cf_est = qarma.cf((Y - YSmth)[shrinkX, shrinkT],
-                          model_order = dcsOptions$modelOrder)
-        varCoef = cf_est$cf
-        qarma_model = cf_est$qarma_model
-      }
     } else {
       nSub = n
       
@@ -85,11 +75,14 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
         cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
         varCoef = cf_est$cf
         qarma_model = cf_est$qarma_model
+      } else if (dcsOptions$varEst == "np") {
+        cf_est = specDens((Y - YSmth), omega = c(0, 0))
+        varCoef = cf_est$cf
       }
     }
     
     # calculate optimal bandwidths for next step
-    hOpt = hOptLP(mxx, mtt, varCoef, n, nSub, dcsOptions$pOrder, kernelProp)
+    hOpt = hOptLP(mxx, mtt, varCoef, nSub, pOrder, drvVec, kernelFcn)
     
     # break condition
     if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 

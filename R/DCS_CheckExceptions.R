@@ -68,16 +68,10 @@
 {
   # check kernel parameters
   
-  # check polynomial order
-  if (dcsOpt$pOrder < 0)
+  # check derivative orders
+  if (any(dcsOpt$pOrder < 0))
   {  
-    stop("Your polynomial order is smaller than 0.")
-  }
-  
-  if (dcsOpt$pOrder > 3)
-  {
-    warning("Your large polynomial order might result in a longer computation",
-            "time.")
+    stop("Your derivative order is smaller than 0.")
   }
   
   # check inflation exponents
@@ -87,7 +81,7 @@
   }
   
   # check inflation parameters
-  if (any(dcsOpt$inflPar != c(2, 1)))
+  if (any(dcsOpt$inflPar != c(1.5, 0.25)))
   {
     warning("Inflation parameters have been changed.")
   }

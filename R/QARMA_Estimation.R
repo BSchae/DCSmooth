@@ -121,10 +121,9 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_ma = max(model_order$ma)
   
   ### AR-only auxiliary estimation model ###
-  
   matrix_aux = .qarma.fill_lag_matrix(Y, lag_x = model_order$ar[1],
-                                      lag_t = model_order$ar[2], include_00 = TRUE,
-                                      name_prefix = "ar")
+                                  lag_t = model_order$ar[2], include_00 = TRUE,
+                                  name_prefix = "ar")
   aux_reg = lm(ar_00 ~ . + 0, data = matrix_aux)
   residuals_aux = matrix(aux_reg$residuals, nrow = nX - model_order$ar[1],
                          ncol = nT - model_order$ar[2])
@@ -150,22 +149,24 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
     arma_reg = lm(ar_00 ~ . + 0, data = matrix_arma)
     
     # fill ar and ma matrices
-    ar_mat = matrix(c(arma_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
+    # updated to lag-order (phi_00/psi_00 in upper left corner)
+    # ar_mat is lhs of QARMA-equation (phi_00 = 1)
+    ar_mat = matrix(c(1, -arma_reg$coef[1:total_lag_ar]), byrow = TRUE,
                     nrow = (model_order$ar[1] + 1), 
                     ncol = (model_order$ar[2] + 1))
-    ma_mat = matrix(c(arma_reg$coef[(total_lag_ar + total_lag_ma):
-                                      (total_lag_ar + 1)], 1), byrow = TRUE,
+    ma_mat = matrix(c(1, arma_reg$coef[(total_lag_ar + 1):
+                    (total_lag_ar + total_lag_ma)]), byrow = TRUE,
                     nrow = (model_order$ma[1] + 1),
                     ncol = (model_order$ma[2] + 1))
     if (total_lag_ar == 0)
     {
-      ar_mat[1, 1] = -1
+      ar_mat[1, 1] = 1
     }
   } else {
     arma_reg = aux_reg
     
     # fill ar matrix (and ma matrix)
-    ar_mat = matrix(c(aux_reg$coef[total_lag_ar:1], -1), byrow = TRUE,
+    ar_mat = matrix(c(1, -aux_reg$coef[1:total_lag_ar]), byrow = TRUE,
                     nrow = (model_order$ar[1] + 1), ncol = (model_order$ar[2] + 1))
     ma_mat = matrix(1)
   }
@@ -258,7 +259,7 @@ qarma.est2 = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   # linear regression & prepare output
   arma_lm = lm(lag_ar_00 ~ . + 0, data = arma_lm_matrix)
   
-  improve = TRUE
+  improve = FALSE
   if (improve == TRUE)
   {
     # byrow = TRUE and reverse needed as lm order is 01,10,11...
@@ -550,9 +551,9 @@ qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
   xInit = max(ar_x, ma_x) + 1
   tInit = max(ar_t, ma_t) + 1
   
-  # check matrices alpha, beta
-  ma_mat[ma_x + 1, ma_t + 1] = 1 # MA-coefficients
-  ar_mat[ar_x + 1, ar_t + 1] = 0  # AR-coefficients
+  # set coefficients for zero-lags
+  ma_mat[1, 1] = 1 # MA-coefficients
+  ar_mat[1, 1] = 0 # AR-coefficients
   
   nMat = floor(1.25 * c(nX, nT))
   errorMat = matrix(rnorm(prod(nMat)), nrow = nMat[1], ncol = nMat[2]) *
@@ -563,8 +564,8 @@ qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
   {
     for (j in tInit:nMat[2])
     {
-      armaMat[i, j] = sum(ar_mat * armaMat[(i - ar_x):i, (j - ar_t):j]) +
-                      sum(ma_mat * errorMat[(i - ma_x):i, (j - ma_t):j])
+      armaMat[i, j] = sum(-ar_mat * armaMat[i:(i - ar_x), j:(j - ar_t)]) +
+                      sum(ma_mat * errorMat[i:(i - ma_x), j:(j - ma_t)])
     }
   }
   
@@ -580,7 +581,8 @@ qarma.sim = function(nX, nT, model = list(ar, ma, sigma))
 
 qarma.statTest = function(ar)
 {
-  ar[dim(ar)[1], dim(ar)[2]] = -1
+  ar = as.matrix(ar)
+  ar[1, 1] = 1
   outValue = TRUE
   
   # compute reference sign at center (0, 0)
@@ -588,6 +590,7 @@ qarma.statTest = function(ar)
   
   # check for random numbers inside unit circle
   
+  set.seed(123)
   if (outValue == TRUE)
   {
     for (k in 1:1000)
@@ -618,8 +621,8 @@ qarma.auxF = function(z1c, z2c, ar)
   ar_x = dim(ar)[1] - 1; ar_t = dim(ar)[2] - 1
   
   # set up vectors for z^i
-  zx_vec = z1c^(ar_x:0)
-  zt_vec = z2c^(ar_t:0)
+  zx_vec = z1c^(0:ar_x)
+  zt_vec = z2c^(0:ar_t)
   
   out = t(zx_vec) %*% ar %*% zt_vec
   

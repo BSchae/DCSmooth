@@ -13,6 +13,10 @@ mWeights <- function(npMatrix, u, drv) {
     .Call('_DCSmooth_mWeights', PACKAGE = 'DCSmooth', npMatrix, u, drv)
 }
 
+acfMatrix_quarter2 <- function(y_Mat) {
+    .Call('_DCSmooth_acfMatrix_quarter2', PACKAGE = 'DCSmooth', y_Mat)
+}
+
 KRSmooth_matrix2 <- function(yMat, h, kernFcnPtr) {
     .Call('_DCSmooth_KRSmooth_matrix2', PACKAGE = 'DCSmooth', yMat, h, kernFcnPtr)
 }

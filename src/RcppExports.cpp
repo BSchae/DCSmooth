@@ -46,6 +46,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// acfMatrix_quarter2
+arma::mat acfMatrix_quarter2(const arma::mat y_Mat);
+RcppExport SEXP _DCSmooth_acfMatrix_quarter2(SEXP y_MatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type y_Mat(y_MatSEXP);
+    rcpp_result_gen = Rcpp::wrap(acfMatrix_quarter2(y_Mat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // KRSmooth_matrix2
 arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr);
 RcppExport SEXP _DCSmooth_KRSmooth_matrix2(SEXP yMatSEXP, SEXP hSEXP, SEXP kernFcnPtrSEXP) {
@@ -288,6 +299,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
     {"_DCSmooth_npMatrix", (DL_FUNC) &_DCSmooth_npMatrix, 3},
     {"_DCSmooth_mWeights", (DL_FUNC) &_DCSmooth_mWeights, 3},
+    {"_DCSmooth_acfMatrix_quarter2", (DL_FUNC) &_DCSmooth_acfMatrix_quarter2, 1},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 3},
     {"_DCSmooth_KR_DoubleSmooth2", (DL_FUNC) &_DCSmooth_KR_DoubleSmooth2, 5},
     {"_DCSmooth_KRSmooth_matrix", (DL_FUNC) &_DCSmooth_KRSmooth_matrix, 4},

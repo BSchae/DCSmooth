@@ -9,9 +9,9 @@ setOptions(...)
 \arguments{
 \item{kernPar}{kernel parameters \eqn{k} and \eqn{\mu} as vector.}
 
-\item{pOrder}{order of polynomials used for smoothing with default value 1 
-(local linear regression). Kernel regression is done via \code{pOrder = 0}.
-Orders are assumed to be the same in both directions.}
+\item{drv}{order for estimation of \eqn{(\nu_1, \nu_2)} to be estimated. The
+polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}. Default value 
+is (0,0).}
 
 \item{inflExp}{inflation exponents for bandwidth selection.}
 

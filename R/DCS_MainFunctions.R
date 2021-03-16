@@ -10,9 +10,9 @@
 #' Set Options for the DCS procedure
 #' 
 #' @param kernPar kernel parameters \eqn{k} and \eqn{\mu} as vector.
-#' @param pOrder order of polynomials used for smoothing with default value 1 
-#' (local linear regression). Kernel regression is done via \code{pOrder = 0}.
-#' Orders are assumed to be the same in both directions.
+#' @param drv order for estimation of \eqn{(\nu_1, \nu_2)} to be estimated. The
+#' polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}. Default value 
+#' is (0,0).
 #' @param inflExp inflation exponents for bandwidth selection.
 #' @param inflPar inflation parameters for bandwidth selection.
 #' @param delta shrink parameters for derivatives.
@@ -92,12 +92,12 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
     bndwAuto = TRUE
   
     # bandwidth selection process
-    if (dcsOptions$pOrder == 0)
+    if (all(dcsOptions$pOrder == 0))
     {
       # kernel regression
       bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
       bndw = pmin(bndwObj$bndw, c(0.45, 0.45)) # KR cannot handle larger bndws.
-    } else if (dcsOptions$pOrder > 0) {
+    } else if (any(dcsOptions$pOrder > 0)) {
       # local polynomial regression
       bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
       bndw = bndwObj$bndw
@@ -107,15 +107,14 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   }
   
   # estimation of resulting surface
-  if (dcsOptions$pOrder == 0) # kernel regression
+  if (all(dcsOptions$pOrder == 0)) # kernel regression
   {
     DCSOut = KR_DoubleSmooth2(yMat = Y, hVec = bndw, drvVec = c(0, 0), 
       kernFcnPtrX = kernelFcn, kernFcnPtrT = kernelFcn)
-  } else if (dcsOptions$pOrder > 0) {
+  } else if (any(dcsOptions$pOrder > 0)) {
     # local polynomial regression
-    DCSOut = LP_DoubleSmooth2(yMat = Y, hVec = bndw, polyOrderVec 
-      = c(dcsOptions$pOrder, dcsOptions$pOrder), drvVec = c(0,0),
-      kernFcnPtr = kernelFcn)
+    DCSOut = LP_DoubleSmooth2(yMat = Y, hVec = bndw, polyOrderVec = 
+            dcsOptions$pOrder, drvVec = dcsOptions$drv, kernFcnPtr = kernelFcn)
   }
   
   # calculate residuals
