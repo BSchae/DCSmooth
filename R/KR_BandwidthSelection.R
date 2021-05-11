@@ -11,9 +11,9 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
   nX = dim(Y)[1]; nT = dim(Y)[2]
   n  = nX * nT                                  # total number of observations is needed later
   
-  kernelProp = kernelPropFcn(kernelFcn)         # calculate properties R and mu_2 of kernel
+  kernelProp = kernelPropKR(kernelFcn)         # calculate properties R and mu_2 of kernel
   
-  kernFcn0 = kernelFcn_assign("MW420")          # assign kernel for regression surface
+  kernFcn0 = kernelFcn_assign("MW220")          # assign kernel for regression surface
   kernFcn2 = kernelFcn_assign("MW422")          # assign kernel for 2nd derivative (needed in )
   
   hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
@@ -28,7 +28,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     
     if (dcsOptions$constWindow == TRUE)
     {
-      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      # pre-smoothing of the surface function m(0,0) for estimation of variance
       YSmth = KR_DoubleSmooth(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
                         kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
 
@@ -39,7 +39,7 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       mtt = KR_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
                     kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
     } else {
-      # pre-smoothing of the surface function m(0,0) for better estimation of derivatives
+      # pre-smoothing of the surface function m(0,0) for estimation of variance
       YSmth = KR_DoubleSmooth2(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
         kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
 
@@ -47,8 +47,17 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
       mxx = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
         kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
 
-      mtt = KR_DoubleSmooth2(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
+      mtt = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, drvVec = c(0, 2),
         kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+      
+      # # TEST for correction of mxx/mtt
+      # mxxxx = KR_DoubleSmooth2(yMat = mxx, hVec = hInfl$h_xx[1], hInfl$h_tt[2]),
+      #         drvVec = c(2, 2), kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn2)
+      # mxxtt = KR_DoubleSmooth2(yMat = Y, hVec = c(hInfl$h_xx[1], hInfl$h_tt[2]),
+      #                          drvVec = c(2, 2), kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn2)
+      # 
+      # mxx = mxx - (hInfl$h_xx[2]^2*kernelProp$mu)/2 * mxxtt
+      # mtt = mtt - (hInfl$h_tt[1]^2*kernelProp$mu)/2 * mxxtt
     }
 
     # shrink mxx, mtt from boundaries

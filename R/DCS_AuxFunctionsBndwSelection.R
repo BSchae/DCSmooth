@@ -46,8 +46,8 @@ hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
   i0x = intCalcKR(mxx, mtt, nSub)[1]
   i0t = intCalcKR(mtt, mxx, nSub)[1]
   
-  hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 + i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 + i0t)
+  hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0x)
+  htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0t)
   
   hxOpt = hxOpt^(1/6)
   htOpt = htOpt^(1/6)
@@ -56,18 +56,6 @@ hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
 }
 
 #----------------------Integrals over mxx^2, mtt^2-----------------------------#
-
-intCalcKR = function(m11, m22, nSub)
-{
-  i11 = sum(m11 * m11)/nSub
-  i22 = sum(m22 * m22)/nSub
-  i12 = sum(m11 * m22)/nSub
-  #print(c(i11, i22, i12))
-  
-  iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
-  
-  return(c(iOut, i11/i22))
-}
 
 intCalcLP = function(m11, m22, p, nSub)
 {
@@ -81,7 +69,33 @@ intCalcLP = function(m11, m22, p, nSub)
   return(c(iOut, i11/i22))
 }
 
+intCalcKR = function(m11, m22, nSub)
+{
+  i11 = sum(m11 * m11)/nSub
+  i22 = sum(m22 * m22)/nSub
+  i12 = sum(m11 * m22)/nSub
+  #print(c(i11, i22, i12))
+  
+  iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
+  
+  return(c(iOut, i11/i22))
+}
+
 #-------------------------Kernel property calculation--------------------------#
+
+#' @export
+kernelPropLP = function(kernelFcn, p, drv, nInt = 5000)
+{
+  uSeq  = seq(from = -1, to = 1, length.out = (2 * nInt + 1))
+  npMatrix = npMatrix(kernelFcn, p, nInt)
+  addWeights = mWeights(npMatrix, uSeq, drv)
+  
+  valR  = sum((addWeights^2 * kernelFcn_use(uSeq, q = 1, kernelFcn))^2) / nInt
+  valMu = sum((addWeights * kernelFcn_use(uSeq, q = 1, kernelFcn)) *
+                uSeq^(p + 1)) / (nInt * factorial(p + 1))
+  
+  return(list(R = valR, mu = valMu))
+}
 
 kernelPropKR = function(kernelFcn, nInt = 5000)
 {
@@ -92,21 +106,17 @@ kernelPropKR = function(kernelFcn, nInt = 5000)
   return(list(R = valR, mu = valMu))
 }
 
-#' @export
-kernelPropLP = function(kernelFcn, p, drv, nInt = 5000)
-{
-  uSeq  = seq(from = -1, to = 1, length.out = (2 * nInt + 1))
-  npMatrix = npMatrix(kernelFcn, p, nInt)
-  addWeights = mWeights(npMatrix, uSeq, drv)
-
-  valR  = sum((addWeights^2 * kernelFcn_use(uSeq, q = 1, kernelFcn))^2) / nInt
-  valMu = sum((addWeights * kernelFcn_use(uSeq, q = 1, kernelFcn)) *
-                uSeq^(p + 1)) / (nInt * factorial(p + 1))
-
-  return(list(R = valR, mu = valMu))
-}
-
 #-----------------bandwidth inflation for derivative estimations---------------#
+
+inflationFcnLP = function(h, n, dcsOptions)
+{
+  hInflxx = c(dcsOptions$inflPar[1] * h[1]^dcsOptions$inflExp[1],
+              dcsOptions$inflPar[2] * h[2]^dcsOptions$inflExp[2])
+  hInfltt = c(dcsOptions$inflPar[2] * h[1]^dcsOptions$inflExp[2],
+              dcsOptions$inflPar[1] * h[2]^dcsOptions$inflExp[1])
+  
+  return(list(h_xx = hInflxx, h_tt = hInfltt))
+}
 
 inflationFcnKR = function(h, n, dcsOptions)
 {
@@ -120,15 +130,5 @@ inflationFcnKR = function(h, n, dcsOptions)
   hInflxx = pmin(hInflxx, c(0.45, 0.45))
   hInfltt = pmin(hInfltt, c(0.45, 0.45))  # ensure no bandwidth > 0.5 (or 0.45)
   
-  return(list(h_xx = hInflxx, h_tt = hInfltt))
-}
-
-inflationFcnLP = function(h, n, dcsOptions)
-{
-  hInflxx = c(dcsOptions$inflPar[1] * h[1]^dcsOptions$inflExp[1],
-              dcsOptions$inflPar[2] * h[2]^dcsOptions$inflExp[2])
-  hInfltt = c(dcsOptions$inflPar[2] * h[1]^dcsOptions$inflExp[2],
-              dcsOptions$inflPar[1] * h[2]^dcsOptions$inflExp[1])
-
   return(list(h_xx = hInflxx, h_tt = hInfltt))
 }

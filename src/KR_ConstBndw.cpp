@@ -18,8 +18,7 @@ arma::vec kernFkt_MW422(arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix2(arma::mat yMat, double h,
-                         SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
+arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr)
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series

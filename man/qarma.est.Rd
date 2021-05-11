@@ -53,8 +53,8 @@ X[i,j] = \theta(B1 B2)u[i,j]}
 }
 
 \examples{
-qarma.example1
-qarma.example2
+#qarma.example1
+#qarma.example2
 qarma.est(qarma.example1)
 qarma.est(qarma.example2, model_order = list(ar = c(1, 1), ma = c(0, 0))
 

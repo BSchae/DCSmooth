@@ -7,26 +7,53 @@
 #------------------------Set Options via Function------------------------------#
 
 .setOptions = function(    # inside function with default values in arguments
-  kernPar   = c(2, 2),     # choose a kernel function with mu = 2, 
-  #pOrder    = c(1, 1),     # choose order of polynomials for X-/T-smoothing
+  type      = "LP",        # either "LP" for local polynomial regression or
+                           # "KR" for kernel regression
+  kernPar   = c(2, 2),     # choose a kernel function with mu = 2
   drv       = c(0, 0),
-  # if pOrder == 0, kernel regression will be used.
-  # (orders have to be the same in both directions)
-  inflExp   = c(0.5, 0.5), # inflation exponent
-  inflPar   = c(1.5, 0.25),     # inflation parameters c (regression),
-  # d (2nd derivative)
-  delta     = c(0.0, 0.0), # parameter for shrinking the derivatives
+  inflExp   = "auto",      # inflation exponent
+  inflPar   = "auto",      # inflation parameters c (regression),
+                           # d (2nd derivative)
+  delta     = "auto",      # parameter for shrinking the derivatives
   constWindow = FALSE,
   varEst    = "iid",
-  modelOrder = list(ar = c(1, 1), ma = c(1, 1))
+  modelOrder = "auto"
+  
+  # Options with default value "auto" are dependent on type or varEst and will
+  # be selected in the following, if not given a specific value.
 )
 {
-  pOrder = drv + 1
+  # Select options according to type ("LP", "KR")
+  if (type == "LP")
+  {
+    pOrder = drv + 1
+    if (inflExp == "auto") { inflExp = c(0.5, 0.5) }
+    if (inflPar == "auto") { inflPar = c(1.5, 0.5) }
+    if (delta == "auto")   { delta = c(0, 0) }
+    
+    options_list = list(type = type, kernPar = kernPar, pOrder = pOrder,
+                       drv = drv, inflExp = inflExp, inflPar = inflPar,
+                       delta = delta, constWindow = constWindow,
+                       varEst = varEst)
+  } else if (type == "KR") {
+    if (inflExp == "auto") { inflExp = c(0.6, 0.6) }
+    if (inflPar == "auto") { inflPar = c(3, 1) }
+    if (delta == "auto")   { delta = c(0.05, 0.05) }
+    options_list = list(type = type, kernPar = kernPar, drv = drv, 
+                        inflExp = inflExp, inflPar = inflPar,
+                        delta = delta, constWindow = constWindow,
+                        varEst = varEst)
+  }
   
-  return(list(kernPar = kernPar, pOrder = pOrder, drv = drv,
-              inflExp = inflExp, inflPar = inflPar, delta = delta, 
-              constWindow = constWindow, varEst = varEst,
-              modelOrder = modelOrder))
+  # Select options according to varEst ("iid", "QARMA")
+  if (varEst == "QARMA")
+  {
+    if (modelOrder == "auto") { modelOrder = list(ar = c(1, 1), ma = c(1, 1))}
+    
+    options_list = c(options_list, list(modelOrder = modelOrder))
+  }
+  
+  return(options_list)
 }
 
 #--------------------Function for color ramping for plots----------------------#

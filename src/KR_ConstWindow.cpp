@@ -47,7 +47,7 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
     yMatOut.col(colIndex) = yMatInterior * weightsInterior;
   }
   
-  yMatOut = yMatOut;
+  //yMatOut = yMatOut;
 
   // smoothing over boundaries
   arma::mat    yLeftMat{ yMat.cols(0, windowWidth - 1) };
@@ -65,7 +65,7 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
     yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
   }
   
-  return yMatOut / pow(h, drv);
+  return yMatOut;
 }
 
 //---------------------------------------------------------------------------//
@@ -76,10 +76,11 @@ arma::mat KR_DoubleSmooth(arma::mat yMat, arma::colvec hVec,
 {
   // Smoothing over cond. on rows first (e.g. over single days).
   // Thus, drv and order is (1) instead of (0) here (depending on t)
-  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1), kernFcnPtrT) };
+  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1),
+                                      kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
   // Smoothing over cols, drv and order is (0) (depending on x)
   arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(0),
-                                        kernFcnPtrX) };
+                                    kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
 
   return yMatOut.t();
 }

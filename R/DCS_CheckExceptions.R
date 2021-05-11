@@ -30,7 +30,7 @@
   }
 }
 
-#----------------------Check for useable bandwidths----------------------------#
+#-----------------------Check for usable bandwidths----------------------------#
 
 .dcsCheck_bndw = function(bndw, dcsOpt)
 {
@@ -66,36 +66,60 @@
 
 .dcsCheck_options = function(dcsOpt)
 {
-  # check kernel parameters
-  
-  # check derivative orders
-  if (any(dcsOpt$pOrder < 0))
-  {  
-    stop("Your derivative order is smaller than 0.")
+  # check regression type
+  if (!(dcsOpt$type %in% c("LP", "KR")))
+  {
+    stop("Unsupported regression type. Choose \"KR\" or \"LP\"")
   }
   
-  # check inflation exponents
-  if (any(dcsOpt$inflExp != 0.5))
+  # Options for Local Polynomial Regression
+  if (dcsOpt$type == "LP")
   {
-    warning("Inflation exponents have been changed.")
+    # check derivative orders
+    if (any(dcsOpt$drv < 0))
+    {  
+      stop("Your derivative order is smaller than 0.")
+    }
+    
+    # check inflation exponents
+    if (any(dcsOpt$inflExp != 0.5))
+    {
+      warning("Inflation exponents have been changed.")
+    }
+  
+    # check inflation parameters
+    if (any(dcsOpt$inflPar != c(1.5, 0.25)))
+    {
+      warning("Inflation parameters have been changed.")
+    } 
+    
+    # check variance estimation method
+    if (!(dcsOpt$varEst %in% c("iid", "qarma")))
+    {
+      stop("unsupported method in varEst (use only \"iid\" and \"qarma\")")
+    }
   }
   
-  # check inflation parameters
-  if (any(dcsOpt$inflPar != c(1.5, 0.25)))
+  # Options for Kernel Regression
+  if (dcsOpt$type == "KR")
   {
-    warning("Inflation parameters have been changed.")
-  }
-  
-  # check for const window
-  if (dcsOpt$inflPar == TRUE && dcsOpt$pOrder > 0)
-  {
-    warning("Constant window width is not yet supported for polynomial",
-              "regression")
-  }
-  
-  # check variance estimation method
-  if (!(dcsOpt$varEst %in% c("iid", "qarma")))
-  {
-    stop("unsupported method in varEst (use only \"iid\" and \"qarma\")")
+    # 
+    # check inflation exponents
+    if (any(dcsOpt$inflExp != 0.6))
+    {
+      warning("Inflation exponents have been changed.")
+    }
+    
+    # check inflation parameters
+    if (any(dcsOpt$inflPar != c(3, 1)))
+    {
+      warning("Inflation parameters have been changed.")
+    } 
+    
+    # check variance estimation method
+    if (!(dcsOpt$varEst %in% c("iid", "qarma")))
+    {
+      stop("unsupported method in varEst (use only \"iid\" and \"qarma\")")
+    }
   }
 }

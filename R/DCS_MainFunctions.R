@@ -69,8 +69,6 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 
 dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 {
-  time_start = Sys.time() # get starting time for performance measuring
-  
   # check for correct inputs of data and options
   .dcsCheck_Y(Y)
   .dcsCheck_bndw(bndw, dcsOptions)
@@ -90,14 +88,16 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   # check for given bandwidths
   if (bndw[1] == "auto") {
     bndwAuto = TRUE
+    
+    time_start = Sys.time() # get starting time for performance measuring
   
     # bandwidth selection process
-    if (all(dcsOptions$pOrder == 0))
+    if (dcsOptions$type == "KR")
     {
       # kernel regression
       bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
       bndw = pmin(bndwObj$bndw, c(0.45, 0.45)) # KR cannot handle larger bndws.
-    } else if (any(dcsOptions$pOrder > 0)) {
+    } else if (dcsOptions$type == "LP") {
       # local polynomial regression
       bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
       bndw = bndwObj$bndw
@@ -105,6 +105,8 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   } else {
     bndwAuto = FALSE
   }
+  
+  time_end = Sys.time()
   
   # estimation of resulting surface
   if (all(dcsOptions$pOrder == 0)) # kernel regression
@@ -119,8 +121,6 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   
   # calculate residuals
   R = Y - DCSOut
-  
-  time_end = Sys.time()
   
   if (bndwAuto == TRUE)
   {
