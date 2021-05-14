@@ -25,14 +25,14 @@ hOptLP = function(mxx, mtt, varCoef, nSub, pVec, drvVec, kernelFcn)
   gamma_12 = 1/gamma_21
   
   # optimal bandwidths
-  I1 = kernelProp2$mu^2 * i22 + kernelProp1$mu * kernelProp2$mu * 
-       i12 * gamma_21^(delta + 1)
+  I1 = kernelProp1$mu^2 * i11 + kernelProp1$mu * kernelProp2$mu * 
+    i12 * gamma_12^(delta + 1)
   hxOpt = (2*drvVec[1] + 1)/(2*(delta + 1)) * (kernelProp1$R * kernelProp2$R*
-          varCoef)/(nSub * gamma_21^(2*drvVec[1] + 1) * I1) 
-  I2 = kernelProp1$mu^2 * i11 + kernelProp1$mu * kernelProp2$mu * 
-       i12 * gamma_12^(delta + 1)
+          varCoef)/(nSub * gamma_12^(2*drvVec[1] + 1) * I1) 
+  I2 = kernelProp2$mu^2 * i22 + kernelProp1$mu * kernelProp2$mu * 
+    i12 * gamma_21^(delta + 1)
   htOpt = (2*drvVec[2] + 1)/(2*(delta + 1)) * (kernelProp1$R * kernelProp2$R*
-          varCoef)/(nSub * gamma_12^(2*drvVec[2] + 1) * I2) 
+          varCoef)/(nSub * gamma_21^(2*drvVec[2] + 1) * I2) 
   
   hxOpt = hxOpt^(1/(2*(delta + sum(drvVec) + 2)))
   htOpt = htOpt^(1/(2*(delta + sum(drvVec) + 2)))

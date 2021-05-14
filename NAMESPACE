@@ -2,10 +2,12 @@
 
 S3method(plot,dcs)
 S3method(print,dcs)
+S3method(print,dcsOpt)
 S3method(summary,dcs)
 export(dcs)
 export(kernelFcn_assign)
 export(kernelPropLP)
+export(plotDCS)
 export(qarma.est)
 export(qarma.sim)
 export(setOptions)

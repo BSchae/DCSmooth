@@ -41,6 +41,8 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' 
 #' @param Y A numeric matrix that contains the observations of the random field
 #'   or functional time-series.
+#' @param dcsOptions Additional options for the smoothing procedure. Is set
+#'   via the \code{setOptions} command.
 #' @param X An optional numeric vector containing the exogenous covariates
 #'   with respect to the rows.
 #' @param T An optional numeric vector containing the exogenous covariates
@@ -49,8 +51,6 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #'   two-valued numerical vector with bandwidths in row- and column-direction.
 #'   If the value is \code{"auto"} bandwidth selection will be carried out by
 #'   the iterative plug-in algorithm.
-#' @param dcsOptions Additional options for the smoothing procedure. Is set
-#'   via the \code{setOptions} command.
 #' 
 #' @return \code{DCSmooth} returns an object of class "dcs".
 #' 
@@ -67,7 +67,7 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' @export
 #' 
 
-dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
+dcs = function(Y, dcsOptions = setOptions(), X = 1, T = 1, bndw = "auto")
 {
   # check for correct inputs of data and options
   .dcsCheck_Y(Y)
@@ -126,7 +126,7 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
   {
     DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
                    cf = bndwObj$varCoef, iterations = bndwObj$iterations,
-                   qarma_model = bndwObj$qarma_model, dcsOptions = dcsOptions,
+                   qarma = bndwObj$qarma_model, dcsOptions = dcsOptions,
                    timeUsed = difftime(time_end, time_start, units = "secs"))
     attr(DCS_out, "bndwAuto") = bndwAuto
   } else if (bndwAuto == FALSE) {
@@ -146,7 +146,65 @@ dcs = function(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
 
 #-------------------Function for plotting smoothed surface--------------------#
 
+#' 3D Surface Plot of "dcs"-object or numeric matrix
+#' 
+#' \code{plotDCS} uses the plotly device to plot the 3D surface of the given
+#' "dcs-object or matrix. If a "dcs"-object is passed to the function, it can
+#' be chosen between plots of the original data (1), smoothed surface (2) and 
+#' residuals (3).
+#' 
+#' @param DCSobj An object of class "dcs" or a numeric matrix that contains the
+#'   values to be plotted.
+#' @param ... optional arguments passed to the plot function. See the vignette 
+#' \code{vignette("DCS", package = "DCSmooth")}
+#' 
+#' @return \code{DCSmooth} returns an object of class "plotly" and "htmlwidget".
+#' 
+#' @section Usage:
+#' \code{plotDCS(DCSobj)}
+#' }
+#' 
+#' @examples
+#' smth =  dcs(y.norm1)
+#' plotDCS(smth)
+#' 
+#' @export
+#' 
+
 plotDCS = function(DCSobj, ...)
 {
-  .persp3ddcs(DCSobj = DCSobj, ...)
+  if (class(DCSobj)[1] == "dcs")
+  {
+    fcn_args = list(...)
+    
+    if (exists("plot_choice", fcn_args))
+    {
+      plot_choice = fcn_args$plot_choice
+    } else {
+      cat("3d-plot choices for dcs object:", fill = TRUE)
+      choices <- c(1, 2, 3)
+      choice_names <- c("Original observations Y:", "Smoothed Surface M:",
+                        "Residuals R:")
+      choices_df <- data.frame(choices)
+      colnames(choices_df) <- ""
+      rownames(choices_df) <- choice_names
+      print.data.frame(choices_df)
+      plot_choice <- readline(prompt="Please enter the corresponding number: ")
+      plot_choice <- as.numeric(plot_choice)
+    }
+    if (plot_choice == 1) {
+      Y = DCSobj$Y
+    } else if (plot_choice == 2) {
+      Y = DCSobj$M
+    } else if (plot_choice == 3) {
+      Y = DCSobj$R
+    } else {
+      stop(plot_choice, " is not a valid plot-type.")
+    }
+    
+    .plotly3d(Y = Y, X = DCSobj$X, T = DCSobj$T, 
+              color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"))
+  } else {
+    .plotly3d(Y = DCSobj, ...)
+  }
 }

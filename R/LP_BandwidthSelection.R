@@ -29,12 +29,11 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
                = pOrder, drvVec = drvVec, kernelFcn)
       
       # smoothing of derivatives m(2,0) and m(0,2)
-      # needs update for p even.
       mxx = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, polyOrderVec = 
-                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2] + 2), drvVec =
+                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2]), drvVec =
                 c(pOrder[1] + 1, drvVec[2]), kernelFcn)
       mtt = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
-                c(pOrder[1], 2*pOrder - drvVec[2] + 1), drvVec =
+                c(pOrder[1], 2*pOrder[2] - drvVec[2] + 1), drvVec =
                 c(drvVec[1], pOrder[2] + 1), kernelFcn)
     } else {
       # smoothing of Y for variance factor estimation
@@ -47,7 +46,7 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
                 c(2*pOrder[1] - drvVec[1] + 1, pOrder[2]), drvVec =
                 c(pOrder[1] + 1, drvVec[2]), kernelFcn)
       mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
-                c(pOrder[1], 2*pOrder - drvVec[2] + 1), drvVec =
+                c(pOrder[1], 2*pOrder[2] - drvVec[2] + 1), drvVec =
                 c(drvVec[1], pOrder[2] + 1), kernelFcn)
     }
       
@@ -65,21 +64,11 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
       
     } else {
       nSub = n
-      
-      # calculate variance factor
-      if (dcsOptions$varEst == "iid")
-      {
-        varCoef = (sd(Y - YSmth))^2
-        qarma_model = NA
-      } else if (dcsOptions$varEst == "qarma") {
-        cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
-        varCoef = cf_est$cf
-        qarma_model = cf_est$qarma_model
-      } else if (dcsOptions$varEst == "np") {
-        cf_est = specDens((Y - YSmth), omega = c(0, 0))
-        varCoef = cf_est$cf
-      }
-    }
+    }  
+     
+    # calculate variance factor
+    varEst = cf.estimation(Y - YSmth, dcsOptions)
+    varCoef = varEst$cf_est
     
     # calculate optimal bandwidths for next step
     hOpt = hOptLP(mxx, mtt, varCoef, nSub, pOrder, drvVec, kernelFcn)
@@ -92,5 +81,5 @@ LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
   }
   return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef,
-              qarma_model = qarma_model))
+              qarma_model = varEst$qarma_model))
 }

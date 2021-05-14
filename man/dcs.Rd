@@ -4,11 +4,14 @@
 \alias{dcs}
 \title{Nonparametric Double Conditional Smoothing for 2D Surfaces}
 \usage{
-dcs(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())
+dcs(Y, dcsOptions = setOptions(), X = 1, T = 1, bndw = "auto")
 }
 \arguments{
 \item{Y}{A numeric matrix that contains the observations of the random field
 or functional time-series.}
+
+\item{dcsOptions}{Additional options for the smoothing procedure. Is set
+via the \code{setOptions} command.}
 
 \item{X}{An optional numeric vector containing the exogenous covariates
 with respect to the rows.}
@@ -20,9 +23,6 @@ with respect to the columns.}
 two-valued numerical vector with bandwidths in row- and column-direction.
 If the value is \code{"auto"} bandwidth selection will be carried out by
 the iterative plug-in algorithm.}
-
-\item{dcsOptions}{Additional options for the smoothing procedure. Is set
-via the \code{setOptions} command.}
 }
 \value{
 \code{DCSmooth} returns an object of class "dcs".

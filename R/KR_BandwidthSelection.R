@@ -76,18 +76,8 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
       
     # calculate variance factor
-    if (dcsOptions$varEst == "iid")
-    {
-      varCoef = (sd(Y - YSmth))^2
-      qarma_model = NA
-    } else if (dcsOptions$varEst == "qarma") {
-      cf_est = qarma.cf((Y - YSmth), model_order = dcsOptions$modelOrder)
-      varCoef = cf_est$cf
-      qarma_model = cf_est$qarma_model
-    } else if (dcsOptions$varEst == "np") {
-      cf_est = specDens((Y - YSmth), omega = c(0, 0))
-      varCoef = cf_est$cf
-    }
+    varEst = cf.estimation(Y - YSmth, dcsOptions)
+    varCoef = varEst$cf_est
     
     # calculate optimal bandwidths for next step
     hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)
@@ -100,5 +90,5 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
   }
   return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef,
-              qarma_model = qarma_model))
+              qarma_model = varEst$qarma_model))
 }

@@ -16,7 +16,7 @@ summary.dcs = function(object)
     cat("---------------------------------------------", "\n")
     cat("DCS with automatic bandwidth selection:\n")
     cat("---------------------------------------------", "\n")
-    cat("Results:\n")
+    cat("Results of ", object$dcsOptions$type, "- Regression:\n")
     cat("Estimated Bandwidths: \t h_x:\t", object$bndw[1], "\n")
     cat("\t \t \t h_t:\t", object$bndw[2], "\n")
     cat("Variance Factor: \t c_f:\t", object$cf, "\n")
@@ -84,7 +84,69 @@ print.dcs = function(object)
   }
 }
 
+#' Print Options for Double Conditional Smoothing
+#' 
+#' \code{print} method for class \code{"dcsOpt"}
+#' 
+#' @export
+
+print.dcsOpt = function(object)
+{
+  cat(class(object), "\n")
+  cat("---------------------------------------", "\n")
+  cat("options for DCS \t rows \t cols \n")
+  cat("---------------------------------------", "\n")
+  
+  # when Kernel Regression is selected
+  if (object$type == "KR")
+  {
+    cat("type: kernel regression \n")
+    cat("kernel order: \t \t ", object$kernPar[1], "\t", object$kernPar[2], "\n")
+    cat("derivative: \t \t ", object$drv[1], "\t", object$drv[2], "\n")
+    cat("inflation exponent: \t ", object$inflExp[1],
+        "\t", object$inflExp[2], "\n")
+    cat("inflation parameters: \t ", object$inflPar[1],
+        "\t", object$inflPar[2], "\n")
+    cat("boundary factor: \t ", object$delta[1], "\t", object$delta[2], "\n")
+    cat("constant window: \t ", object$constWindow, "\n")
+    cat("---------------------------------------", "\n")
+  } else if (object$type == "LP") {  
+  # when Local Polynomial Regression is selected
+    cat("type: local polynomial regression \n")
+    cat("kernel order: \t \t ", object$kernPar[1], "\t", object$kernPar[2], "\n")
+    cat("derivative: \t \t ", object$drv[1], "\t", object$drv[2], "\n")
+    cat("polynomial order: \t ", object$pOrder[1], "\t", object$pOrder[2], "\n")
+    cat("inflation exponent: \t ", object$inflExp[1],
+        "\t", object$inflExp[2], "\n")
+    cat("inflation parameters: \t ", object$inflPar[1],
+        "\t", object$inflPar[2], "\n")
+    cat("boundary factor: \t ", object$delta[1], "\t", object$delta[2], "\n")
+    cat("constant window: \t ", object$constWindow, "\n")
+    cat("---------------------------------------", "\n")
+  }
+  if (object$varEst == "iid")
+  {
+    cat("variance estimation: \t iid. \n")
+  } else if (object$varEst == "qarma")
+  {
+    cat("variance estimation: \t  qarma \n")
+    if (!(is.list(object$modelOrder)) && 
+        object$modelOrder %in% c("gpac", "bic"))
+    {
+      cat("order selection: \t ", object$modelOrder, "\n")
+    } else {
+      cat("model order: \t ar: \t ", object$modelOrder$ar[1], 
+          "\t", object$modelOrder$ar[2], "\n")
+      cat("\t \t ma: \t ", object$modelOrder$ma[1], 
+          "\t", object$modelOrder$ma[2], "\n")
+    }
+  }
+  cat("---------------------------------------", "\n")
+}
+
 #' Contour Plot for the Double Conditional Smoothing
+#' 
+#' \code{plot} method for class \code{"dcs"}
 #' 
 #' @export
 
