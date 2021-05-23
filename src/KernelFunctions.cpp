@@ -255,7 +255,7 @@ arma::vec kernFkt_TR422(arma::vec& uVec, double q)
 
 //' @export
 // [[Rcpp::export]]
-XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
+XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
   if (fstr == "MW200")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW200)));
   else if (fstr == "MW210")
@@ -273,7 +273,7 @@ XPtr<funcPtr> kernelFcn_assign(std::string fstr) {
 }
 
 // [[Rcpp::export]]
-arma::vec kernelFcn_use(arma::vec x, double q, SEXP xpsexp) {
+arma::vec kernel_fcn_use(arma::vec x, double q, SEXP xpsexp) {
   XPtr<funcPtr> xpfun(xpsexp);
   funcPtr fun = *xpfun;
   arma::vec y = fun(x, q);

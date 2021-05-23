@@ -4,14 +4,14 @@
 \alias{dcs}
 \title{Nonparametric Double Conditional Smoothing for 2D Surfaces}
 \usage{
-dcs(Y, dcsOptions = setOptions(), X = 1, T = 1, bndw = "auto")
+dcs(Y, dcs_options = set.options(), X = 1, T = 1, h = "auto")
 }
 \arguments{
 \item{Y}{A numeric matrix that contains the observations of the random field
 or functional time-series.}
 
-\item{dcsOptions}{Additional options for the smoothing procedure. Is set
-via the \code{setOptions} command.}
+\item{dcs_options}{An object of class \code{"dcs_options"}, specifying the
+parameters for the smoothing and bandwidth selection procedure.}
 
 \item{X}{An optional numeric vector containing the exogenous covariates
 with respect to the rows.}
@@ -19,31 +19,47 @@ with respect to the rows.}
 \item{T}{An optional numeric vector containing the exogenous covariates
 with respect to the columns.}
 
-\item{bndw}{Bandwidth for smoothing the observations in \code{Y}. Can be a
+\item{h}{Bandwidth for smoothing the observations in \code{Y}. Can be a
 two-valued numerical vector with bandwidths in row- and column-direction.
-If the value is \code{"auto"} bandwidth selection will be carried out by
-the iterative plug-in algorithm.}
+If the value is \code{"auto"} (the default), bandwidth selection will be 
+carried out by the iterative plug-in algorithm.}
 }
 \value{
-\code{DCSmooth} returns an object of class "dcs".
+\code{DCSmooth} returns an object of class "dcs", including
+ \tabular{ll}{
+ \code{Y} \tab matrix of original observations. \cr
+ \code{X, T} \tab vectors of covariates over rows (\code{X}) and columns 
+  (\code{T}). \cr
+ \code{M} \tab resulting matrix of smoothed values. \cr
+ \code{R} \tab matrix of resudials of estimation, \eqn{Y - M}. \cr
+ \code{h} \tab optimized or given bandwidths. \cr
+ \code{c_f} \tab estimated variance coefficient. \cr
+ \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
+  options of the dcs procedure. \cr
+ \code{iterations} \tab number of iterations of the IPI-procedure. \cr
+ \code{time_used} \tab time spend searching for optimal bandwidths (not overall
+  runtime of the function). \cr
+ \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for estimation
+  of the variance factor. Omitted, if \code{"iid"} is used. \cr
+ \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
+  options of the dcs procedure. \cr
+}
 }
 \description{
 \code{DCSmooth} provides a double conditional nonparametric smoothing of the
 expectation surface of a functional time series or a random field on a
 lattice. Bandwidth selection is done via an iterative plug-in method.
 }
-\section{Usage}{
-
-\code{DCSmooth(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())}
-}
-
 \section{Details}{
 
-The function \code{summary}
+See the vignette for a more detailed description of the function.
 }
 
 \examples{
-y = y.norm1 + rnorm(100^2)
+y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
 dcs(y)
 
+}
+\seealso{
+\code{\link{set.options}}
 }

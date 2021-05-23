@@ -41,7 +41,7 @@ arma::mat xMatrix(arma::colvec xVector, int polyOrder)
 // Calculates K_p - Kernels
 
 // [[Rcpp::export]]
-arma::mat npMatrix(SEXP kernFcnPtr, int p, int n = 500)
+arma::mat np_matrix(SEXP kernFcnPtr, int p, int n = 500)
 {
   // enable Kernel function
   XPtr<funcPtr> xpfun(kernFcnPtr);
@@ -65,7 +65,7 @@ arma::mat npMatrix(SEXP kernFcnPtr, int p, int n = 500)
 }
 
 // [[Rcpp::export]]
-arma::vec mWeights(arma::mat npMatrix, arma::vec u, int drv)
+arma::vec m_weights(arma::mat npMatrix, arma::vec u, int drv)
 {
   int p = npMatrix.n_rows - 1;
   arma::mat mpMatrix{ npMatrix };

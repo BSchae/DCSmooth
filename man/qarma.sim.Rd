@@ -2,9 +2,9 @@
 % Please edit documentation in R/QARMA_AdditionalFunctions.R
 \name{qarma.sim}
 \alias{qarma.sim}
-\title{Simulation of a \eqn{QARMA(p, q)}-process on a lattice.}
+\title{Simulation of a \eqn{QARMA(p, q)}-process}
 \usage{
-qarma.sim(nX, nT, model = list(ar, ma, sigma))
+qarma.sim(n_x, n_t, model = list(ar, ma, sigma))
 }
 \arguments{
 \item{Y}{A numeric matrix that contains the demeaned observations of the
@@ -15,47 +15,44 @@ form \code{model_order = list(ar = c(p1, p2), ma = c(q1, q2))}. Default
 value is a \eqn{QARMA((1, 1), (1, 1))} model.}
 }
 \value{
-The function returns a list including
-
-\describe{
-\item{ar}{A \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
-containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. The
-\eqn{[i, j]}th entry is the \eqn{(p_1 + 1 - i, p_2 + 1 - j)}th lag with the
-\eqn{[p_1 + 1, p_2 + 1]}th entry being 1.}
-\item{ma}{A \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
-containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. The
-\eqn{[i, j]}th entry is the \eqn{(q_1 + 1 - i, q_2 + 1 - j)}th lag with the 
-\eqn{[q_1 + 1, q_2 + 1]}th entry being 1.}
-\item{sigma}{The estimated standard deviation \eqn{\sigma} of the QARMA-model.}
-\item{innov}{The matrix of innovations resulting from the QARMA estimation. 
-The initial values (from \eqn{i = 1,...,p_1}{i = 1,...,p1} and
-\eqn{j = 1,...,p_2}{j = 1,...,p2}) are set to zero.} 
+The function returns a list, consisting of
+ \tabular{ll}{
+  \code{ar} \tab a \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
+    containing the given AR-parameters \eqn{\phi} of the QARMA-process. \cr
+  \code{ma} \tab a \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
+    containing the given MA-parameters \eqn{\theta} of the QARMA-process. \cr
+  \code{sigma} \tab the standard deviation \eqn{\sigma} of the innovations. \cr
+  \code{innov} \tab the simulated matrix of innovations. \cr
 }
 }
 \description{
-The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
-using the Hannen-Rissanen Algorithm (Hannen-Rissanen ???). The lag-orders of 
-the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
-(p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
-rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation
-process is based on the model
-\deqn{\phi(B_{1}B_{2})X_{i,j} = \theta(B_{1}B_{2})u_{i,j}}{\phi(B1 B2)
-X[i,j] = \theta(B1 B2)u[i,j]}
+\code{qarma.sim} is used to simulate a specified QARMA-model
+ on a lattice, with normally distributed innovations.
 }
-\section{Usage}{
-
-\code{qarma(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))}
-}
-
 \section{Details}{
 
-???
+The values of a \eqn{QARMA((p_2, p_2), (q_1, q_2))}-model are simulated from
+ given matrices \eqn{\phi} (\code{ar}) and \eqn{\theta} (\code{ma}) and 
+ a standard deviation for the innovations \eqn{\sigma} (\code{sigma}). The
+ simulation process is based on the model
+ \deqn{\phi(B_{1}B_{2})X_{i,j} = \theta(B_{1}B_{2})u_{i,j}}{\phi(B1 B2)
+ X[i,j] = \theta(B1 B2)u[i,j]}
+ where the innovations \eqn{u} are iid. draws from a standard normal distribution
+ with zero mean and variance \eqn{\sigma^2}
+
+ see the vignette for further details.
 }
 
 \examples{
-qarma.example1
-qarma.example2
-qarma.est(qarma.example1)
-qarma.est(qarma.example2, model_order = list(ar = c(1, 1), ma = c(0, 0))
+ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+sigma = 0.5
+q_model = list(ar = ar, ma = ma, sigma = sigma)
 
+q_sim = qarma.sim(100, 100, model = model)
+q_sim
+
+}
+\seealso{
+\code{\link{qarma.est}}
 }

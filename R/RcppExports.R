@@ -5,12 +5,12 @@ xMatrix <- function(xVector, polyOrder) {
     .Call('_DCSmooth_xMatrix', PACKAGE = 'DCSmooth', xVector, polyOrder)
 }
 
-npMatrix <- function(kernFcnPtr, p, n = 500L) {
-    .Call('_DCSmooth_npMatrix', PACKAGE = 'DCSmooth', kernFcnPtr, p, n)
+np_matrix <- function(kernFcnPtr, p, n = 500L) {
+    .Call('_DCSmooth_np_matrix', PACKAGE = 'DCSmooth', kernFcnPtr, p, n)
 }
 
-mWeights <- function(npMatrix, u, drv) {
-    .Call('_DCSmooth_mWeights', PACKAGE = 'DCSmooth', npMatrix, u, drv)
+m_weights <- function(npMatrix, u, drv) {
+    .Call('_DCSmooth_m_weights', PACKAGE = 'DCSmooth', npMatrix, u, drv)
 }
 
 acfMatrix_quarter2 <- function(y_Mat) {
@@ -21,16 +21,16 @@ KRSmooth_matrix2 <- function(yMat, h, kernFcnPtr) {
     .Call('_DCSmooth_KRSmooth_matrix2', PACKAGE = 'DCSmooth', yMat, h, kernFcnPtr)
 }
 
-KR_DoubleSmooth2 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
-    .Call('_DCSmooth_KR_DoubleSmooth2', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
+KR_dcs_const0 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
+    .Call('_DCSmooth_KR_dcs_const0', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
 KRSmooth_matrix <- function(yMat, h, drv, kernFcnPtr) {
     .Call('_DCSmooth_KRSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, drv, kernFcnPtr)
 }
 
-KR_DoubleSmooth <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
-    .Call('_DCSmooth_KR_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
+KR_dcs_const1 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
+    .Call('_DCSmooth_KR_dcs_const1', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
 kernFkt_MW210 <- function(u, q = 1) {
@@ -66,27 +66,43 @@ kernFkt_TR422 <- function(uVec, q) {
 }
 
 #' @export
-kernelFcn_assign <- function(fstr) {
-    .Call('_DCSmooth_kernelFcn_assign', PACKAGE = 'DCSmooth', fstr)
+kernel_fcn_assign <- function(fstr) {
+    .Call('_DCSmooth_kernel_fcn_assign', PACKAGE = 'DCSmooth', fstr)
 }
 
-kernelFcn_use <- function(x, q, xpsexp) {
-    .Call('_DCSmooth_kernelFcn_use', PACKAGE = 'DCSmooth', x, q, xpsexp)
+kernel_fcn_use <- function(x, q, xpsexp) {
+    .Call('_DCSmooth_kernel_fcn_use', PACKAGE = 'DCSmooth', x, q, xpsexp)
 }
 
 LPSmooth_matrix2 <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
     .Call('_DCSmooth_LPSmooth_matrix2', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
 }
 
-LP_DoubleSmooth2 <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr) {
-    .Call('_DCSmooth_LP_DoubleSmooth2', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
+LP_dcs_const0 <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t) {
+    .Call('_DCSmooth_LP_dcs_const0', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t)
+}
+
+LPSmooth_matrix2_BMod <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
+    .Call('_DCSmooth_LPSmooth_matrix2_BMod', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
+}
+
+LP_dcs_const0_BMod <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_1, kernFcnPtr_2) {
+    .Call('_DCSmooth_LP_dcs_const0_BMod', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_1, kernFcnPtr_2)
 }
 
 LPSmooth_matrix <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
     .Call('_DCSmooth_LPSmooth_matrix', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
 }
 
-LP_DoubleSmooth <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr) {
-    .Call('_DCSmooth_LP_DoubleSmooth', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr)
+LP_dcs_const1 <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t) {
+    .Call('_DCSmooth_LP_dcs_const1', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t)
+}
+
+LPSmooth_matrix_BMod <- function(yMat, h, polyOrder, drv, kernFcnPtr) {
+    .Call('_DCSmooth_LPSmooth_matrix_BMod', PACKAGE = 'DCSmooth', yMat, h, polyOrder, drv, kernFcnPtr)
+}
+
+LP_dcs_const1_BMod <- function(yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t) {
+    .Call('_DCSmooth_LP_dcs_const1_BMod', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, kernFcnPtr_x, kernFcnPtr_t)
 }
 

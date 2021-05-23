@@ -1,11 +1,72 @@
 ---
 title: "DCSmooth"
+author: "Bastian Schäfer"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{DCSmooth}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+# 1 Introduction
+
+This vignette describes the use of the *DCSmooth*-package and its functions 
+`dcs`, `set.options`, `surface.3d`, `qarma.est` and `qarma.sim`. This package
+provides some tools for nonparametric estimation of the mean surface $m$ of an
+observed sample of some function $y(x, t) = m(x, t) + \varepsilon(x, t)$. This 
+package is accompanying Feng/Schäfer (2021) and Schäfer (2021).
+
+The *DCSmooth* contains the following functions, methods and data sets:
+
+| <span style="display: inline-block; width:170px">Functions</span>|<span style="display: inline-block; width:500px"> </span>|
+|:-------------------|:--------------------------------------------------------|
+| `dcs()`            | Nonparametric estimation of the expectation function of a matrix `Y`. Includes automatic iterative plug-in bandwidth selection.          |
+| `set.options()`    | Define options for the `dcs()`-function.                |
+| `surface.dcs()`    | Plot for the surface from an `"dcs"`-object.            |
+| `qarma.sim()`      | Simulate a QARMA-model.                                 |
+| `qarma.est()`      | Estimate the parameters of a QARMA-model.               |
+
+| <span style="display: inline-block; width:170px">Methods/Generics</span>|<span style="display: inline-block; width:500px"> </span>|
+|:-------------------|:--------------------------------------------------------|
+| `summary.dcs()`    | Summary statistics for an object of class `"dcs"`.      |
+| `print.dcs()`      | Print an object of class `"dcs"`.                       |
+| `plot.dcs()`       | Plot method for an `"dcs"`-object, returns contour plot.|
+| `residuals.dcs()`  | Returns the residuals of the regression from an `"dcs"`-object.|
+| `print.summary_dcs()`| Print an object of class `"summary_dcs"`, which inherits from `summary.dcs()`.|
+| `print.set_options()`| Prints an object of class `"dcs_options"`, which inherits from `set.options()` |
+
+| <span style="display: inline-block; width:170px">Data</span>|<span style="display: inline-block; width:510px"> </span>|
+|:-------------------|:--------------------------------------------------------|
+| `y.norm1`          |  A surface with a single gaussian peak.                 |
+| `y.norm2`          |  A surface with two gaussian peaks.                     |
+| `y.norm3`          |  A surface with two gaussian ridges.                    |
+
+
+# 2 Details of Functions
+
+## `set.options`
+This auxiliary function simplifies the settings of the `dcs` function. An object
+of class `dcs_options` is created and should be used as `dcs_options`-argument 
+in the `dcs` function.
+
+Arguments of the `set.options` function are
+
+* **`type`** Specifies the regression type. Supported methods are kernel regression (`"KR"`) and local polynomial regression (`"LP"`).
+* **`kern_par`** Kernel parameters $k$ and $\mu$. Supported values are $k \in \{2, 3, 4\}$ and $\mu \in \{0, 1, 2\}$. Default values are $k = 2, \mu = 2$.
+* **`drv`** Derivative $(\nu_x, \nu_t$ of $m(x,t)$ to be estimated. Note that $k \geq \nu + 2$, hence, only the regression surface ($\nu = 0$) and the first and second derivatives can be estimated.
+* **`infl_exp`** A vector containing the two exponents of the bandwidth inflation method used in the derivative estimation of the iterative plug-in method. The default is 0.6 for both directions,  reasonable values are between 0.5 and 1, although a change in the exponent usually decreases the precision of the bandwidth selection.
+* **`infl_par`** Factors for the bandwidth inflation method.
+* **`delta`** 
+
+
+
+
+
+
+## dcs
+The `dcs`-function includes IPI-bandwidth selection and non-parametric smoothing 
+using the selected bandwidths. 
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

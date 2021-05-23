@@ -4,82 +4,84 @@
 #                                                                              #
 ################################################################################
 
-LP_bndwSelect = function(Y, kernelFcn, dcsOptions)
+LP.bndw = function(Y, kernFcn_x, kernFcn_t, dcs_options)
 {
-  nX = dim(Y)[1]; nT = dim(Y)[2]
-  n  = nX * nT              # total number of observations is needed later
-  pOrder = dcsOptions$pOrder
-  drvVec = dcsOptions$drv
+  n_x = dim(Y)[1]; n_t = dim(Y)[2]
+  n  = n_x * n_x              # total number of observations is needed later
+  p_order = dcs_options$p_order
+  drv_vec = dcs_options$drv
   
-  hOpt = c(0.1, 0.1)        # initial values for h_0, arbitrary chosen
+  h_opt = c(0.1, 0.1)          # initial values for h_0, arbitrary chosen
 
-  iterate = TRUE            # iteration indicator
-  iterationCount = 0
-  while(iterate)            # loop for IPI
+  iterate = TRUE              # iteration indicator
+  iteration_count = 0
+  while(iterate)              # loop for IPI
   {
-    iterationCount = iterationCount + 1
-    hOptTemp   = hOpt[1:2]      # store old bandwidths for breaking condition
-    hInfl      = inflationFcnLP(hOptTemp, c(nX, nT), dcsOptions)  
+    iteration_count = iteration_count + 1
+    h_opt_temp   = h_opt[1:2]      # store old bandwidths for breaking condition
+    h_infl      = inflation.LP(h_opt_temp, c(n_x, n_x), dcs_options)  
                                 # inflation of bandwidths for drv estimation
    
-    if (dcsOptions$constWindow == TRUE)
+    if (dcs_options$const_window == TRUE)
     {
       # smoothing of Y for variance factor estimation
-      YSmth = LP_DoubleSmooth(yMat = Y, hVec = hOptTemp, polyOrderVec
-               = pOrder, drvVec = drvVec, kernelFcn)
+      Y_smth = LP_dcs_const1(yMat = Y, hVec = h_opt_temp, polyOrderVec
+               = p_order, drvVec = drv_vec, kernFcn_x, kernFcn_t)
       
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, polyOrderVec = 
-                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2]), drvVec =
-                c(pOrder[1] + 1, drvVec[2]), kernelFcn)
-      mtt = LP_DoubleSmooth(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
-                c(pOrder[1], 2*pOrder[2] - drvVec[2] + 1), drvVec =
-                c(drvVec[1], pOrder[2] + 1), kernelFcn)
+      mxx = LP_dcs_const1(yMat = Y, hVec = h_infl$h_xx, polyOrderVec = 
+                c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
+                c(p_order[1] + 1, drv_vec[2]), kernFcn_x, kernFcn_t)
+      mtt = LP_dcs_const1(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+                c(drv_vec[1], p_order[2] + 1), kernFcn_x, kernFcn_t)
     } else {
       # smoothing of Y for variance factor estimation
-      YSmth = LP_DoubleSmooth2(yMat = Y, hVec = hOptTemp, polyOrderVec
-                              = pOrder, drvVec = drvVec, kernelFcn)
+      Y_smth = LP_dcs_const0(yMat = Y, hVec = h_opt_temp, polyOrderVec
+                              = p_order, drvVec = drv_vec, kernFcn_x, kernFcn_t)
       
       # smoothing of derivatives m(2,0) and m(0,2)
       # needs update for p even.
-      mxx = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, polyOrderVec = 
-                c(2*pOrder[1] - drvVec[1] + 1, pOrder[2]), drvVec =
-                c(pOrder[1] + 1, drvVec[2]), kernelFcn)
-      mtt = LP_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, polyOrderVec =
-                c(pOrder[1], 2*pOrder[2] - drvVec[2] + 1), drvVec =
-                c(drvVec[1], pOrder[2] + 1), kernelFcn)
+      mxx = LP_dcs_const0(yMat = Y, hVec = h_infl$h_xx, polyOrderVec = 
+                c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
+                c(p_order[1] + 1, drv_vec[2]), kernFcn_x, kernFcn_t)
+      mtt = LP_dcs_const0(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+                c(drv_vec[1], p_order[2] + 1), kernFcn_x, kernFcn_t)
     }
       
     # shrink mxx, mtt from boundaries
-    if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
+    if (dcs_options$delta[1] != 0 || dcs_options$delta[2] != 0)
     {
-      shrinkX = ceiling(dcsOptions$delta[1]*nX):
-        floor((1 - dcsOptions$delta[1])*nX)
-      shrinkT = ceiling(dcsOptions$delta[2]*nT):
-        floor((1 - dcsOptions$delta[2])*nT)
+      shrink_x = ceiling(dcs_options$delta[1] * n_x):
+        floor((1 - dcs_options$delta[1]) * n_x)
+      shrink_t = ceiling(dcs_options$delta[2] * n_t):
+        floor((1 - dcs_options$delta[2]) * n_t)
       
-      mxx = mxx[shrinkX, shrinkT]
-      mtt = mtt[shrinkX, shrinkT]
-      nSub = dim(mxx)[1]*dim(mxx)[2]
+      mxx = mxx[shrink_x, shrink_t]
+      mtt = mtt[shrink_x, shrink_t]
+      n_sub = dim(mxx)[1]*dim(mxx)[2]
       
     } else {
-      nSub = n
+      n_sub = n
     }  
      
     # calculate variance factor
-    varEst = cf.estimation(Y - YSmth, dcsOptions)
-    varCoef = varEst$cf_est
+    var_est = cf.estimation(Y - Y_smth, dcs_options)
+    var_coef = var_est$cf_est
     
     # calculate optimal bandwidths for next step
-    hOpt = hOptLP(mxx, mtt, varCoef, nSub, pOrder, drvVec, kernelFcn)
+    h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_fcn)
     
     # break condition
-    if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                    < 0.001) && (iterationCount > 2)) || iterationCount > 10)
+    if( all(!is.nan(h_opt)) &&
+        ((h_opt[1]/h_opt_temp[1] - 1 < 0.001) &&
+        (h_opt[2]/h_opt_temp[2] - 1 < 0.001) &&
+        (iteration_count > 2)) || iteration_count > 15)
     {
       iterate = FALSE
     }
   }
-  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef,
-              qarma_model = varEst$qarma_model))
+  return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
+              qarma_model = var_est$qarma_model))
 }

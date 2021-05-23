@@ -9,26 +9,53 @@
 
 #' Set Options for the DCS procedure
 #' 
-#' @param kernPar kernel parameters \eqn{k} and \eqn{\mu} as vector.
-#' @param drv order for estimation of \eqn{(\nu_1, \nu_2)} to be estimated. The
-#' polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}. Default value 
-#' is (0,0).
-#' @param inflExp inflation exponents for bandwidth selection.
-#' @param inflPar inflation parameters for bandwidth selection.
-#' @param delta shrink parameters for derivatives.
-#' @param constWindow use a constant window width for estimation.
-#' @param varEst procedure for estimation of variance factor \eqn{c_f}.
+#'  either local polynomial regression (\code{"LP"}, the default) or kernel
+#'  regression (\code{"KR"}).
+#' @param kern_par integer vector of length 2, containing the kernel parameters
+#'  \eqn{k} and \eqn{\mu}. Default is \code{c(2, 0)}.
+#' @param drv A non-negative vector of length 2, containing the derivative
+#'  orders to be estimated from the given data. Default ist \code{c(0, 0)}. For
+#'  LP-regression, polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}.
+#' @param infl_exp A vector for the inflation exponents for bandwidth selection, 
+#'  with default values depending on the regression type.
+#' @param infl_par A vector for the inflation parameters for bandwidth selection, 
+#'  with default values depending on the regression type.
+#' @param delta A vector indicating the percentage of cutting off boundaries.
+#'  Default for kernel regression is 5% (\code{c(0.05, 0.05)}) and 0% for local
+#'  polynomial regression. 
+#' @param const_window logical. Should a constant window be used at the 
+#'  boundaries? Default is \code{FALSE}.
+#' @param var_est the method of estimating the variance coefficient \eqn{c_f}. 
+#'  Currently available are \code{var_est = "iid"} (the default), where an iid. error strucutre
+#'  is modeled and \code{var_est = "qarma"}, where a spatial ARMA model is applied.
+#' @param qarma_order A list containing the order of the qarma model to be estimated.
+#'  Default is a \eqn{QARMA((1, 1), (1, 1))}-model (\code{qarma_model = list(ar = 
+#'  c(1, 1), ma = c(1, 1))}). Could be also one of \code{c("gpac", "bic")} for
+#'  automatic order selection. If \code{var_est = "iid"}, this argument is ignored.
+#' @param order_max A list specifying the maximum order, when automatic order
+#'  selection is used. Default is \code{order_max = list(ar = c(1, 1), ma = c(1, 1))}.
+#' 
+#' @section Details:
+#' This function is used to set the options for bandwidth selection in the 
+#' \code{dcs} function. Detailed information can be found in the vignette
+#' 
+#' @return  An object of class \code{"dcs_options"}.
+#' 
+#' @seealso \code{\link{dcs}}
 #' 
 #' @export
 #' 
 #' @examples
-#' myOpt = setOptions(kernPar = c(4,2), pOrder = 0, inflExp = c(0.5, 0.5),
-#' inflPar = c(2, 1), delta = c(0.05, 0.05), constWindow = TRUE,
-#' varEst = "iid")
+#' set.options()
+#' 
+#' myOpt <- set.options(type = "KR", var_est = "qarma")
+#' y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
+#' dcs(y, dcs_options = myOpt)
+#'
 
-setOptions = function(...) # user friendly wrapper function for .setOptions
+set.options = function(...) # user friendly wrapper function for .setOptions
 {
-  .setOptions(...)
+  .set.options(...)
 }
 
 #--------------Function for smoothing and bandwidth estimation----------------#
@@ -41,38 +68,55 @@ setOptions = function(...) # user friendly wrapper function for .setOptions
 #' 
 #' @param Y A numeric matrix that contains the observations of the random field
 #'   or functional time-series.
-#' @param dcsOptions Additional options for the smoothing procedure. Is set
-#'   via the \code{setOptions} command.
+#' @param dcs_options An object of class \code{"dcs_options"}, specifying the
+#'  parameters for the smoothing and bandwidth selection procedure.
 #' @param X An optional numeric vector containing the exogenous covariates
 #'   with respect to the rows.
 #' @param T An optional numeric vector containing the exogenous covariates
 #'   with respect to the columns.
-#' @param bndw Bandwidth for smoothing the observations in \code{Y}. Can be a
+#' @param h Bandwidth for smoothing the observations in \code{Y}. Can be a
 #'   two-valued numerical vector with bandwidths in row- and column-direction.
-#'   If the value is \code{"auto"} bandwidth selection will be carried out by
-#'   the iterative plug-in algorithm.
+#'   If the value is \code{"auto"} (the default), bandwidth selection will be 
+#'   carried out by the iterative plug-in algorithm.
 #' 
-#' @return \code{DCSmooth} returns an object of class "dcs".
-#' 
-#' @section Usage:
-#' \code{DCSmooth(Y, X = 1, T = 1, bndw = "auto", dcsOptions = setOptions())}
+#' @return \code{DCSmooth} returns an object of class "dcs", including
+#'  \tabular{ll}{
+#'  \code{Y} \tab matrix of original observations. \cr
+#'  \code{X, T} \tab vectors of covariates over rows (\code{X}) and columns 
+#'   (\code{T}). \cr
+#'  \code{M} \tab resulting matrix of smoothed values. \cr
+#'  \code{R} \tab matrix of resudials of estimation, \eqn{Y - M}. \cr
+#'  \code{h} \tab optimized or given bandwidths. \cr
+#'  \code{c_f} \tab estimated variance coefficient. \cr
+#'  \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
+#'   options of the dcs procedure. \cr
+#'  \code{iterations} \tab number of iterations of the IPI-procedure. \cr
+#'  \code{time_used} \tab time spend searching for optimal bandwidths (not overall
+#'   runtime of the function). \cr
+#'  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for estimation
+#'   of the variance factor. Omitted, if \code{"iid"} is used. \cr
+#'  \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
+#'   options of the dcs procedure. \cr
+#' }
 #' 
 #' @section Details:
-#' The function \code{summary}
+#' See the vignette for a more detailed description of the function.
+#' 
+#' @seealso \code{\link{set.options}}
 #' 
 #' @examples
-#' y = y.norm1 + rnorm(100^2)
+#' y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
 #' dcs(y)
 #' 
 #' @export
 #' 
 
-dcs = function(Y, dcsOptions = setOptions(), X = 1, T = 1, bndw = "auto")
+dcs = function(Y, dcs_options = set.options(), X = 1, T = 1, h = "auto")
 {
   # check for correct inputs of data and options
-  .dcsCheck_Y(Y)
-  .dcsCheck_bndw(bndw, dcsOptions)
-  .dcsCheck_options(dcsOptions)
+  .dcs.check.Y(Y)
+  .dcs.check.bndw(h, dcs_options)
+  .dcs.check.options(dcs_options)
   
   # set up vectors for X and T
   if (length(X) == 1 && length(T) == 1)
@@ -82,129 +126,152 @@ dcs = function(Y, dcsOptions = setOptions(), X = 1, T = 1, bndw = "auto")
   }
   
   # set kernel function (type, k, mu, nu = 0)
-  nameKernFcn = paste0("MW", dcsOptions$kernPar[1], dcsOptions$kernPar[2], "0")
-  kernelFcn  = kernelFcn_assign(nameKernFcn) # set kernel Function to use in optimization
+  type_kernel_fcn = paste0("MW", dcs_options$kern_par[1], 
+                         dcs_options$kern_par[2], "0")
+  # set kernel Function to use in optimization
+  kernel_fcn = kernel_fcn_assign(type_kernel_fcn) 
 
   # check for given bandwidths
-  if (bndw[1] == "auto") {
-    bndwAuto = TRUE
+  if (h[1] == "auto")
+  {
+    h_select_auto = TRUE
     
     time_start = Sys.time() # get starting time for performance measuring
   
     # bandwidth selection process
-    if (dcsOptions$type == "KR")
+    if (dcs_options$type == "KR")
     {
       # kernel regression
-      bndwObj = KR_bndwSelect(Y, kernelFcn, dcsOptions)
-      bndw = pmin(bndwObj$bndw, c(0.45, 0.45)) # KR cannot handle larger bndws.
-    } else if (dcsOptions$type == "LP") {
+      h_select_obj = KR.bndw(Y, kernel_fcn, dcs_options)
+      h_opt = pmin(h_select_obj$h_opt, c(0.45, 0.45)) # KR cannot handle larger hs.
+    } else if (dcs_options$type == "LP") {
       # local polynomial regression
-      bndwObj = LP_bndwSelect(Y, kernelFcn, dcsOptions)
-      bndw = bndwObj$bndw
-    } 
+      h_select_obj = LP.bndw(Y, kernFcn_x, kernFcn_t, dcs_options)
+      h_opt = h_select_obj$h_opt
+    }
+    
+    time_end = Sys.time()
+    
   } else {
-    bndwAuto = FALSE
+    h_select_auto = FALSE
+    time_end = time_start = Sys.time()
   }
   
-  time_end = Sys.time()
-  
   # estimation of resulting surface
-  if (all(dcsOptions$pOrder == 0)) # kernel regression
+  if (dcs_options$type == "KR") # kernel regression
   {
-    DCSOut = KR_DoubleSmooth2(yMat = Y, hVec = bndw, drvVec = c(0, 0), 
-      kernFcnPtrX = kernelFcn, kernFcnPtrT = kernelFcn)
-  } else if (any(dcsOptions$pOrder > 0)) {
-    # local polynomial regression
-    DCSOut = LP_DoubleSmooth2(yMat = Y, hVec = bndw, polyOrderVec = 
-            dcsOptions$pOrder, drvVec = dcsOptions$drv, kernFcnPtr = kernelFcn)
+    if (dcs_options$const_window == TRUE)
+    {
+      dcs_out = KR_dcs_const1(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
+                              kernFcnPtrX = kernel_fcn,
+                              kernFcnPtrT = kernel_fcn)
+    } else if (dcs_options$const_window == FALSE) {
+      dcs_out = KR_dcs_const0(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
+                              kernFcnPtrX = kernel_fcn,
+                              kernFcnPtrT = kernel_fcn)
+    }
+  } else if (dcs_options$type == "LP") {     # local polynomial regression
+    if (dcs_options$const_window == TRUE)
+    {
+      dcs_out = LP_dcs_const1(yMat = Y, hVec = h_opt, polyOrderVec = 
+                              dcs_options$p_order, drvVec = dcs_options$drv,
+                              kernFcnPtr = kernel_fcn)
+    } else if (dcs_options$const_window == FALSE){
+      dcs_out = LP_dcs_const0(yMat = Y, hVec = h_opt, polyOrderVec = 
+                              dcs_options$p_order, drvVec = dcs_options$drv,
+                              kernFcnPtr = kernel_fcn)
+    }
   }
   
   # calculate residuals
-  R = Y - DCSOut
+  R = Y - dcs_out
   
-  if (bndwAuto == TRUE)
+  if (h_select_auto == TRUE)
   {
-    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R,bndw = bndw,
-                   cf = bndwObj$varCoef, iterations = bndwObj$iterations,
-                   qarma = bndwObj$qarma_model, dcsOptions = dcsOptions,
-                   timeUsed = difftime(time_end, time_start, units = "secs"))
-    attr(DCS_out, "bndwAuto") = bndwAuto
-  } else if (bndwAuto == FALSE) {
+    dcs_out = list(Y = Y, X = X, T = T, M = dcs_out, R = R, h = h_opt,
+                   c_f = h_select_obj$var_coef, dcs_options = dcs_options,
+                   iterations = h_select_obj$iterations,
+                   qarma = h_select_obj$qarma_model,
+                   time_used = difftime(time_end, time_start, units = "secs"))
+    attr(dcs_out, "h_select_auto") = h_select_auto
+  } else if (h_select_auto == FALSE) {
     # probably unadvised, that the dcs object differs according to the type
-    # of bndw selection
-    DCS_out = list(X = X, T = T, Y = Y, M = DCSOut, R = R, bndw = bndw,
-                   dcsOptions = dcsOptions,
+    # of h selection
+    dcs_out = list(X = X, T = T, Y = Y, M = dcs_out, R = R, h = h_opt,
+                   dcs_options = dcs_options,
                    timeUsed = difftime(time_end, time_start, units = "secs"))
-    attr(DCS_out, "bndwAuto") = bndwAuto
+    attr(dcs_out, "h_select_auto") = h_select_auto
   }
   
   # apply class to output object
-  class(DCS_out) = "dcs"
+  class(dcs_out) = "dcs"
 
-  return(DCS_out)
+  return(dcs_out)
 }
 
 #-------------------Function for plotting smoothed surface--------------------#
 
 #' 3D Surface Plot of "dcs"-object or numeric matrix
 #' 
-#' \code{plotDCS} uses the plotly device to plot the 3D surface of the given
-#' "dcs-object or matrix. If a "dcs"-object is passed to the function, it can
+#' @section Details:
+#' \code{surface.dcs} uses the plotly device to plot the 3D surface of the given
+#' \code{"dcs"}-object or matrix. If a "dcs"-object is passed to the function, it can
 #' be chosen between plots of the original data (1), smoothed surface (2) and 
 #' residuals (3).
 #' 
-#' @param DCSobj An object of class "dcs" or a numeric matrix that contains the
+#' @param dcs_object an object of class \code{"dcs"} or a numeric matrix that contains the
 #'   values to be plotted.
+#' @param plot_choice override the prompt to specify a plot, can be 
+#'  \code{c(1, 2, 3)}.
 #' @param ... optional arguments passed to the plot function. See the vignette 
 #' \code{vignette("DCS", package = "DCSmooth")}
 #' 
-#' @return \code{DCSmooth} returns an object of class "plotly" and "htmlwidget".
+#' @return \code{dcs.3d} returns an object of class "plotly" and "htmlwidget".
 #' 
-#' @section Usage:
-#' \code{plotDCS(DCSobj)}
-#' }
+#' @seealso \code{\link{plot.dcs}}
 #' 
 #' @examples
 #' smth =  dcs(y.norm1)
-#' plotDCS(smth)
+#' dcs.3d(smth)
 #' 
 #' @export
 #' 
 
-plotDCS = function(DCSobj, ...)
+surface.dcs = function(dcs_object, plot_choice = "choice", ...)
 {
-  if (class(DCSobj)[1] == "dcs")
+  if (class(dcs_object)[1] == "dcs")
   {
-    fcn_args = list(...)
+    fcn_arg = list(...)
     
-    if (exists("plot_choice", fcn_args))
+    if (plot_choice == "choice")
     {
-      plot_choice = fcn_args$plot_choice
-    } else {
-      cat("3d-plot choices for dcs object:", fill = TRUE)
+      cat("Plot choices for dcs object:", fill = TRUE)
       choices <- c(1, 2, 3)
-      choice_names <- c("Original observations Y:", "Smoothed Surface M:",
-                        "Residuals R:")
+      choice_names <- c("original observations", "smoothed surface",
+                        "residuals")
       choices_df <- data.frame(choices)
       colnames(choices_df) <- ""
       rownames(choices_df) <- choice_names
       print.data.frame(choices_df)
       plot_choice <- readline(prompt="Please enter the corresponding number: ")
       plot_choice <- as.numeric(plot_choice)
+    } else if (!(plot_choice %in% 1:3)) {
+      stop("Invalid value in argument \"plot_choice\". Use c(1, 2, 3).")
     }
+    
     if (plot_choice == 1) {
-      Y = DCSobj$Y
+      Y = dcs_object$Y
     } else if (plot_choice == 2) {
-      Y = DCSobj$M
+      Y = dcs_object$M
     } else if (plot_choice == 3) {
-      Y = DCSobj$R
+      Y = dcs_object$R
     } else {
       stop(plot_choice, " is not a valid plot-type.")
     }
     
-    .plotly3d(Y = Y, X = DCSobj$X, T = DCSobj$T, 
+    .plotly.3d(Y = Y, X = dcs_object$X, T = dcs_object$T, 
               color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"))
   } else {
-    .plotly3d(Y = DCSobj, ...)
+    .plotly.3d(Y = dcs_object, ...)
   }
 }

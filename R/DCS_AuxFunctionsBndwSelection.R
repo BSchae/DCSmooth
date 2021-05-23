@@ -7,128 +7,117 @@
 #----------------------Formula for optimal bandwidths--------------------------#
 
 # Local Polynomial Regression
-hOptLP = function(mxx, mtt, varCoef, nSub, pVec, drvVec, kernelFcn)
+h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_vec, drv_vec, kernel_fcn)
 {
   # calculation of integrals
-  i11 = sum(mxx^2)/nSub; i22 = sum(mtt^2)/nSub; i12 = sum(mxx * mtt)/nSub
+  i11 = sum(mxx^2)/n_sub; i22 = sum(mtt^2)/n_sub; i12 = sum(mxx * mtt)/n_sub
   
   # kernel constants (kernel Functions may also depend on p, drv)
-  kernelProp1 = kernelPropLP(kernelFcn, pVec[1], drvVec[1])
-  kernelProp2 = kernelPropLP(kernelFcn, pVec[2], drvVec[2])
+  kernel_prop_1 = kernel.prop.LP(kernel_fcn, p_vec[1], drv_vec[1])
+  kernel_prop_2 = kernel.prop.LP(kernel_fcn, p_vec[2], drv_vec[2])
   
   # relation factor gamma_21 (h_1 = gamma_21 * h_2)
-  delta = (pVec - drvVec)[1] # should be the same for both entries
-  gamma_21 = (kernelProp1$mu/kernelProp2$mu)^(1/(delta + 1)) *
-              ( i12/i11 * (drvVec[1] - drvVec[2])/(2*drvVec[2] + 1) +
-              sqrt(i12^2/i11^2 * (drvVec[1] - drvVec[2])^2/(2*drvVec[2] + 1)^2 +
-              i22/i11 * (2*drvVec[1] + 1)/(2*drvVec[2] + 1)) )^(1/(delta + 1))
+  delta = (p_vec - drv_vec)[1] # should be the same for both entries
+  gamma_21 = (kernel_prop_1$mu/kernel_prop_2$mu)^(1/(delta + 1)) *
+          ( i12/i11 * (drv_vec[1] - drv_vec[2])/(2*drv_vec[2] + 1) +
+          sqrt(i12^2/i11^2 * (drv_vec[1] - drv_vec[2])^2/(2*drv_vec[2] + 1)^2 +
+          i22/i11 * (2*drv_vec[1] + 1)/(2*drv_vec[2] + 1)) )^(1/(delta + 1))
   gamma_12 = 1/gamma_21
   
   # optimal bandwidths
-  I1 = kernelProp1$mu^2 * i11 + kernelProp1$mu * kernelProp2$mu * 
+  I1 = kernel_prop_1$mu^2 * i11 + kernel_prop_1$mu * kernel_prop_2$mu * 
     i12 * gamma_12^(delta + 1)
-  hxOpt = (2*drvVec[1] + 1)/(2*(delta + 1)) * (kernelProp1$R * kernelProp2$R*
-          varCoef)/(nSub * gamma_12^(2*drvVec[1] + 1) * I1) 
-  I2 = kernelProp2$mu^2 * i22 + kernelProp1$mu * kernelProp2$mu * 
+  hx_opt = (2*drv_vec[1] + 1)/(2*(delta + 1)) * (kernel_prop_1$R * kernel_prop_2$R*
+          var_coef)/(n_sub * gamma_12^(2*drv_vec[1] + 1) * I1) 
+  I2 = kernel_prop_2$mu^2 * i22 + kernel_prop_1$mu * kernel_prop_2$mu * 
     i12 * gamma_21^(delta + 1)
-  htOpt = (2*drvVec[2] + 1)/(2*(delta + 1)) * (kernelProp1$R * kernelProp2$R*
-          varCoef)/(nSub * gamma_21^(2*drvVec[2] + 1) * I2) 
+  ht_opt = (2*drv_vec[2] + 1)/(2*(delta + 1)) * (kernel_prop_1$R * kernel_prop_2$R*
+          var_coef)/(n_sub * gamma_21^(2*drv_vec[2] + 1) * I2) 
   
-  hxOpt = hxOpt^(1/(2*(delta + sum(drvVec) + 2)))
-  htOpt = htOpt^(1/(2*(delta + sum(drvVec) + 2)))
+  hx_opt = hx_opt^(1/(2*(delta + sum(drv_vec) + 2)))
+  ht_opt = ht_opt^(1/(2*(delta + sum(drv_vec) + 2)))
   
-  return(c(hxOpt, htOpt))
+  return(c(hx_opt, ht_opt))
 }
 
 # Kernel Regression
-hOptKR = function(mxx, mtt, varCoef, n, nSub, kernelProp)
+h.opt.KR = function(mxx, mtt, var_coef, n, n_sub, kernel_prop)
 {
-  i0x = intCalcKR(mxx, mtt, nSub)[1]
-  i0t = intCalcKR(mtt, mxx, nSub)[1]
+  i0x = integral.calc.KR(mxx, mtt, n_sub)[1]
+  i0t = integral.calc.KR(mtt, mxx, n_sub)[1]
   
-  hxOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0x)
-  htOpt = (kernelProp$R^2 * varCoef)/(n * kernelProp$mu^2 * i0t)
+  hx_opt = (kernel_prop$R^2 * var_coef)/(n * kernel_prop$mu^2 * i0x)
+  ht_opt = (kernel_prop$R^2 * var_coef)/(n * kernel_prop$mu^2 * i0t)
   
-  hxOpt = hxOpt^(1/6)
-  htOpt = htOpt^(1/6)
+  hx_opt = hx_opt^(1/6)
+  ht_opt = ht_opt^(1/6)
 
-  return(c(hxOpt, htOpt))
+  return(c(hx_opt, ht_opt))
 }
 
 #----------------------Integrals over mxx^2, mtt^2-----------------------------#
 
-intCalcLP = function(m11, m22, p, nSub)
-{
-  i11 = sum(m11 * m11)/nSub
-  i22 = sum(m22 * m22)/nSub
-  i12 = sum(m11 * m22)/nSub
-  #print(c(i11, i22, i12))
-  
-  iOut = (i11/i22)^(1/(2*p + 2)) * (2*i11 + sqrt(i11 / i22) * i12)
-  
-  return(c(iOut, i11/i22))
-}
+# calculation for LP done in h.opt.LP function
 
-intCalcKR = function(m11, m22, nSub)
+integral.calc.KR = function(m11, m22, n_sub)
 {
-  i11 = sum(m11 * m11)/nSub
-  i22 = sum(m22 * m22)/nSub
-  i12 = sum(m11 * m22)/nSub
-  #print(c(i11, i22, i12))
+  i11 = sum(m11 * m11)/n_sub
+  i22 = sum(m22 * m22)/n_sub
+  i12 = sum(m11 * m22)/n_sub
+
+  i_out = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
   
-  iOut = (i11/i22)^0.75 * (sqrt(i11 * i22) + i12)
-  
-  return(c(iOut, i11/i22))
+  return(c(i_out, i11/i22))   # second element of return actually not needed
 }
 
 #-------------------------Kernel property calculation--------------------------#
 
-#' @export
-kernelPropLP = function(kernelFcn, p, drv, nInt = 5000)
+kernel.prop.LP = function(kernel_fcn, p, drv, n_int = 5000)
 {
-  uSeq  = seq(from = -1, to = 1, length.out = (2 * nInt + 1))
-  npMatrix = npMatrix(kernelFcn, p, nInt)
-  addWeights = mWeights(npMatrix, uSeq, drv)
+  u_seq  = seq(from = -1, to = 1, length.out = (2 * n_int + 1))
+  np_matrix = np_matrix(kernel_fcn, p, n_int)
+  add_weights = m_weights(np_matrix, u_seq, drv)
   
-  valR  = sum((addWeights^2 * kernelFcn_use(uSeq, q = 1, kernelFcn))^2) / nInt
-  valMu = sum((addWeights * kernelFcn_use(uSeq, q = 1, kernelFcn)) *
-                uSeq^(p + 1)) / (nInt * factorial(p + 1))
+  val_R  = sum((add_weights^2 * 
+                  kernel_fcn_use(u_seq, q = 1, kernel_fcn))^2)/n_int
+  val_mu = sum((add_weights * kernel_fcn_use(u_seq, q = 1, kernel_fcn)) *
+                u_seq^(p + 1)) / (n_int * factorial(p + 1))
   
-  return(list(R = valR, mu = valMu))
+  return(list(R = val_R, mu = val_mu))
 }
 
-kernelPropKR = function(kernelFcn, nInt = 5000)
+kernel.prop.KR = function(kernel_fcn, n_int = 5000)
 {
-  uSeq  = seq(from = -1, to = 1, length.out = (2 * nInt + 1))
-  valR  = sum((kernelFcn_use(uSeq, q = 1, kernelFcn))^2) / nInt
-  valMu = sum((kernelFcn_use(uSeq, q = 1, kernelFcn)) * uSeq^2) / nInt
+  u_seq  = seq(from = -1, to = 1, length.out = (2 * n_int + 1))
+  val_R  = sum((kernel_fcn_use(u_seq, q = 1, kernel_fcn))^2)/n_int
+  val_mu = sum((kernel_fcn_use(u_seq, q = 1, kernel_fcn)) * u_seq^2)/n_int
   
-  return(list(R = valR, mu = valMu))
+  return(list(R = val_R, mu = val_mu))
 }
 
 #-----------------bandwidth inflation for derivative estimations---------------#
 
-inflationFcnLP = function(h, n, dcsOptions)
+inflation.LP = function(h, n, dcs_options)
 {
-  hInflxx = c(dcsOptions$inflPar[1] * h[1]^dcsOptions$inflExp[1],
-              dcsOptions$inflPar[2] * h[2]^dcsOptions$inflExp[2])
-  hInfltt = c(dcsOptions$inflPar[2] * h[1]^dcsOptions$inflExp[2],
-              dcsOptions$inflPar[1] * h[2]^dcsOptions$inflExp[1])
+  h_infl_xx = c(dcs_options$infl_par[1] * h[1]^dcs_options$infl_exp[1],
+              dcs_options$infl_par[2] * h[2]^dcs_options$infl_exp[2])
+  h_infl_tt = c(dcs_options$infl_par[2] * h[1]^dcs_options$infl_exp[2],
+              dcs_options$infl_par[1] * h[2]^dcs_options$infl_exp[1])
   
-  return(list(h_xx = hInflxx, h_tt = hInfltt))
+  return(list(h_xx = h_infl_xx, h_tt = h_infl_tt))
 }
 
-inflationFcnKR = function(h, n, dcsOptions)
+inflation.KR = function(h, n, dcs_options)
 {
-  Tx = 1#n[2]/sum(n)
-  Tt = 1#n[1]/sum(n)
-  hInflxx = c(dcsOptions$inflPar[1] * Tx * (h[1]/Tx)^dcsOptions$inflExp[1],
-              dcsOptions$inflPar[2] * Tt * (h[2]/Tt)^dcsOptions$inflExp[2])
-  hInfltt = c(dcsOptions$inflPar[2] * Tx * (h[1]/Tx)^dcsOptions$inflExp[2],
-              dcsOptions$inflPar[1] * Tt * (h[2]/Tt)^dcsOptions$inflExp[1])
+  h_infl_xx = c(dcs_options$infl_par[1] * h[1]^dcs_options$infl_exp[1],
+              dcs_options$infl_par[2] * h[2]^dcs_options$infl_exp[2])
+  h_infl_tt = c(dcs_options$infl_par[2] * h[1]^dcs_options$infl_exp[2],
+              dcs_options$infl_par[1] * h[2]^dcs_options$infl_exp[1])
   
-  hInflxx = pmin(hInflxx, c(0.45, 0.45))
-  hInfltt = pmin(hInfltt, c(0.45, 0.45))  # ensure no bandwidth > 0.5 (or 0.45)
+  # ensure no bandwidth > 0.5 (or 0.45) as KR cannot handle estimation windows
+  # > 1
+  h_infl_xx = pmin(h_infl_xx, c(0.45, 0.45))
+  h_infl_tt = pmin(h_infl_tt, c(0.45, 0.45))  
   
-  return(list(h_xx = hInflxx, h_tt = hInfltt))
+  return(list(h_xx = h_infl_xx, h_tt = h_infl_tt))
 }

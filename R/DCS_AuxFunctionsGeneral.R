@@ -6,70 +6,76 @@
 
 #------------------------Set Options via Function------------------------------#
 
-.setOptions = function(    # inside function with default values in arguments
-  type      = "LP",        # either "LP" for local polynomial regression or
-                           # "KR" for kernel regression
-  kernPar   = c(2, 2),     # choose a kernel function with mu = 2
+.set.options = function(    # inside function with default values in arguments
+  type      = "LP",         # either "LP" for local polynomial regression or
+                            # "KR" for kernel regression
+  kern_par   = c(2, 2),     # choose a kernel function with mu = 2
   drv       = c(0, 0),
-  inflExp   = "auto",      # inflation exponent
-  inflPar   = "auto",      # inflation parameters c (regression),
-                           # d (2nd derivative)
-  delta     = "auto",      # parameter for shrinking the derivatives
-  constWindow = FALSE,
-  varEst    = "iid",
-  qarmaOrder = "auto",
-  orderMax = "auto"
+  infl_exp   = "auto",      # inflation exponent
+  infl_par   = "auto",      # inflation parameters c (regression),
+                            # d (2nd derivative)
+  delta     = "auto",       # parameter for shrinking the derivatives
+  const_window = FALSE,
+  var_est    = "iid",
+  qarma_order = "auto",
+  order_max = "auto"
   
-  # Options with default value "auto" are dependent on type or varEst and will
+  # Options with default value "auto" are dependent on type or var_est and will
   # be selected in the following, if not given a specific value.
 )
 {
   # Select options according to type ("LP", "KR")
   if (type == "LP")
   {
-    pOrder = drv + 1
-    if (inflExp[1] == "auto") { inflExp = c(0.6, 0.6) }
-    if (inflPar[1] == "auto") { inflPar = c(1.5, 1) }
-    if (delta[1] == "auto")   { delta = c(0, 0) }
+    p_order = drv + 1
+    if (infl_exp[1] == "auto") { infl_exp = c(0.6, 0.6) }
+    if (infl_par[1] == "auto") { infl_par = c(1.5, 1) }
+    if (delta[1] == "auto")    { delta = c(0, 0) }
     
-    options_list = list(type = type, kernPar = kernPar, pOrder = pOrder,
-                       drv = drv, inflExp = inflExp, inflPar = inflPar,
-                       delta = delta, constWindow = constWindow,
-                       varEst = varEst)
+    options_list = list(type = type, kern_par = kern_par, p_order = p_order,
+                       drv = drv, infl_exp = infl_exp, infl_par = infl_par,
+                       delta = delta, const_window = const_window,
+                       var_est = var_est)
   } else if (type == "KR") {
-    if (inflExp[1] == "auto") { inflExp = c(0.6, 0.6) }
-    if (inflPar[1] == "auto") { inflPar = c(3, 1) }
+    if (infl_exp[1] == "auto") { infl_exp = c(0.6, 0.6) }
+    if (infl_par[1] == "auto") { infl_par = c(3, 1) }
     if (delta[1] == "auto")   { delta = c(0.05, 0.05) }
-    options_list = list(type = type, kernPar = kernPar, drv = drv, 
-                        inflExp = inflExp, inflPar = inflPar,
-                        delta = delta, constWindow = constWindow,
-                        varEst = varEst)
+    options_list = list(type = type, kern_par = kern_par, drv = drv, 
+                        infl_exp = infl_exp, infl_par = infl_par,
+                        delta = delta, const_window = const_window,
+                        var_est = var_est)
   }
   
-  # Select options according to varEst ("iid", "QARMA")
-  if (varEst == "qarma")
+  # Select options according to var_est ("iid", "QARMA")
+  if (var_est == "qarma")
   {
-    if (modelOrder[1] == "auto") { modelOrder = list(ar = c(1, 1), ma = c(1, 1)) }
-    if (any(modelOrder %in% c("gpac", "bic")))
+    if (qarma_order[1] == "auto")
     {
-      if (orderMax == "auto") { orderMax = list(ar = c(1, 1), ma = c(1, 1)) }
-      options_list = c(options_list, list(orderMax = orderMax))
+      qarma_order = list(ar = c(1, 1), ma = c(1, 1))
+    }
+    if (any(qarma_order %in% c("gpac", "bic")))
+    {
+      if (order_max == "auto")
+      {
+        order_max = list(ar = c(1, 1), ma = c(1, 1))
+      }
+      options_list = c(options_list, list(order_max = order_max))
     }
     
-    options_list = c(options_list, list(modelOrder = modelOrder))
+    options_list = c(options_list, list(qarma_order = qarma_order))
   }
   
   # apply class to output object
-  class(options_list) = "dcsOpt"
+  class(options_list) = "dcs_options"
   
-  .dcsCheck_options(options_list)
+  .dcs.check.options(options_list)
   
   return(options_list)
 }
 
 #----------------------Function for 3d plots using plotly----------------------#
 
-.plotly3d = function(Y, X = 1, T = 1,
+.plotly.3d = function(Y, X = 1, T = 1,
                      color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"),
                      x_lab = "X_1", t_lab = "X_2", y_lab = "Value", 
                      showaxes = TRUE)
@@ -130,4 +136,14 @@
   fig = plotly::layout(fig, scene = scene, margin = list(l = 100))
   
   return(fig)
+}
+
+plot.dcs.colors = function(Y, color, n_color = 100)
+{
+  Y_color = Y - min(Y)
+  Y_color = Y_color/max(Y_color) * (n_color - 1) + 1
+  color_fcn = grDevices::colorRampPalette(colors = color)
+  color_grad = color_fcn(n_color)
+  color_out = matrix(color_grad[Y_color])
+  return(color_out)
 }

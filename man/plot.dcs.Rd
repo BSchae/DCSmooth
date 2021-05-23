@@ -4,8 +4,31 @@
 \alias{plot.dcs}
 \title{Contour Plot for the Double Conditional Smoothing}
 \usage{
-\method{plot}{dcs}(object, color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"))
+\method{plot}{dcs}(object, plot_choice = "choice", ...)
+}
+\arguments{
+\item{object}{an object of class "dcs_options", usually, a result of a call to 
+\code{\link{set_options}}.}
+
+\item{plot_choice}{override the prompt to specify a plot, can be 
+\code{c(1, 2, 3)}.}
 }
 \description{
 \code{plot} method for class \code{"dcs"}
+}
+\section{Details}{
+
+\code{plot.dcs} provides a contour plot of either the original data (1),
+ smoothed surface (2) or residuals (3).
+}
+
+\examples{
+## Contour plot of smoothed surface
+y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
+dcs_object <- dcs(y)
+plot(dcs_object, plot_choice = 2)
+
+}
+\seealso{
+\code{\link{dcs.3d}} to plot the surface.
 }

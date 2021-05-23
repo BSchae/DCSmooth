@@ -10,7 +10,7 @@
 
 #----------------------Check Matrix of Observations Y--------------------------#
 
-.dcsCheck_Y = function(Y)
+.dcs.check.Y = function(Y)
 {
   # check for missing values
   if (any(is.na(Y)))
@@ -32,7 +32,7 @@
 
 #-----------------------Check for usable bandwidths----------------------------#
 
-.dcsCheck_bndw = function(bndw, dcsOpt)
+.dcs.check.bndw = function(bndw, dcs_opt)
 {
   if (bndw[1] != "auto")
   {
@@ -46,7 +46,7 @@
       stop("bndw must be positive")
     }  
       
-    if (any(bndw > 0.45) && dcsOpt$pOrder == 0)
+    if (any(bndw > 0.45) && dcs_opt$p_order == 0)
     {
       stop("bndw must be < 0.45 for kernel regression")
     }  
@@ -64,110 +64,110 @@
 # This function is used in the .setOptions() function for direct check as well
 # as in the dcs() function.
 
-.dcsCheck_options = function(dcsOpt)
+.dcs.check.options = function(dcs_opt)
 {
-  if(!(class(dcsOpt) == "dcsOpt"))
+  if(!(class(dcs_opt) == "dcs_options"))
   {
     stop("Incorrect options specified, please use \"setOptions()\".")
   }
   
   # check regression type
-  if (!(dcsOpt$type %in% c("LP", "KR")))
+  if (!(dcs_opt$type %in% c("LP", "KR")))
   {
     stop("Unsupported regression type. Choose \"KR\" or \"LP\"")
   }
   
   ### Options for Local Polynomial Regression
-  if (dcsOpt$type == "LP")
+  if (dcs_opt$type == "LP")
   {
     # check derivative orders
-    if (any(dcsOpt$drv < 0))
+    if (any(dcs_opt$drv < 0))
     {  
       stop("Your derivative order is smaller than 0.")
     }
     
     # check inflation exponents
-    if (any(dcsOpt$inflExp != 0.6))
+    if (any(dcs_opt$infl_exp != 0.6))
     {
       warning("Inflation exponents have been changed.")
     }
   
     # check inflation parameters
-    if (any(dcsOpt$inflPar != c(1.5, 1)))
+    if (any(dcs_opt$infl_par != c(1.5, 1)))
     {
       warning("Inflation parameters have been changed.")
     } 
   }
   
   ### Options for Kernel Regression
-  if (dcsOpt$type == "KR")
+  if (dcs_opt$type == "KR")
   {
     # 
     # check inflation exponents
-    if (any(dcsOpt$inflExp != 0.6))
+    if (any(dcs_opt$infl_exp != 0.6))
     {
       warning("Inflation exponents have been changed.")
     }
     
     # check inflation parameters
-    if (any(dcsOpt$inflPar != c(3, 1)))
+    if (any(dcs_opt$infl_par != c(3, 1)))
     {
       warning("Inflation parameters have been changed.")
     } 
   }
   
   ### Options for variance estimation method
-  if (!(dcsOpt$varEst %in% c("iid", "qarma", "qarma_gpac", "qarma_bic")))
+  if (!(dcs_opt$var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic")))
   {
     stop("unsupported method in varEst (use only \"iid\" and \"qarma\")")
   } else {
-    if (dcsOpt$varEst == "iid")
+    if (dcs_opt$var_est == "iid")
     {
-      if (exists("modelOrder", where = dcsOpt))
+      if (exists("qarma_order", where = dcs_opt))
       {
-        warning("model order is no valid parameter in iid. case and will be
+        warning("QARMA order is no valid parameter in iid. case and will be
                  ignored.")
       }
-    } else if (dcsOpt$varEst == "qarma") {
-      # check for correct modelOrder
-      if (!exists("modelOrder", where = dcsOpt))
+    } else if (dcs_opt$var_est == "qarma") {
+      # check for correct qarma_order
+      if (!exists("qarma_order", where = dcs_opt))
       {
         stop("No model order for QARMA estimation provided.")
       } else {
-        if (is.list(dcsOpt$modelOrder) &&
-            exists("ar", where = dcsOpt$modelOrder) && 
-            exists("ma", where = dcsOpt$modelOrder))
+        if (is.list(dcs_opt$qarma_order) &&
+            exists("ar", where = dcs_opt$qarma_order) && 
+            exists("ma", where = dcs_opt$qarma_order))
         {
-          if (!(all(dcsOpt$modelOrder$ar %in% 0:100) &&
-                length(dcsOpt$modelOrder$ar) == 2))
+          if (!(all(dcs_opt$qarma_order$ar %in% 0:100) &&
+                length(dcs_opt$qarma_order$ar) == 2))
           {
             stop("unsupported values in AR-order")
           }
-          if (!(all(dcsOpt$modelOrder$ma %in% 0:100) &&
-                length(dcsOpt$modelOrder$ma) == 2))
+          if (!(all(dcs_opt$qarma_order$ma %in% 0:100) &&
+                length(dcs_opt$qarma_order$ma) == 2))
           {
             stop("unsupported values in MA-order")
           }
-        } else if (!any(dcsOpt$modelOrder %in% c("gpac", "bic"))) {
+        } else if (!any(dcs_opt$qarma_order %in% c("gpac", "bic"))) {
           stop("unsupported values in model order")
         }
         
-        if (any(dcsOpt$modelOrder %in% c("gpac", "bic")) && 
-            exists("orderMax", where = dcsOpt))
+        if (any(dcs_opt$qarma_order %in% c("gpac", "bic")) && 
+            exists("order_max", where = dcs_opt))
         {
-          if (!(is.list(dcsOpt$orderMax) &&
-              exists("ar", where = dcsOpt$orderMax) &&
-              exists("ma", where = dcsOpt$orderMax)))
+          if (!(is.list(dcs_opt$order_max) &&
+              exists("ar", where = dcs_opt$order_max) &&
+              exists("ma", where = dcs_opt$order_max)))
           {
             stop("Unsupported values for max. order of order selection.")
           } else {
-            if (!(all(dcsOpt$orderMax$ar %in% 0:100) &&
-                  length(dcsOpt$orderMax$ar) == 2))
+            if (!(all(dcs_opt$order_max$ar %in% 0:100) &&
+                  length(dcs_opt$order_max$ar) == 2))
             {
               stop("unsupported values in AR-part of max. order")
             }
-            if (!(all(dcsOpt$orderMax$ma %in% 0:100) && 
-                  length(dcsOpt$orderMax$ma) == 2))
+            if (!(all(dcs_opt$order_max$ma %in% 0:100) && 
+                  length(dcs_opt$order_max$ma) == 2))
             {
               stop("unsupported values in MA-part of max. order")
             }

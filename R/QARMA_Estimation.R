@@ -26,10 +26,14 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 
 #-------------Hannen-Rissanen Estimation Function for QARMA--------------------#
 
-#' Parametric Estimation of a \eqn{QARMA(p, q)}-process on a lattice.
+#' Estimation of a QARMA-process
+#'
+#' @description Parametric Estimation of a \eqn{QARMA(p, q)}-process on a 
+#'  lattice using the Hannan-Rissanen algorithm.
 #' 
+#' @section Details:
 #' The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
-#' using the Hannen-Rissanen Algorithm (Hannen-Rissanen ???). The lag-orders of 
+#' using the Hannen-Rissanen Algorithm (Hannen-Rissanen 1992). The lag-orders of 
 #' the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
 #' (p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
 #' rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation
@@ -45,32 +49,29 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' 
 #' @return The function returns a list including
 #' 
-#' \describe{
-#' \item{ar}{A \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
-#' containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. The
-#' \eqn{[i, j]}th entry is the \eqn{(p_1 + 1 - i, p_2 + 1 - j)}th lag with the
-#' \eqn{[p_1 + 1, p_2 + 1]}th entry being 1.}
-#' \item{ma}{A \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
-#' containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. The
-#' \eqn{[i, j]}th entry is the \eqn{(q_1 + 1 - i, q_2 + 1 - j)}th lag with the 
-#' \eqn{[q_1 + 1, q_2 + 1]}th entry being 1.}
-#' \item{sigma}{The estimated standard deviation \eqn{\sigma} of the QARMA-model.}
-#' \item{innov}{The matrix of innovations resulting from the QARMA estimation. 
-#' The initial values (from \eqn{i = 1,...,p_1}{i = 1,...,p1} and
-#' \eqn{j = 1,...,p_2}{j = 1,...,p2}) are set to zero.} 
+#' \tabular{ll}{
+#'  \code{ar} \tab a \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
+#'   containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. \cr
+#'  \code{ma} \tab a \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
+#'   containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. \cr
+#'  \code{sigma} \tab the estimated standard deviation \eqn{\sigma} of the QARMA-model.\cr
+#'  \code{innov} \tab the matrix of innovations resulting from the QARMA estimation. \cr
 #' }
 #' 
-#' @section Usage:
-#' \code{qarma(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))}
-#' 
-#' @section Details:
-#' ???
+#' @seealso \code{\link{qarma.sim}}
 #' 
 #' @examples
-#' #qarma.example1
-#' #qarma.example2
-#' qarma.est(qarma.example1)
-#' qarma.est(qarma.example2, model_order = list(ar = c(1, 1), ma = c(0, 0))
+#' ## simulation of QARMA process
+#' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+#' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+#' sigma = 0.5
+#' q_model = list(ar = ar, ma = ma, sigma = sigma)
+#' qarma_simulated = qarma.sim(100, 100, model = model)
+#' qarma_simulated
+#' 
+#' ## estimation of QARMA process
+#' qarma.est(qarma_simulated)
+#' qarma.est(qarma._simulated, model_order = list(ar = c(1, 1), ma = c(0, 0))
 #' 
 #' @export
 
@@ -171,6 +172,11 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   }
   
   # preparation of output
+  rownames(ar_mat) = paste0("lag ", 0:model_order$ar[1])
+  colnames(ar_mat) = paste0("lag ", 0:model_order$ar[2])
+  rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
+  colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
+  
   stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
                                (nT - max_lag_t - model_order$ar[2])))
   coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov, 

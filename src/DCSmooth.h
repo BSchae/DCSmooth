@@ -3,8 +3,8 @@
 
 arma::mat weightMatrix(arma::colvec weights, arma::mat matrix);
 arma::mat xMatrix(arma::colvec xVector, int polyOrder);
-arma::mat npMatrix(SEXP kernFcnPtr, int p, int n);
-arma::vec mWeights(arma::mat npMatrix, arma::vec u, int drv);
+arma::mat np_matrix(SEXP kernFcnPtr, int p, int n);
+arma::vec m_weights(arma::mat npMatrix, arma::vec u, int drv);
 int factorialFunction(int value);
 
 arma::vec kernFkt_MW200(arma::vec&, double);

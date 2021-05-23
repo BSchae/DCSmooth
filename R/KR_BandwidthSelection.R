@@ -6,49 +6,49 @@
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
+KR.bndw = function(Y, kernel_fcn, dcs_options)
 {
-  nX = dim(Y)[1]; nT = dim(Y)[2]
-  n  = nX * nT                                  # total number of observations is needed later
+  n_x = dim(Y)[1]; n_t = dim(Y)[2]
+  n  = n_x * n_t                                  # total number of observations is needed later
   
-  kernelProp = kernelPropKR(kernelFcn)         # calculate properties R and mu_2 of kernel
+  kernel_prop = kernel.prop.KR(kernel_fcn)         # calculate properties R and mu_2 of kernel
   
-  kernFcn0 = kernelFcn_assign("MW220")          # assign kernel for regression surface
-  kernFcn2 = kernelFcn_assign("MW422")          # assign kernel for 2nd derivative (needed in )
+  kern_fcn_0 = kernel_fcn_assign("MW220")          # assign kernel for regression surface
+  kern_fcn_2 = kernel_fcn_assign("MW422")          # assign kernel for 2nd derivative (needed in )
   
-  hOpt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
+  h_opt = c(0.1, 0.1)                            # initial values for h_0, arbitrary chosen
   
   iterate = TRUE                                # iteration indicator
-  iterationCount = 0
+  iteration_count = 0
   while(iterate)                                # loop for IPI
   {
-    iterationCount = iterationCount + 1
-    hOptTemp   = pmin(hOpt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
-    hInfl  = inflationFcnKR(hOptTemp, c(nX, nT), dcsOptions)  # inflation of bandwidths for drv estimation
+    iteration_count = iteration_count + 1
+    h_opt_temp   = pmin(h_opt[1:2], c(0.45, 0.45))        # store old bandwidths for breaking condition
+    h_infl  = inflation.KR(h_opt_temp, c(nX, nT), dcs_options)  # inflation of bandwidths for drv estimation
     
-    if (dcsOptions$constWindow == TRUE)
+    if (dcs_options$const_window == TRUE)
     {
       # pre-smoothing of the surface function m(0,0) for estimation of variance
-      YSmth = KR_DoubleSmooth(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
-                        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
+      Y_smth = KR_dcs_const1(yMat = Y, hVec = h_opt_temp, drvVec = c(0, 0),
+                        kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_0)
 
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = KR_DoubleSmooth(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
-                           kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
+      mxx = KR_dcs_const1(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
+                        kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
 
-      mtt = KR_DoubleSmooth(yMat = YSmth, hVec = hInfl$h_tt, drvVec = c(0, 2),
-                    kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
-    } else {
+      mtt = KR_dcs_const1(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
+                    kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
+    } else if (dcs_options$const_window == FALSE) {
       # pre-smoothing of the surface function m(0,0) for estimation of variance
-      YSmth = KR_DoubleSmooth2(yMat = Y, hVec = hOptTemp, drvVec = c(0, 0),
-        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn0)
-
+      Y_smth = KR_dcs_const0(yMat = Y, hVec = h_opt_temp, drvVec = c(0, 0),
+                             kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_0)
+      
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_xx, drvVec = c(2, 0),
-        kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn0)
-
-      mtt = KR_DoubleSmooth2(yMat = Y, hVec = hInfl$h_tt, drvVec = c(0, 2),
-        kernFcnPtrX = kernFcn0, kernFcnPtrT = kernFcn2)
+      mxx = KR_dcs_const0(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
+                          kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
+      
+      mtt = KR_dcs_const0(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
+                          kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
       
       # # TEST for correction of mxx/mtt
       # mxxxx = KR_DoubleSmooth2(yMat = mxx, hVec = hInfl$h_xx[1], hInfl$h_tt[2]),
@@ -61,34 +61,34 @@ KR_bndwSelect = function(Y, kernelFcn, dcsOptions)
     }
 
     # shrink mxx, mtt from boundaries
-    if (dcsOptions$delta[1] != 0 || dcsOptions$delta[2] != 0)
+    if (dcs_options$delta[1] != 0 || dcs_options$delta[2] != 0)
     {
-      shrinkX = ceiling(dcsOptions$delta[1]*nX):
-                      floor((1 - dcsOptions$delta[1])*nX)
-      shrinkT = ceiling(dcsOptions$delta[2]*nT):
-                      floor((1 - dcsOptions$delta[2])*nT)
+      shrink_x = ceiling(dcs_options$delta[1]*n_x):
+                      floor((1 - dcs_options$delta[1])*n_t)
+      shrink_t = ceiling(dcs_options$delta[2]*n_t):
+                      floor((1 - dcs_options$delta[2])*n_t)
 
-      mxx = mxx[shrinkX, shrinkT]
-      mtt = mtt[shrinkX, shrinkT]
-      nSub = dim(mxx)[1]*dim(mxx)[2]
+      mxx = mxx[shrink_x, shrink_t]
+      mtt = mtt[shrink_x, shrink_t]
+      n_sub = dim(mxx)[1]*dim(mxx)[2]
     } else {
-      nSub = n
+      n_sub = n
     }
       
     # calculate variance factor
-    varEst = cf.estimation(Y - YSmth, dcsOptions)
-    varCoef = varEst$cf_est
+    var_est = cf.estimation(Y - Y_smth, dcs_options)
+    var_coef = var_est$cf_est
     
     # calculate optimal bandwidths for next step
-    hOpt = hOptKR(mxx, mtt, varCoef, n, nSub, kernelProp)
+    h_opt = h.opt.KR(mxx, mtt, var_coef, n, n_sub, kernel_prop)
     
     # break condition
-    if( ((hOpt[1]/hOptTemp[1] - 1 < 0.001) && (hOpt[2]/hOptTemp[2] - 1 
-                    < 0.001) && (iterationCount > 3)) || (iterationCount > 15) )
+    if( ((h_opt[1]/h_opt_temp[1] - 1 < 0.001) && (h_opt[2]/h_opt_temp[2] - 1 
+        < 0.001) && (iteration_count > 3)) || (iteration_count > 15) )
     {
       iterate = FALSE
     }
   }
-  return(list(bndw = hOpt, iterations = iterationCount, varCoef = varCoef,
-              qarma_model = varEst$qarma_model))
+  return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
+              qarma_model = var_est$qarma_model))
 }

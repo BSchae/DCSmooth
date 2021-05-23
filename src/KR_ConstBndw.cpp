@@ -65,7 +65,7 @@ arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr)
 //---------------------------------------------------------------------------//
 
 // [[Rcpp::export]]
-arma::mat KR_DoubleSmooth2(arma::mat yMat, arma::colvec hVec,
+arma::mat KR_dcs_const0(arma::mat yMat, arma::colvec hVec,
                     arma::colvec drvVec, SEXP kernFcnPtrX, SEXP kernFcnPtrT)
 {
   // Smoothing over cond. on rows first (e.g. over single days).

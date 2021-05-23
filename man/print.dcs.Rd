@@ -6,6 +6,27 @@
 \usage{
 \method{print}{dcs}(object)
 }
+\arguments{
+\item{object}{an object of class "dcs", usually, a result of a call to 
+\code{\link{dcs}}.}
+}
 \description{
 \code{print} method for class \code{"dcs"}
+}
+\section{Details}{
+
+\code{print.dcs} prints a short summary of an object of class \code{dcs},
+only including bandwidths and the estimated variance coefficient (only if
+automatic bandwidth selection is used).
+}
+
+\examples{
+y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
+dcs_object <- dcs(y)
+print(dcs_object)
+dcs_object
+
+}
+\seealso{
+\code{\link{plot.dcs}}, \code{\link{print.dcs_options}}
 }

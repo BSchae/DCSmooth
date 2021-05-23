@@ -15,26 +15,24 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
   // get additional information on nX, nT, bndw etc.
   int nRow{ yMat.n_rows };
   int nCol{ yMat.n_cols };
-  int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) }; 
+  int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };
                         // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };  // width of estimation window
-  
+
   // result matrix
   arma::mat yMatOut(nRow, nCol);
-  
+
   // enable Kernel function
   XPtr<funcPtr> xpfun(kernFcnPtr);
   funcPtr kernFcn = *xpfun;
-  
+
   // calculate weights
-  arma::colvec  uVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol + 1, 
+  arma::colvec  uVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol + 1,
                         static_cast<double>(polyOrder + 1)) }; // vector from -1 to 1 to compute weights
-  arma::colvec  xVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol, 
+  arma::colvec  xVec{ arma::regspace(-bndw, bndw)/std::max(h * nCol,
                         static_cast<double>(polyOrder + 1)) }; // vector from -1 to 1 to compute weights
   arma::colvec  weightsVec{ (kernFcn(uVec, 1)) };         // computation of weights // sqrt removed
-  //arma::vec lWeights{ lejWeights(arma::vec u, int p, int drv, SEXP kernFcnPtr) };
-  //weightsVec = weightsVec % lWeights;
-  
+
   // smoothing over boundaries
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {
@@ -53,8 +51,8 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
     arma::mat    xWeightBound{ weightMatrix(weightsBound, xMatBound) };
     arma::mat    xMatSolved{ arma::inv(xWeightBound.t() * xMatBound)
                                 * xWeightBound.t() };
-    arma::rowvec xWeightsLeft{ factorialFunction(drv)
-                                * xMatSolved.row(drv) / pow(h, drv) };
+    arma::rowvec xWeightsLeft{ xMatSolved.row(drv) * factorialFunction(drv) /
+                               pow(h, drv) };
     // pow(-1, drv) ensures the correct sign
     arma::rowvec xWeightsRight{ pow(-1, drv) * xWeightsLeft };
 
@@ -63,7 +61,7 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
     yMatOut.col(nCol - colIndex - 1) = arma::reverse(yMat.cols(nCol -
                               xBound.n_rows, nCol - 1), 1) * xWeightsRight.t();
   }
-  
+
   if (h < 0.5)
   {
     // smothing over interior values
@@ -73,9 +71,9 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
     arma::mat xMatWeight{ weightMatrix(weightsVec, xMatInterior) };
     arma::mat xMatSolved{ arma::inv(xMatWeight.t() * xMatInterior)
       * xMatWeight.t() };         // compute inv(X*W*X)^(-1)*X*W only once here
-    arma::rowvec xWeightsVec{ factorialFunction(drv)
-      * xMatSolved.row(drv) / pow(h, drv) };
-    
+    arma::rowvec xWeightsVec{ xMatSolved.row(drv) *  factorialFunction(drv) /
+                              pow(h, drv) };
+
     // Loops smooth over the columns, conditional on rows. That is, every row is
     // consiedered to be an individual time series. To speed up computation, the
     // smoothing order is inverted (computing of weights only once per column, as
@@ -86,21 +84,21 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
       yMatOut.col(colIndex) = yInterior * xWeightsVec.t();
     }
   }
-  
+
   return yMatOut;
 }
 
 //---------------------------------------------------------------------------//
 
 // [[Rcpp::export]]
-arma::mat LP_DoubleSmooth2(arma::mat yMat, arma::colvec hVec,
+arma::mat LP_dcs_const0(arma::mat yMat, arma::colvec hVec,
                        arma::icolvec polyOrderVec, arma::icolvec drvVec,
-                       SEXP kernFcnPtr)
+                       SEXP kernFcnPtr_x, SEXP kernFcnPtr_t)
 {
-  arma::mat mMatTemp{ LPSmooth_matrix2(yMat, hVec(1),
-                                    polyOrderVec(1), drvVec(1), kernFcnPtr) };
-  arma::mat yMatOut{ LPSmooth_matrix2(mMatTemp.t(), hVec(0),
-                                    polyOrderVec(0), drvVec(0), kernFcnPtr) };
+  arma::mat mMatTemp{ LPSmooth_matrix2(yMat, hVec(1), polyOrderVec(1),
+                                       drvVec(1), kernFcnPtr_t) };
+  arma::mat yMatOut{ LPSmooth_matrix2(mMatTemp.t(), hVec(0), polyOrderVec(0),
+                                      drvVec(0), kernFcnPtr_x) };
 
   return yMatOut.t();
 }
