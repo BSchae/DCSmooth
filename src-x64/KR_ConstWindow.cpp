@@ -17,11 +17,9 @@ arma::vec kernFkt_MW422(arma::vec&, double);
 
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
-
-
-
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv, SEXP kernFcnPtr) 
+arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv,
+                          SEXP kernFcnPtr) //arma::vec (*kernFktPtr)(const arma::vec&, double))
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series
@@ -33,44 +31,38 @@ arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv, SEXP kernFcnPtr)
   // enable Kernel function
   XPtr<funcPtr> xpfun(kernFcnPtr);
   funcPtr kernFcn = *xpfun;
+
+  // smoothing over interior values
+  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * nCol) };   // vector from -1 to 1 to compute weights
+  arma::colvec  weightsInterior{ kernFcn(uInterior, 1)/bndw };            // computation of weights (put in kernel-function later)
+  arma::mat     yMatInterior(nRow, windowWidth + 1);                           // empty matrix for use inside loop
+
+  // Loops smooth over the columns, conditional on rows. That is, every row is
+  // consiedered to be an individual time series. To speed up computation, the
+  // smoothing order is inverted (computing of weights only once per column, as
+  // the weights are the same on a grid)
+  for (int colIndex{ bndw }; colIndex < (nCol - bndw); ++colIndex)                  // outer loop over columns
+  {
+    yMatInterior = yMat.cols(colIndex - bndw, colIndex + bndw);
+    yMatOut.col(colIndex) = yMatInterior * weightsInterior;
+  }
   
+  //yMatOut = yMatOut;
+
   // smoothing over boundaries
   arma::mat    yLeftMat{ yMat.cols(0, windowWidth - 1) };
   arma::mat    yRightMat{ yMat.cols(nCol - windowWidth, nCol - 1) };
+  arma::colvec uBound(windowWidth);
+  arma::colvec weightsBound(windowWidth);
+
+  for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
+  {
+    double q = static_cast<double>(colIndex)/(windowWidth - colIndex - 1);
+    uBound = arma::linspace(q, -1, windowWidth);
+    weightsBound = kernFcn(uBound, q) / (windowWidth - colIndex - 1);
   
-  for (int colIndex{ 0 }; colIndex < bndw + 1; ++colIndex)
-  {
-    if (colIndex >= (nCol/2) + 1)
-    {
-      break;
-    }
-    
-    // calculate weights for kernel regression
-    double h_window{ 2*h - colIndex/(nCol - 1.0) };
-    double q{ 2*h / h_window - 1 };
-    arma::colvec uBound{ arma::regspace(colIndex, colIndex + 1 - windowWidth) /
-      ((nCol - 1) * h_window) };
-    arma::colvec weightsBound{ kernFcn(uBound, q) /
-                               ((nCol - 1) * pow(h_window, drv + 1.0)) };
-
-    // calculation of estimates (complete columns)
     yMatOut.col(colIndex) = yLeftMat * weightsBound;
-    yMatOut.col(nCol - colIndex - 1) =  yRightMat * reverse(weightsBound);
-  }
-
-  // smoothing over interior values
-  arma::colvec  uInterior{ arma::regspace(-bndw, bndw) / (h * (nCol - 1)) };   // vector from -1 to 1 to compute weights
-  arma::colvec  weightsInterior{ kernFcn(uInterior, 1) / 
-                                 ((nCol - 1) * pow(h, drv + 1.0)) };           // computation of weights (put in kernel-function later)
-
-  // Loops smooth over the columns, conditional on rows. That is, every row is
-  // considered to be an individual time series. To speed up computation, the
-  // smoothing order is inverted (computing of weights only once per column, as
-  // the weights are the same on a grid)
-  for (int colIndex{ bndw + 1 }; colIndex < (nCol - bndw - 1); ++colIndex) // outer loop over columns
-  {
-    arma::mat yMatInterior{ yMat.cols(colIndex - bndw, colIndex + bndw) };
-    yMatOut.col(colIndex) = yMatInterior * weightsInterior;
+    yMatOut.col(nCol - colIndex - 1) = yRightMat * reverse(weightsBound);
   }
   
   return yMatOut;
@@ -84,10 +76,11 @@ arma::mat KR_dcs_const1(arma::mat yMat, arma::colvec hVec,
 {
   // Smoothing over cond. on rows first (e.g. over single days).
   // Thus, drv and order is (1) instead of (0) here (depending on t)
-  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1), kernFcnPtrT) };
+  arma::mat mMatTemp{ KRSmooth_matrix(yMat, hVec(1), drvVec(1),
+                                      kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
   // Smoothing over cols, drv and order is (0) (depending on x)
-  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(0), 
-                                     kernFcnPtrX) };
+  arma::mat yMatOut{ KRSmooth_matrix(mMatTemp.t(), hVec(0), drvVec(0),
+                                    kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
 
   return yMatOut.t();
 }

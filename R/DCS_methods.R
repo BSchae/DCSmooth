@@ -222,27 +222,27 @@ print.dcs_options = function(object)
   if (object$type == "KR")
   {
     cat("type: kernel regression \n")
-    cat("kernel order: \t \t ", object$kern_par[1], "\t", object$kern_par[2], "\n")
-    cat("derivative: \t \t ", object$drv[1], "\t", object$drv[2], "\n")
-    cat("inflation exponent: \t ", object$infl_exp[1],
+    cat("kernels used: \t \t", object$kerns[1], "\t", object$kerns[2], "\n")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n")
+    cat("inflation exponent: \t", object$infl_exp[1],
         "\t", object$infl_exp[2], "\n")
-    cat("inflation parameters: \t ", object$infl_par[1],
+    cat("inflation parameters: \t", object$infl_par[1],
         "\t", object$infl_par[2], "\n")
-    cat("boundary factor: \t ", object$delta[1], "\t", object$delta[2], "\n")
-    cat("constant window: \t ", object$const_window, "\n")
+    cat("boundary factor: \t", object$delta[1], "\t", object$delta[2], "\n")
+    cat("constant window: \t", object$const_window, "\n")
     cat("---------------------------------------", "\n")
   } else if (object$type == "LP") {  
   # when Local Polynomial Regression is selected
     cat("type: local polynomial regression \n")
-    cat("kernel order: \t \t ", object$kern_par[1], "\t", object$kern_par[2], "\n")
-    cat("derivative: \t \t ", object$drv[1], "\t", object$drv[2], "\n")
-    cat("polynomial order: \t ", object$p_order[1], "\t", object$p_order[2], "\n")
-    cat("inflation exponent: \t ", object$infl_exp[1],
+    cat("kernel order: \t \t", object$kerns[1], "\t", object$kerns[2], "\n")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n")
+    cat("polynomial order: \t", object$p_order[1], "\t", object$p_order[2], "\n")
+    cat("inflation exponent: \t", object$infl_exp[1],
         "\t", object$infl_exp[2], "\n")
-    cat("inflation parameters: \t ", object$infl_par[1],
+    cat("inflation parameters: \t", object$infl_par[1],
         "\t", object$infl_par[2], "\n")
-    cat("boundary factor: \t ", object$delta[1], "\t", object$delta[2], "\n")
-    cat("constant window: \t ", object$const_window, "\n")
+    cat("boundary factor: \t", object$delta[1], "\t", object$delta[2], "\n")
+    cat("constant window: \t", object$const_window, "\n")
     cat("---------------------------------------", "\n")
   }
   if (object$var_est == "iid")
@@ -254,11 +254,11 @@ print.dcs_options = function(object)
     if (!(is.list(object$qarma_order)) && 
         object$qarma_order %in% c("gpac", "bic"))
     {
-      cat("order selection: \t ", object$qarma_order, "\n")
+      cat("order selection: \t", object$qarma_order, "\n")
     } else {
-      cat("model order: \t ar: \t ", object$qarma_order$ar[1], 
+      cat("model order: \t ar: \t", object$qarma_order$ar[1], 
           "\t", object$qarma_order$ar[2], "\n")
-      cat("\t \t ma: \t ", object$qarma_order$ma[1], 
+      cat("\t \t ma: \t", object$qarma_order$ma[1], 
           "\t", object$qarma_order$ma[2], "\n")
     }
   }
@@ -275,7 +275,7 @@ print.dcs_options = function(object)
 #' 
 #' @seealso \code{\link{dcs}}
 #' 
-#' @example
+#' @examples
 #' y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
 #' dcs_object = dcs(y)
 #' residuals(dcs_object)
@@ -354,5 +354,9 @@ plot.dcs = function(object, plot_choice = "choice", ...)
        xlab = "T", ylab = "X", main = main_title)
 }
 
-# necessary from H. Wickhams best practices
+# .onLoad = function(libname, pkgname)
+# {
+#   data("model1", "mydata", package=pkgname, envir=parent.env(environment()))
+# }
+
 .onUnload <- function(libpath) { library.dynam.unload("DCSmooth", libpath) }

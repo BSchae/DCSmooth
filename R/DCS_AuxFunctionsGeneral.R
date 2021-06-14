@@ -7,18 +7,23 @@
 #------------------------Set Options via Function------------------------------#
 
 .set.options = function(    # inside function with default values in arguments
+  # standard options
   type      = "LP",         # either "LP" for local polynomial regression or
                             # "KR" for kernel regression
-  kern_par   = c(2, 2),     # choose a kernel function with mu = 2
   drv       = c(0, 0),
-  infl_exp   = "auto",      # inflation exponent
-  infl_par   = "auto",      # inflation parameters c (regression),
+  var_est   = "iid",
+  qarma_order = "auto",
+  order_max = "auto",
+  
+  # advanced options
+  kerns     = c("MW220", "MW220"), # choose a kernel function
+  #bound_mod = FALSE,
+  infl_exp  = "auto",       # inflation exponent
+  infl_par  = "auto",       # inflation parameters c (regression),
                             # d (2nd derivative)
   delta     = "auto",       # parameter for shrinking the derivatives
-  const_window = FALSE,
-  var_est    = "iid",
-  qarma_order = "auto",
-  order_max = "auto"
+  const_window = FALSE     # should a constant window be maintained?
+  #bound_imprv  = FALSE      # should estimation at boundaries be improved?
   
   # Options with default value "auto" are dependent on type or var_est and will
   # be selected in the following, if not given a specific value.
@@ -29,20 +34,22 @@
   {
     p_order = drv + 1
     if (infl_exp[1] == "auto") { infl_exp = c(0.6, 0.6) }
-    if (infl_par[1] == "auto") { infl_par = c(1.5, 1) }
-    if (delta[1] == "auto")    { delta = c(0, 0) }
+    if (infl_par[1] == "auto") { infl_par = c(1, 1) }
+    if (delta[1] == "auto")    { delta = c(0.05, 0.05) }
     
-    options_list = list(type = type, kern_par = kern_par, p_order = p_order,
+    options_list = list(type = type, kerns = kerns, p_order = p_order,
                        drv = drv, infl_exp = infl_exp, infl_par = infl_par,
                        delta = delta, const_window = const_window,
+                       #bound_imprv = bound_imprv,
                        var_est = var_est)
   } else if (type == "KR") {
-    if (infl_exp[1] == "auto") { infl_exp = c(0.6, 0.6) }
-    if (infl_par[1] == "auto") { infl_par = c(3, 1) }
+    if (infl_exp[1] == "auto") { infl_exp = c(0.5, 0.5) }
+    if (infl_par[1] == "auto") { infl_par = c(2, 1) }
     if (delta[1] == "auto")   { delta = c(0.05, 0.05) }
-    options_list = list(type = type, kern_par = kern_par, drv = drv, 
+    options_list = list(type = type, kerns = kerns, drv = drv, 
                         infl_exp = infl_exp, infl_par = infl_par,
                         delta = delta, const_window = const_window,
+                        #bound_imprv = bound_imprv,
                         var_est = var_est)
   }
   
@@ -68,7 +75,7 @@
   # apply class to output object
   class(options_list) = "dcs_options"
   
-  .dcs.check.options(options_list)
+  exception.check.options(options_list)
   
   return(options_list)
 }

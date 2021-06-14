@@ -6,7 +6,7 @@
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR.bndw = function(Y, kernel_fcn, dcs_options)
+KR.bndw = function(Y, kernel_fcn, kernel_fcn_t, dcs_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n  = n_x * n_t                                  # total number of observations is needed later
@@ -49,24 +49,15 @@ KR.bndw = function(Y, kernel_fcn, dcs_options)
       
       mtt = KR_dcs_const0(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
                           kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
-      
-      # # TEST for correction of mxx/mtt
-      # mxxxx = KR_DoubleSmooth2(yMat = mxx, hVec = hInfl$h_xx[1], hInfl$h_tt[2]),
-      #         drvVec = c(2, 2), kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn2)
-      # mxxtt = KR_DoubleSmooth2(yMat = Y, hVec = c(hInfl$h_xx[1], hInfl$h_tt[2]),
-      #                          drvVec = c(2, 2), kernFcnPtrX = kernFcn2, kernFcnPtrT = kernFcn2)
-      # 
-      # mxx = mxx - (hInfl$h_xx[2]^2*kernelProp$mu)/2 * mxxtt
-      # mtt = mtt - (hInfl$h_tt[1]^2*kernelProp$mu)/2 * mxxtt
     }
 
     # shrink mxx, mtt from boundaries
     if (dcs_options$delta[1] != 0 || dcs_options$delta[2] != 0)
     {
-      shrink_x = ceiling(dcs_options$delta[1]*n_x):
-                      floor((1 - dcs_options$delta[1])*n_t)
-      shrink_t = ceiling(dcs_options$delta[2]*n_t):
-                      floor((1 - dcs_options$delta[2])*n_t)
+      shrink_x = ceiling(dcs_options$delta[1] * n_x):
+                      (n_x - floor(dcs_options$delta[1] * n_x))
+      shrink_t = ceiling(dcs_options$delta[2] * n_t):
+                      (n_t - floor(dcs_options$delta[2] * n_t))
 
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
@@ -78,6 +69,7 @@ KR.bndw = function(Y, kernel_fcn, dcs_options)
     # calculate variance factor
     var_est = cf.estimation(Y - Y_smth, dcs_options)
     var_coef = var_est$cf_est
+    stat_test = var_est$stationary
     
     # calculate optimal bandwidths for next step
     h_opt = h.opt.KR(mxx, mtt, var_coef, n, n_sub, kernel_prop)
@@ -90,5 +82,5 @@ KR.bndw = function(Y, kernel_fcn, dcs_options)
     }
   }
   return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
-              qarma_model = var_est$qarma_model))
+              qarma_model = var_est$qarma_model, stat_test = stat_test))
 }

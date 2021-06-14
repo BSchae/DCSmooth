@@ -18,7 +18,7 @@ arma::vec kernFkt_MW422(arma::vec&, double);
 // function smoothes over the rows of a matrix yMat, conditional on columns
 
 // [[Rcpp::export]]
-arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr)
+arma::mat KRSmooth_matrix2(arma::mat yMat, double h, int drv,  SEXP kernFcnPtr)
 {
   int nRow{ yMat.n_rows };                // number of conditional Time-Series
   int nCol{ yMat.n_cols };                // number of observations per Time-Series
@@ -32,8 +32,10 @@ arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr)
   funcPtr kernFcn = *xpfun;
 
   // smoothing over interior values
-  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth)/(h * nCol) }; // vector from -1 to 1 to compute weights
-  arma::colvec  weightsInterior{ kernFcn(uInterior, 1)/bndw };              // computation of weights (put in kernel-function later)
+  arma::colvec  uInterior{ arma::linspace(-bndw, bndw, windowWidth) / 
+                           (h * nCol) }; // vector from -1 to 1 to compute weights
+  arma::colvec  weightsInterior{ kernFcn(uInterior, 1 ) / 
+                                 (nCol * pow(h, drv + 1.0)) };              // computation of weights (put in kernel-function later)
   arma::mat     yMatInterior(nRow, windowWidth);                            // empty matrix for use inside loop
   
   // Loops smooth over the columns, conditional on rows. That is, every row is
@@ -50,8 +52,9 @@ arma::mat KRSmooth_matrix2(arma::mat yMat, double h, SEXP kernFcnPtr)
   for (int colIndex{ 0 }; colIndex < bndw; ++colIndex)
   {
     double q = static_cast<double>(colIndex)/bndw;
-    arma::colvec  uBound(arma::regspace(colIndex, -bndw) / bndw);
-    arma::colvec  weightsBound{ kernFcn(uBound, q) / bndw };
+    arma::colvec  uBound(arma::regspace(colIndex, -bndw) / (h * nCol));
+    arma::colvec  weightsBound{ kernFcn(uBound, q) / 
+                              (nCol * pow(h, drv + 1.0)) };
     
     arma::mat     yLeftMat{ yMat.cols(0, uBound.n_rows - 1) };
     arma::mat     yRightMat{ yMat.cols(nCol - uBound.n_rows, nCol - 1) };
@@ -70,11 +73,10 @@ arma::mat KR_dcs_const0(arma::mat yMat, arma::colvec hVec,
 {
   // Smoothing over cond. on rows first (e.g. over single days).
   // Thus, drv and order is (1) instead of (0) here (depending on t)
-  arma::mat mMatTemp{ KRSmooth_matrix2(yMat, hVec(1),
-                        kernFcnPtrT)/pow(hVec(1), drvVec(1)) };
+  arma::mat mMatTemp{ KRSmooth_matrix2(yMat, hVec(1), drvVec(1), kernFcnPtrT) };
   // Smoothing over cols, drv and order is (0) (depending on x)
-  arma::mat yMatOut{ KRSmooth_matrix2(mMatTemp.t(), hVec(0),
-                        kernFcnPtrX)/pow(hVec(0), drvVec(0)) };
+  arma::mat yMatOut{ KRSmooth_matrix2(mMatTemp.t(), hVec(0), drvVec(0), 
+                                      kernFcnPtrX) };
 
   return yMatOut.t();
 }

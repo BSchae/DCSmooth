@@ -4,17 +4,17 @@
 \alias{surface.dcs}
 \title{3D Surface Plot of "dcs"-object or numeric matrix}
 \usage{
-surface.dcs(dcs_object, plot_coice = "choice", ...)
+surface.dcs(dcs_object, plot_choice = "choice", ...)
 }
 \arguments{
 \item{dcs_object}{an object of class \code{"dcs"} or a numeric matrix that contains the
 values to be plotted.}
 
-\item{...}{optional arguments passed to the plot function. See the vignette 
-\code{vignette("DCS", package = "DCSmooth")}}
-
 \item{plot_choice}{override the prompt to specify a plot, can be 
 \code{c(1, 2, 3)}.}
+
+\item{...}{optional arguments passed to the plot function. See the vignette 
+\code{vignette("DCS", package = "DCSmooth")}}
 }
 \value{
 \code{dcs.3d} returns an object of class "plotly" and "htmlwidget".

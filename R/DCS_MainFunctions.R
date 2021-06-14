@@ -1,11 +1,11 @@
-###############################################################################
-#                                                                             #
-#                     DCSmooth Package: User Functions                        #
-#                                                                             #
-###############################################################################
+################################################################################
+#                                                                              #
+#                      DCSmooth Package: User Functions                        #
+#                                                                              #
+################################################################################
 
 
-#-----------------------Set Options via Function------------------------------#
+#------------------------Set Options via Function------------------------------#
 
 #' Set Options for the DCS procedure
 #' 
@@ -111,25 +111,31 @@ set.options = function(...) # user friendly wrapper function for .setOptions
 #' @export
 #' 
 
-dcs = function(Y, dcs_options = set.options(), X = 1, T = 1, h = "auto")
+dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
 {
-  # check for correct inputs of data and options
-  .dcs.check.Y(Y)
-  .dcs.check.bndw(h, dcs_options)
-  .dcs.check.options(dcs_options)
-  
-  # set up vectors for X and T
-  if (length(X) == 1 && length(T) == 1)
+  # set up vectors for X and T if neccessary
+  args_list = list(...)
+  if (!exists("X", where = args_list))
   {
-    X = seq(from = 0, to = 1, length.out = dim(Y)[1])
-    T = seq(from = 0, to = 1, length.out = dim(Y)[2])
+    X = 0:(dim(Y)[1] - 1)/(dim(Y)[1] - 1)
+  } else {
+    X = args_list$X
+  }
+  if (!exists("T", where = args_list))
+  {
+    T = 0:(dim(Y)[2] - 1)/(dim(Y)[2] - 1)
+  } else {
+    T = args_list$T
   }
   
-  # set kernel function (type, k, mu, nu = 0)
-  type_kernel_fcn = paste0("MW", dcs_options$kern_par[1], 
-                         dcs_options$kern_par[2], "0")
+  # check for correct inputs of data and options
+  exception.check.Y(Y, X, T)
+  exception.check.bndw(h, dcs_options)
+  exception.check.options(dcs_options)
+  
   # set kernel Function to use in optimization
-  kernel_fcn = kernel_fcn_assign(type_kernel_fcn) 
+  kernel_x = kernel_fcn_assign(dcs_options$kerns[1])
+  kernel_t = kernel_fcn_assign(dcs_options$kerns[2])
 
   # check for given bandwidths
   if (h[1] == "auto")
@@ -142,17 +148,23 @@ dcs = function(Y, dcs_options = set.options(), X = 1, T = 1, h = "auto")
     if (dcs_options$type == "KR")
     {
       # kernel regression
-      h_select_obj = KR.bndw(Y, kernel_fcn, dcs_options)
+      h_select_obj = KR.bndw(Y, kernel_x, kernel_t, dcs_options)
       h_opt = pmin(h_select_obj$h_opt, c(0.45, 0.45)) # KR cannot handle larger hs.
     } else if (dcs_options$type == "LP") {
       # local polynomial regression
-      h_select_obj = LP.bndw(Y, kernFcn_x, kernFcn_t, dcs_options)
+      h_select_obj = LP.bndw(Y, kernel_x, kernel_t, dcs_options)
       h_opt = h_select_obj$h_opt
+    }
+    
+    if (h_select_obj$stat_test == FALSE)
+    {
+      warning("QARMA model not stationary, a change of the option \"qarma_order\" is advised.")
     }
     
     time_end = Sys.time()
     
   } else {
+    h_opt = h
     h_select_auto = FALSE
     time_end = time_start = Sys.time()
   }
@@ -162,24 +174,24 @@ dcs = function(Y, dcs_options = set.options(), X = 1, T = 1, h = "auto")
   {
     if (dcs_options$const_window == TRUE)
     {
-      dcs_out = KR_dcs_const1(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
-                              kernFcnPtrX = kernel_fcn,
-                              kernFcnPtrT = kernel_fcn)
+      dcs_out = KR_dcs_const0(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
+                              kernFcnPtrX = kernel_x,
+                              kernFcnPtrT = kernel_t)
     } else if (dcs_options$const_window == FALSE) {
       dcs_out = KR_dcs_const0(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
-                              kernFcnPtrX = kernel_fcn,
-                              kernFcnPtrT = kernel_fcn)
+                              kernFcnPtrX = kernel_x,
+                              kernFcnPtrT = kernel_t)
     }
   } else if (dcs_options$type == "LP") {     # local polynomial regression
     if (dcs_options$const_window == TRUE)
     {
-      dcs_out = LP_dcs_const1(yMat = Y, hVec = h_opt, polyOrderVec = 
+      dcs_out = LP_dcs_const0(yMat = Y, hVec = h_opt, polyOrderVec = 
                               dcs_options$p_order, drvVec = dcs_options$drv,
-                              kernFcnPtr = kernel_fcn)
+                              kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
     } else if (dcs_options$const_window == FALSE){
       dcs_out = LP_dcs_const0(yMat = Y, hVec = h_opt, polyOrderVec = 
                               dcs_options$p_order, drvVec = dcs_options$drv,
-                              kernFcnPtr = kernel_fcn)
+                              kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
     }
   }
   
