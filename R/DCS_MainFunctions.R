@@ -282,7 +282,7 @@ surface.dcs = function(dcs_object, plot_choice = "choice", ...)
     }
     
     .plotly.3d(Y = Y, X = dcs_object$X, T = dcs_object$T, 
-              color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"))
+              color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"), ...)
   } else {
     .plotly.3d(Y = dcs_object, ...)
   }

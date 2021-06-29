@@ -6,11 +6,11 @@
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR.bndw = function(Y, kernel_fcn, kernel_fcn_t, dcs_options)
+KR.bndw = function(Y, kernel_x, kernel_t, dcs_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n  = n_x * n_t                                  # total number of observations is needed later
-  
+
   kernel_prop = kernel.prop.KR(kernel_fcn)         # calculate properties R and mu_2 of kernel
   
   kern_fcn_0 = kernel_fcn_assign("MW220")          # assign kernel for regression surface

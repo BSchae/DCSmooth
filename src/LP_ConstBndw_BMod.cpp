@@ -10,7 +10,8 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
-                           const int polyOrder, const int drv, SEXP kernFcnPtr)
+                                const int polyOrder, const int drv,
+                                const int mu, SEXP weightFcnPtr)
 {
   // get additional information on nX, nT, bndw etc.
   int nRow{ yMat.n_rows };
@@ -18,9 +19,9 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
   int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };    // calculate absolute bandwidth, decimals will be dumped
   arma::mat yMatOut(nRow, nCol);   // result matrix
   
-  // enable Kernel function
-  XPtr<funcPtr> xpfun(kernFcnPtr);
-  funcPtr kernFcn = *xpfun;
+  // enable weight function
+  XPtr<weightPtr> xpfun(weightFcnPtr);
+  weightPtr weightFcn = *xpfun;
   
   // smoothing over boundaries
   for (int colIndex{ 0 }; colIndex < bndw + 1; ++colIndex)
@@ -34,7 +35,7 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
     double q{ static_cast<double>(colIndex)/(bndw - 1) };
     arma::colvec xBound{ arma::regspace(-colIndex, bndw) / (nCol - 1) }; // vector for exogenous variables. is [q, -1]
     arma::colvec uBound{ - xBound / h };
-    arma::colvec wBound{ (kernFcn(uBound, q)) };           // computation of weights
+    arma::colvec wBound{ (weightFcn(uBound, q, mu)) };           // computation of weights
 
     // calculate regression weights for linear regression
     arma::mat    xMatBound{ xMatrix(xBound, polyOrder) };
@@ -56,7 +57,7 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
     // calculate weights for interior smoothing
     arma::colvec xVec{ arma::regspace(-bndw, bndw) / (nCol - 1) };
     arma::colvec uVec{ - xVec / h };
-    arma::colvec wVec{ kernFcn(uVec, 1) };
+    arma::colvec wVec{ weightFcn(uVec, 1, mu) };
     
     arma::mat xMatInterior{ xMatrix(xVec, polyOrder) };
     arma::mat xWeightsInterior{ weightMatrix(wVec, xMatInterior) };
@@ -82,13 +83,16 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
 
 // [[Rcpp::export]]
 arma::mat LP_dcs_const0_BMod(arma::mat yMat, arma::colvec hVec,
-                       arma::colvec polyOrderVec, arma::icolvec drvVec,
-                       SEXP kernFcnPtr_x, SEXP kernFcnPtr_t)
+                       arma::icolvec polyOrderVec, arma::icolvec drvVec,
+                       arma::icolvec muVec, SEXP weightFcnPtr_x, 
+                       SEXP weightFcnPtr_t)
 {
-  arma::mat mMatTemp{ LPSmooth_matrix2_BMod(yMat, hVec(1),
-                                    polyOrderVec(1), drvVec(1), kernFcnPtr_t) };
-  arma::mat yMatOut{ LPSmooth_matrix2_BMod(mMatTemp.t(), hVec(0),
-                                    polyOrderVec(0), drvVec(0), kernFcnPtr_x) };
+  arma::mat mMatTemp{ LPSmooth_matrix2_BMod(yMat, hVec(1), polyOrderVec(1),
+                                            drvVec(1), muVec(1),
+                                            weightFcnPtr_t) };
+  arma::mat yMatOut{ LPSmooth_matrix2_BMod(mMatTemp.t(), hVec(0), 
+                                           polyOrderVec(0), drvVec(0), muVec(0),
+                                           weightFcnPtr_x) };
 
   return yMatOut.t();
 }

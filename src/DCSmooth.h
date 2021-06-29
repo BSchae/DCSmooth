@@ -7,6 +7,10 @@ arma::mat np_matrix(SEXP kernFcnPtr, int p, int n);
 arma::vec m_weights(arma::mat npMatrix, arma::vec u, int drv);
 int factorialFunction(int value);
 
+arma::vec weights_T(arma::vec&, double, int);
+arma::vec weights_M(arma::vec&, double, int);
+arma::vec weights_MW(arma::vec&, double, int);
+
 arma::vec kernFkt_MW200(arma::vec&, double);
 arma::vec kernFkt_MW210(arma::vec&, double);
 arma::vec kernFkt_MW220(arma::vec&, double);

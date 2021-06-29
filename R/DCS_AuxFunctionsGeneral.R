@@ -16,7 +16,7 @@
   order_max = "auto",
   
   # advanced options
-  kerns     = c("MW220", "MW220"), # choose a kernel function
+  kerns     = c("MW_220", "MW_220"), # choose a kernel function
   #bound_mod = FALSE,
   infl_exp  = "auto",       # inflation exponent
   infl_par  = "auto",       # inflation parameters c (regression),
@@ -114,15 +114,22 @@
   
   if (showaxes == TRUE)
   {
-    axx = list(titlefont = f1, tickfont = f2, title = t_lab,
-              gridcolor = "lightgray", zerolinecolor = "black")
-    axy = list(titlefont = f1, tickfont = f2, title = x_lab,
-              gridcolor = "lightgray", zerolinecolor = "black",
-              autorange = "reversed")
-    axz = list(titlefont = f1, tickfont = f2, title = y_lab,
-              backgroundcolor = "white",  gridcolor = "lightgray",
-              showbackground = TRUE, zerolinecolor = "black",
-              tickformat = ".1e")
+    # axx = list(titlefont = f1, tickfont = f2, title = t_lab,
+    #           gridcolor = "lightgray", zerolinecolor = "black")
+    # axy = list(titlefont = f1, tickfont = f2, title = x_lab,
+    #           gridcolor = "lightgray", zerolinecolor = "black",
+    #           autorange = "reversed")
+    # axz = list(titlefont = f1, tickfont = f2, title = y_lab,
+    #           backgroundcolor = "white",  gridcolor = "lightgray",
+    #           showbackground = TRUE, zerolinecolor = "black",
+    #           tickformat = ".1e")
+    axx = list(title = t_lab, gridcolor = "lightgray", zerolinecolor = "black",
+               automargin = TRUE)
+    axy = list(title = x_lab, gridcolor = "lightgray", zerolinecolor = "black",
+               autorange = "reversed", automargin = TRUE)
+    axz = list(title = y_lab, backgroundcolor = "white",  gridcolor = "lightgray",
+               showbackground = TRUE, zerolinecolor = "black",
+               tickformat = ".1e", automargin = TRUE) #, tickmode = "linear", dtick = 4000, tick0 = 2000)
   } else {
     axx = list(title = "", showticklabels = FALSE, gridcolor = "lightgray",
                zerolinecolor = "black")
@@ -134,7 +141,8 @@
   }
   scene = list(xaxis = axx, yaxis = axy, zaxis = axz,
              camera = list(eye = list(x = -1.8, y = 1.2, z = 1),
-                           projection = list(type = "orthographic")))
+                           projection = list(type = "orthographic")),
+             autosize = FALSE)
   # projection can be "projection" or "orthographic"
   
   fig = plotly::plot_ly(x = T0, y = X0, z = Y_data, showscale = FALSE,

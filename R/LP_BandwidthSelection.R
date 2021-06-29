@@ -11,6 +11,13 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
   p_order = dcs_options$p_order
   drv_vec = dcs_options$drv
   
+  # set variables for weight type
+  kern_type_vec = sub("^([[:alpha:]]*).*", "\\1", dcs_options$kern)
+  mu_vec = as.numeric(substr(dcs_options$kern, nchar(dcs_options$kern) - 1,
+                  nchar(dcs_options$kern) - 1))
+  weight_x = weight_fcn_assign(kern_type_vec[1])
+  weight_t = weight_fcn_assign(kern_type_vec[2])
+  
   h_opt = c(0.1, 0.1)         # initial values for h_0, arbitrary chosen
 
   iterate = TRUE              # iteration indicator
@@ -25,35 +32,36 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
     if (dcs_options$const_window == TRUE)
     {
       # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0(yMat = Y, hVec = h_opt_temp, polyOrderVec
-                                  = p_order, drvVec = drv_vec, kernFcnPtr_x =
-                                    kernel_x, kernFcnPtr_t = kernel_t)
-
+      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt_temp, polyOrderVec
+                                  = p_order, drvVec = drv_vec, muVec = mu_vec,
+                                  weightFcnPtr_x = weight_x,
+                                  weightFcnPtr_t = weight_t)
       # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_dcs_const1(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
+      mxx = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
                           c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                          c(p_order[1] + 1, drv_vec[2]), kernFcnPtr_x =
-                          kernel_x, kernFcnPtr_t = kernel_t)
-      mtt = LP_dcs_const1(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                          c(p_order[1] + 1, drv_vec[2]), muVec = mu_vec,
+                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+      mtt = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
                           c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                          c(drv_vec[1], p_order[2] + 1), kernFcnPtr_x =
-                          kernel_x, kernFcnPtr_t = kernel_t)
+                          c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
+                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
     } else {
       # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0(yMat = Y, hVec = h_opt_temp, polyOrderVec
-                                  = p_order, drvVec = drv_vec, kernFcnPtr_x =
-                                    kernel_x, kernFcnPtr_t = kernel_t)
+      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt_temp, polyOrderVec
+                                  = p_order, drvVec = drv_vec, muVec = mu_vec,
+                                  weightFcnPtr_x = weight_x,
+                                  weightFcnPtr_t = weight_t)
 
       # smoothing of derivatives m(2,0) and m(0,2)
       # needs update for p even.
-      mxx = LP_dcs_const0(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
+      mxx = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
                           c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                          c(p_order[1] + 1, drv_vec[2]), kernFcnPtr_x =
-                          kernel_x, kernFcnPtr_t = kernel_t)
-      mtt = LP_dcs_const0(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                          c(p_order[1] + 1, drv_vec[2]),  muVec = mu_vec,
+                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+      mtt = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
                           c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                          c(drv_vec[1], p_order[2] + 1), kernFcnPtr_x =
-                          kernel_x, kernFcnPtr_t = kernel_t)
+                          c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
+                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
     }
       
     # shrink mxx, mtt from boundaries
@@ -93,3 +101,4 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
   return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
               qarma_model = var_est$qarma_model, stat_test = stat_test))
 }
+

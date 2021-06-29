@@ -6,6 +6,44 @@
 
 using namespace Rcpp;
 
+//-----------------------Weight Functions for LPR-----------------------------//
+
+// Truncated
+arma::vec weights_T(arma::vec& u, double q = 1, int mu = 2)
+{
+  arma::vec weights_out{ pow(1 + u, mu) % pow(1 - u, mu) };
+  return weights_out;
+}
+
+// Müller
+arma::vec weights_M(arma::vec& u, double q = 1, int mu = 2)
+{
+  arma::vec weights_out{ pow(1 + u, mu) % pow(q - u, mu) };
+  return weights_out;
+}
+
+// Müller-Wang
+arma::vec weights_MW(arma::vec& u, double q = 1, int mu = 2)
+{
+  arma::vec weights_out{ pow(1 + u, mu) % pow(q - u, std::max(mu - 1, 0)) };
+  return weights_out;
+}
+
+//' @export
+// [[Rcpp::export]]
+XPtr<weightPtr> weight_fcn_assign(std::string fstr) {
+  if (fstr == "T")
+    return(XPtr<weightPtr>(new weightPtr(&weights_T)));
+  else if (fstr == "M")
+    return(XPtr<weightPtr>(new weightPtr(&weights_M)));
+  else if (fstr == "MW")
+    return(XPtr<weightPtr>(new weightPtr(&weights_MW)));
+  else
+    return XPtr<weightPtr>(R_NilValue); // runtime error as NULL no XPtr
+}
+
+//----------------------------Kernel Functions--------------------------------//
+
 // Müller-Wang kernels
 // Form is: Type_k_mu_nu
 
@@ -256,17 +294,17 @@ arma::vec kernFkt_TR422(arma::vec& uVec, double q)
 //' @export
 // [[Rcpp::export]]
 XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
-  if (fstr == "MW200")
+  if (fstr == "MW_200")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW200)));
-  else if (fstr == "MW210")
+  else if (fstr == "MW_210")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW210)));
-  else if (fstr == "MW220")
+  else if (fstr == "MW_220")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW220)));
-  else if (fstr == "MW320")
+  else if (fstr == "MW_320")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW320)));
-  else if (fstr == "MW420")
+  else if (fstr == "MW_420")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW420)));
-  else if (fstr == "MW422")
+  else if (fstr == "MW_422")
     return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW422)));
   else
     return XPtr<funcPtr>(R_NilValue); // runtime error as NULL no XPtr

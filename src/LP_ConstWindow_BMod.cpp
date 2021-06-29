@@ -12,7 +12,8 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
-                          const int polyOrder, const int drv, SEXP kernFcnPtr)
+                               const int polyOrder, const int drv,
+                               const int mu, SEXP weightFcnPtr)
 {
   int nRow{ yMat.n_rows };    // number of conditional Time-Series
   int nCol{ yMat.n_cols };    // number of observations per Time-Series
@@ -21,9 +22,9 @@ arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
   int windowWidth{ std::min(2*bndw + 1, nCol) };  // width of estimation window
   arma::mat yMatOut(nRow, nCol);  // matrix for results
   
-  // enable Kernel function
-  XPtr<funcPtr> xpfun(kernFcnPtr);
-  funcPtr kernFcn = *xpfun;
+  // enable weight function
+  XPtr<weightPtr> xpfun(weightFcnPtr);
+  weightPtr weightFcn = *xpfun;
   
   // smoothing over boundaries
   arma::colvec  xBound{ (arma::regspace(1, windowWidth)) / (nCol - 1) };
@@ -43,7 +44,7 @@ arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
     double q{ 2*h / h_window - 1 };
     
     arma::colvec uBound{ - xBound / h_window };
-    arma::colvec wBound{ kernFcn(uBound, q) };
+    arma::colvec wBound{ weightFcn(uBound, q, mu) };
     
     arma::mat xMatBound{ xMatrix(xBound, polyOrder) };
     arma::mat xMatWeight{ weightMatrix(wBound, xMatBound) };
@@ -64,7 +65,7 @@ arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
     // calculate weights for interior smoothing
     arma::colvec xVec{ arma::regspace(-bndw, bndw) / (nCol - 1) };
     arma::colvec uVec{ - xVec / h };
-    arma::colvec wVec{ kernFcn(uVec, 1) };
+    arma::colvec wVec{ weightFcn(uVec, 1, mu) };
     
     arma::mat xMatInterior{ xMatrix(xVec, polyOrder) };
     arma::mat xWeightsInterior{ weightMatrix(wVec, xMatInterior) };
@@ -91,15 +92,18 @@ arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
 // [[Rcpp::export]]
 arma::mat LP_dcs_const1_BMod(arma::mat yMat, arma::colvec hVec,
                         arma::icolvec polyOrderVec, arma::icolvec drvVec,
-                        SEXP kernFcnPtr_x, SEXP kernFcnPtr_t)
+                        arma::icolvec muVec, SEXP weightFcnPtr_x, 
+                        SEXP weightFcnPtr_t)
 {
   // Smoothing over cond. on rows first (e.g. over single days).
   // Thus, drv and order is (1) instead of (0) here (depending on t)
   arma::mat mMatTemp{ LPSmooth_matrix_BMod(yMat, hVec(1), polyOrderVec(1),
-                                      drvVec(1), kernFcnPtr_t) };
+                                           drvVec(1), muVec(1),
+                                           weightFcnPtr_t) };
   // Smoothing over cols, drv and order is (0) (depending on x)
-  arma::mat yMatOut{ LPSmooth_matrix_BMod(mMatTemp.t(), hVec(0), polyOrderVec(0),
-                                     drvVec(0), kernFcnPtr_x) };
+  arma::mat yMatOut{ LPSmooth_matrix_BMod(mMatTemp.t(), hVec(0), 
+                                          polyOrderVec(0), drvVec(0), muVec(0),
+                                          weightFcnPtr_x) };
   
   return yMatOut.t();
 }
