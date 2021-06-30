@@ -6,51 +6,51 @@
 
 #----------------------Formula for optimal bandwidths--------------------------#
 
-h.opt.LM = function(mxx, mtt, d_vec, var_coef, p_order, drv_vec, n_x, n_t,
-                    n_sub, kernel_x, kernel_t)
+h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, p_order, drv_vec,
+                    n_x, n_t, kernel_x, kernel_t)
 {
+  d_vec = var_model$d_vec
   # calculation of integrals
   i11 = sum(mxx^2)/n_sub; i22 = sum(mtt^2)/n_sub; i12 = sum(mxx * mtt)/n_sub
   
   # kernel constants (kernel Functions may also depend on p, drv)
-  kernel_prop_1 = kernel.prop.LM(kernel_x, p_order[1], drv_vec[1], 
-                                 var_coef$d_vec[1])
-  kernel_prop_2 = kernel.prop.LM(kernel_t, p_order[2], drv_vec[2],
-                                 var_coef$d_vec[2])
+  kernel_prop_x = kernel.prop.LM(kernel_x, p_order[1], drv_vec[1], d_vec[1])
+  kernel_prop_t = kernel.prop.LM(kernel_t, p_order[2], drv_vec[2], d_vec[2])
   
   # compute additional values
-  cb = h.coef.cb(i11, i22, i12, kernel_prop_1, kernel_prop_2, drv_vec, 
-                   var_coef$d_vec)
+  cb = h.coef.cb(i11, i22, i12, kernel_prop_x, kernel_prop_t, drv_vec, d_vec)
   cn = n_t/n_x
-  C1 = 4 * prod(var_coef$cf_vec) * var_coef$sigma2 *
-       kernel_prop_1$V * kernel_prop_2$V
+  C1 = 4 * var_coef * var_model$sigma^2 *
+       kernel_prop_x$V * kernel_prop_t$V
   delta = p_order[1] + 1 - drv_vec[1]
-  # replace "R" by "V" later.
   
   C1A = (1 - 2*d_vec[1] + 2*drv_vec[1]) * C1 * cn^(diff(d_vec)) /
-        (2 * delta * kernel_prop_1$mu * cb^(1 - 2*d_vec[2] + 2*drv_vec[2]) *
-        (kernel_prop_1$mu * i11 + kernel_prop_2$mu * i12 * cb^delta))
+        (2 * delta * kernel_prop_x$mu * cb^(1 - 2*d_vec[2] + 2*drv_vec[2]) *
+        (kernel_prop_x$mu * i11 + kernel_prop_t$mu * i12 * cb^delta))
   C2A = (1 - 2*d_vec[2] + 2*drv_vec[2]) * C1 * cn^(diff(d_vec)) /
-        (2 * delta * kernel_prop_2$mu * cb^(1 - 2*d_vec[2] + 2*drv_vec[2]) *
-        (kernel_prop_1$mu * i12 * cb^(-delta) + kernel_prop_2$mu * i22))
+        (2 * delta * kernel_prop_t$mu * cb^(1 - 2*d_vec[2] + 2*drv_vec[2]) *
+        (kernel_prop_x$mu * i12 * cb^(-delta) + kernel_prop_t$mu * i22))
   
   b1A = (C1A / n_sub^(1 - sum(d_vec)))^(1/
-                                (2*(1 - sum(d_vec) + delta + sum(drv_vec))))
+                        (2*(1 - sum(d_vec) + delta + sum(drv_vec))))
   b2A = (C2A / n_sub^(1 - sum(d_vec)))^(1/
-                                (2*(1 - sum(d_vec) + delta + sum(drv_vec))))
+                        (2*(1 - sum(d_vec) + delta + sum(drv_vec))))
     
   return(c(b1A, b2A))
 }
 
-var.coef.LM = function(R_mat, model_order = list(ar = c(0, 0), ma = c(0, 0)))
+cf.estimation.LM = function(R_mat, model_order = 
+                              list(ar = c(0, 0), ma = c(0, 0)))
 {
   sfarima = sfarima.est(R_mat, model_order = list(ar = c(0, 0), ma = c(0, 0)))
   
   c_f1 = sum(sfarima$ma$ma_x)^2/sum(sfarima$ar$ar_x)^2
   c_f2 = sum(sfarima$ma$ma_t)^2/sum(sfarima$ar$ar_t)^2
-  sigma2 = sfarima$sigma[1] * sfarima$sigma[2]
+  sigma = sqrt(sfarima$sigma[1] * sfarima$sigma[2])
+  cf_est = c_f1 * c_f2
+  var_model = list(d_vec = sfarima$d_vec, sigma = sigma, stnry = TRUE)
   
-  return(list(cf_vec = c(c_f1, c_f2), d_vec = sfarima$d_vec, sigma2 = sigma2))
+  return(list(cf_est = cf_est, var_model = var_model))
 }
 
 #------------------------Formula for coefficient cb----------------------------#

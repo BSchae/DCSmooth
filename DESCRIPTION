@@ -14,8 +14,8 @@ Description: This package provides nonparametric smoothing techniques for
     of the nonparametric regression model.
 License: GPL-3
 LazyData: true
-Imports: Rcpp, RcppArmadillo, RcppEigen, plotly
-LinkingTo: Rcpp, RcppArmadillo, RcppEigen, plotly
+Imports: Rcpp, RcppArmadillo, RcppEigen, plotly, fracdiff
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen, plotly, fracdiff
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr

@@ -33,7 +33,8 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
     
     // calculate kernel weights
     double q{ static_cast<double>(colIndex)/(bndw - 1) };
-    arma::colvec xBound{ arma::regspace(-colIndex, bndw) / (nCol - 1) }; // vector for exogenous variables. is [q, -1]
+    arma::colvec xBound{ arma::regspace(-colIndex, std::min(bndw,
+                         nCol - colIndex - 1)) / (nCol - 1) }; // vector for exogenous variables. is [q, -1]
     arma::colvec uBound{ - xBound / h };
     arma::colvec wBound{ (weightFcn(uBound, q, mu)) };           // computation of weights
 

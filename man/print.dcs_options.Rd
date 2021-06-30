@@ -2,21 +2,27 @@
 % Please edit documentation in R/DCS_Methods.R
 \name{print.dcs_options}
 \alias{print.dcs_options}
-\title{Print Options for Double Conditional Smoothing}
+\alias{summary.dcs_options}
+\title{Summarize Options for Double Conditional Smoothing}
 \usage{
 \method{print}{dcs_options}(object)
+
+\method{summary}{dcs_options}(object)
 }
 \arguments{
-\item{object}{an object of class "dcs_options", usually, a result of a call to 
-\code{\link{set_options}}.}
+\item{object}{an object of class "dcs_options", usually, a result of a call
+to \code{\link{set_options}}.}
 }
 \description{
-\code{print} method for class \code{"dcs_options"}
+\code{print} and \code{summary} method for class
+\code{"dcs_options"}
 }
 \section{Details}{
 
-\code{print.dcs_options} prints the obptions used for the \code{\link{dcs}} 
-function, which should be an object of class \code{"dcs_options"}.
+\code{print.dcs_options} prints the main options and 
+\code{summary.dcs_options} prints main and advanced (IPI) options used for
+the \code{\link{dcs}} function. Arguments which should be an object of class
+\code{"dcs_options"}.
 }
 
 \examples{

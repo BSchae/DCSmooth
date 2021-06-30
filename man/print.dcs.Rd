@@ -2,7 +2,7 @@
 % Please edit documentation in R/DCS_Methods.R
 \name{print.dcs}
 \alias{print.dcs}
-\title{Print Results from Double Conditional Smoothing}
+\title{Summarize Results from Double Conditional Smoothing}
 \usage{
 \method{print}{dcs}(object)
 }

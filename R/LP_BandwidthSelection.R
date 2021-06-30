@@ -4,10 +4,10 @@
 #                                                                              #
 ################################################################################
 
-LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
+LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  n  = n_x * n_t              # total number of observations is needed later
+  n = n_x * n_t              # total number of observations is needed later
   p_order = dcs_options$p_order
   drv_vec = dcs_options$drv
   
@@ -25,11 +25,11 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
   while(iterate)              # loop for IPI
   {
     iteration_count = iteration_count + 1
-    h_opt_temp      = h_opt[1:2]      # store old bandwidths for breaking condition
-    h_infl          = inflation.LP(h_opt_temp, c(n_x, n_x), dcs_options)  
+    h_opt_temp = h_opt[1:2]      # store old bandwidths for breaking condition
+    h_infl = inflation.LP(h_opt_temp, c(n_x, n_x), dcs_options$IPI_options)  
                                 # inflation of bandwidths for drv estimation
    
-    if (dcs_options$const_window == TRUE)
+    if (dcs_options$IPI_options$const_window == TRUE)
     {
       # smoothing of Y for variance factor estimation
       Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt_temp, polyOrderVec
@@ -65,12 +65,13 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
     }
       
     # shrink mxx, mtt from boundaries
-    if (dcs_options$delta[1] != 0 || dcs_options$delta[2] != 0)
+    if (dcs_options$IPI_options$delta[1] != 0 ||
+        dcs_options$IPI_options$delta[2] != 0)
     {
-      shrink_x = ceiling(dcs_options$delta[1] * n_x):
-                         (n_x - floor(dcs_options$delta[1] * n_x))
-      shrink_t = ceiling(dcs_options$delta[2] * n_t):
-                         (n_t - floor(dcs_options$delta[2] * n_t))
+      shrink_x = ceiling(dcs_options$IPI_options$delta[1] * n_x):
+                         (n_x - floor(dcs_options$IPI_options$delta[1] * n_x))
+      shrink_t = ceiling(dcs_options$IPI_options$delta[2] * n_t):
+                         (n_t - floor(dcs_options$IPI_options$delta[2] * n_t))
       
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
@@ -78,16 +79,32 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
       
     } else {
       n_sub = n
-    }  
-     
-    # calculate variance factor
-    var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options))
-    var_coef  = var_est$cf_est
-    stat_test = var_est$stationary
+    }
     
-    # calculate optimal bandwidths for next step
-    h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
-                        kernel_t)
+    # long-memory applies here
+    if (dcs_options$var_est == "lm")
+    {
+      # calculate variance factor
+      var_est = suppressWarnings(cf.estimation.LM(Y - Y_smth, 
+                             model_order = list(ar = c(0, 0), ma = c(0, 0))))
+      var_coef = var_est$cf_est
+      var_model = var_est$var_model
+      
+      # calculate optimal bandwidths for next step
+      h_opt = h.opt.LM(mxx, mtt, var_coef, var_model, n_sub, p_order, drv_vec,
+                       n_x, n_t, kernel_x, kernel_t)
+    } else {
+      # calculate variance factor
+      var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
+                                                 add_options))
+      var_coef  = var_est$cf_est
+      var_model = var_est$var_model
+      
+      # calculate optimal bandwidths for next step
+      h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
+                       kernel_t)
+    }
+
     
     # break condition
     if( all(!is.nan(h_opt)) &&
@@ -99,6 +116,5 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options)
     }
   }
   return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
-              qarma_model = var_est$qarma_model, stat_test = stat_test))
+              var_model = var_model))
 }
-

@@ -8,43 +8,33 @@
 # selection are joined in this function
 
 # Y should be the residuals, e.g. Y - YSmth in the estimation codes
-cf.estimation = function(Y, dcs_options)
+cf.estimation = function(Y, dcs_options, add_options)
 {
   if (dcs_options$var_est == "iid")
   {
     cf_est = sd(Y)^2
-    cf_out = list(cf_est = cf_est, var_est = "iid", stationary = TRUE)
+    var_model = list(stnry = TRUE)
   } else if (dcs_options$var_est == "qarma") {
-    if (!is.list(dcs_options$qarma_order) && dcs_options$qarma_order == "gpac")
-    {
-      model_order = qarma.order_gpac(Y, order_max = dcs_options$order_max)
-      qarma = qarma.cf(Y, model_order = model_order)
-      cf_est = qarma$cf
-      qarma_model = list(ar = qarma$qarma_model$ar, ma = qarma$qarma_model$ma)
-      cf_out = list(cf_est = cf_est, qarma_model = qarma_model,
-                    var_est = "qarma_gpac", stationary =
-                    qarma$qarma_model$stationary)
-    } else if (!is.list(dcs_options$qarma_order) &&
-               dcs_options$qarma_order == "bic") {
-      model_order = qarma.order_bic(Y, order_max = dcs_options$order_max)
-      qarma = qarma.cf(Y, model_order = model_order)
-      cf_est = qarma$cf
-      qarma_model = list(ar = qarma$qarma_model$ar, ma = qarma$qarma_model$ma)
-      cf_out = list(cf_est = cf_est, qarma_model = qarma_model,
-                    var_est = "qarma_bic", stationary = 
-                    qarma$qarma_model$stationary)
-    } else {
-      qarma = qarma.cf(Y, model_order = dcs_options$qarma_order)
-      cf_est = qarma$cf
-      qarma_model = list(ar = qarma$qarma_model$ar, ma = qarma$qarma_model$ma)
-      cf_out = list(cf_est = cf_est, qarma_model = qarma_model,
-                    var_est = "qarma", stationary =
-                    qarma$qarma_model$stationary)
-    }
+    qarma = qarma.cf(Y, model_order = add_options$qarma_order)
+    cf_est = qarma$cf
+    var_model = list(qarma = qarma$qarma_model[c("ar", "ma")], sigma = 
+                     qarma$qarma_model$sigma, stnry = qarma$qarma_model$stnry)
+  } else if (dcs_options$var_est == "qarma_gpac") {
+    model_order = qarma.order_gpac(Y, order_max = add_options$order_max)
+    qarma = qarma.cf(Y, model_order = model_order)
+    cf_est = qarma$cf
+    var_model = list(qarma = qarma$qarma_model[c("ar", "ma")], sigma = 
+                       qarma$qarma_model$sigma, stnry = qarma$qarma_model$stnry)
+  } else if (dcs_options$var_est == "qarma_bic") {
+    model_order = qarma.order_bic(Y, order_max = add_options$order_max)
+    qarma = qarma.cf(Y, model_order = model_order)
+    cf_est = qarma$cf
+    var_model = list(qarma = qarma$qarma_model[c("ar", "ma")], sigma = 
+                       qarma$qarma_model$sigma, stnry = qarma$qarma_model$stnry)
   } else if (dcs_options$var_est == "nonpar") {
-    cf_est = specDens((Y - YSmth), omega = c(0, 0))
-    cf_out = list(cf_est = cf_est$cf, var_est = "nonpar")
+    cf_est = specDens(Y, omega = c(0, 0))
+    var_model = NA
   }
   
-  return(cf_out)
+  return(list(cf_est = cf_est, var_model = var_model))
 }

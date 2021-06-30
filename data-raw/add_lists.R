@@ -1,6 +1,5 @@
-dcs_list_options = c("type", "drv", "var_est", "qarma_order", "order_max",
-                     "kerns", "infl_exp", "infl_par", "delta", "const_window",
-                     "p_order")
+dcs_list_options = c("type", "kerns", "p_order", "drv", "var_est",
+                     "IPI_options")
 
 dcs_list_kernels = c("MW_200", "MW_210", "MW_220", "MW_320", "MW_420",
                      "MW_421", "MW_422")

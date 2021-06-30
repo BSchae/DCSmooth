@@ -10,7 +10,7 @@
 
 #----------------------Check Matrix of Observations Y--------------------------#
 
-exception.check.Y = function(Y, X, T)
+exception.check.Y = function(Y)
 {
   sys.call(-1)
   # check for missing values
@@ -18,26 +18,34 @@ exception.check.Y = function(Y, X, T)
   {
     stop("Y contains missing values (NAs)")
   }
-  if (any(is.na(X)) || any(is.na(T)))
-  {
-    stop("X and/or T contain missing values (NAs)")
-  }
   
-  # check if Y, X, T is numeric
+  # check if Y is numeric
   if (!is.numeric(Y) || !is.matrix(Y))
   {
     stop("Y must be a numeric matrix")
-  }
-  if (!is.numeric(X) || !is.numeric(T))
-  {
-    stop("X and/or T be a numeric vector")
   }
   
   # check for correct dimension of Y
   if (any(dim(Y) < 3)) {
     stop("Y has to be at least of dimension 3 in each direction.")
   }
+}
+
+exception.check.XT = function(Y, X, T)
+{
+  sys.call(-1)
+  # check for missing values
+  if (any(is.na(X)) || any(is.na(T)))
+  {
+    stop("X and/or T contain missing values (NAs)")
+  }
   
+  # check if X, T is numeric
+  if (!is.numeric(X) || !is.numeric(T))
+  {
+    stop("X and/or T be a numeric vector")
+  }
+
   # check for correct dimension of X, T
   if (dim(Y)[1] != length(X))
   {
@@ -89,7 +97,7 @@ exception.check.options = function(dcs_opt)
   # check class
   if(!(class(dcs_opt) == "dcs_options"))
   {
-    stop("Incorrect options specified, please use \"setOptions()\".")
+    stop("Incorrect options specified, please use \"set.options()\".")
   }
   
   # check for unknown or missing options
@@ -98,12 +106,12 @@ exception.check.options = function(dcs_opt)
   {
     warning("Option \"", unknown_name, "\" is unknown and will be ignored.")
   }
-  # unspec_name = dcs_list_options[which(!(dcs_list_options %in%
-  #                                                 names(dcs_opt)))]
-  # if (length(unspec_name) > 0)
-  # {
-  #   stop("Option \"", unknown_name, "\" not specified.")
-  # }
+  unspec_name = dcs_list_options[which(!(dcs_list_options %in%
+                                                  names(dcs_opt)))]
+  if (length(unspec_name) > 0)
+  {
+    stop("Option \"", unspec_name, "\" not specified.")
+  }
   
   # check kernels
   if (!(dcs_opt$kerns[1] %in% DCSmooth:::dcs_list_kernels) || 
@@ -128,13 +136,13 @@ exception.check.options = function(dcs_opt)
     }
     
     # check inflation exponents
-    if (any(dcs_opt$infl_exp != 0.6))
+    if (any(dcs_opt$IPI_options$infl_exp != 0.6))
     {
       warning("Inflation exponents have been changed.")
     }
   
     # check inflation parameters
-    if (any(dcs_opt$infl_par != c(1, 1)))
+    if (any(dcs_opt$IPI_options$infl_par != c(1, 1)))
     {
       warning("Inflation parameters have been changed.")
     } 
@@ -145,76 +153,42 @@ exception.check.options = function(dcs_opt)
   {
     # 
     # check inflation exponents
-    if (any(dcs_opt$infl_exp != 0.5))
+    if (any(dcs_opt$IPI_options$infl_exp != 0.5))
     {
       warning("Inflation exponents have been changed.")
     }
     
     # check inflation parameters
-    if (any(dcs_opt$infl_par != c(2, 1)))
+    if (any(dcs_opt$IPI_options$infl_par != c(2, 1)))
     {
       warning("Inflation parameters have been changed.")
     } 
   }
   
   ### Options for variance estimation method
-  if (!(dcs_opt$var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic")))
+  if (!(dcs_opt$var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic",
+                               "lm")))
   {
-    stop("unsupported method in varEst (use only \"iid\" and \"qarma\")")
-  } else {
-    if (dcs_opt$var_est == "iid")
-    {
-      if (exists("qarma_order", where = dcs_opt))
-      {
-        warning("QARMA order is no valid parameter in iid. case and will be
-                 ignored.")
-      }
-    } else if (dcs_opt$var_est == "qarma") {
-      # check for correct qarma_order
-      if (!exists("qarma_order", where = dcs_opt))
-      {
-        stop("No model order for QARMA estimation provided.")
-      } else {
-        if (is.list(dcs_opt$qarma_order) &&
-            exists("ar", where = dcs_opt$qarma_order) && 
-            exists("ma", where = dcs_opt$qarma_order))
-        {
-          if (!(all(dcs_opt$qarma_order$ar %in% 0:100) &&
-                length(dcs_opt$qarma_order$ar) == 2))
-          {
-            stop("unsupported values in AR-order")
-          }
-          if (!(all(dcs_opt$qarma_order$ma %in% 0:100) &&
-                length(dcs_opt$qarma_order$ma) == 2))
-          {
-            stop("unsupported values in MA-order")
-          }
-        } else if (!any(dcs_opt$qarma_order %in% c("gpac", "bic"))) {
-          stop("unsupported values in model order")
-        }
-        
-        if (any(dcs_opt$qarma_order %in% c("gpac", "bic")) && 
-            exists("order_max", where = dcs_opt))
-        {
-          if (!(is.list(dcs_opt$order_max) &&
-              exists("ar", where = dcs_opt$order_max) &&
-              exists("ma", where = dcs_opt$order_max)))
-          {
-            stop("Unsupported values for max. order of order selection.")
-          } else {
-            if (!(all(dcs_opt$order_max$ar %in% 0:100) &&
-                  length(dcs_opt$order_max$ar) == 2))
-            {
-              stop("unsupported values in AR-part of max. order")
-            }
-            if (!(all(dcs_opt$order_max$ma %in% 0:100) && 
-                  length(dcs_opt$order_max$ma) == 2))
-            {
-              stop("unsupported values in MA-part of max. order")
-            }
-          }
-        }
-      }
-    }
+    stop("unsupported method in var_est.")
+  }
+}
+
+#---------------------------Check additional Options---------------------------#
+
+exception.check.qarma_order = function(qarma_order, dcs_options)
+{
+  if (!(exists("ar", qarma_order) && exists("ma", qarma_order)))
+  {
+    stop("\"qarma_order\" incorrectly specified.")
+  }
+  if (!is.numeric(qarma_order$ar) || length(qarma_order$ar) != 2 ||
+      any(qarma_order$ar < 0))
+  {
+    stop("AR order of \"qarma_order\" incorrectly specified")
+  }
+  if (!is.numeric(qarma_order$ma) || length(qarma_order$ma) != 2 ||
+      any(qarma_order$ma < 0))
+  {
+    stop("MA order of \"qarma_order\" incorrectly specified")
   }
 }

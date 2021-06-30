@@ -180,7 +180,7 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
                                (nT - max_lag_t - model_order$ar[2])))
   coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov, 
-                  stationary = statTest)
+                  stnry = statTest)
   return(coef_out)
 }
 

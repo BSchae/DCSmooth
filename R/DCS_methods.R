@@ -72,7 +72,6 @@ summary.dcs = function(object)
 
 #----------------------------Print (Summary) Methods---------------------------#
 
-
 #'
 #' @rdname summary.dcs
 #' 
@@ -134,7 +133,7 @@ print.summary_dcs = function(object, digits = max(3, getOption("digits") - 3))
   }
 }
   
-#' Print Results from Double Conditional Smoothing
+#' Summarize Results from Double Conditional Smoothing
 #' 
 #' @description \code{print} method for class \code{"dcs"}
 #' 
@@ -155,7 +154,7 @@ print.summary_dcs = function(object, digits = max(3, getOption("digits") - 3))
 #' dcs_object
 #' 
 #' @export
-#' 
+#'
 
 print.dcs = function(object)
 {
@@ -186,16 +185,21 @@ print.dcs = function(object)
   }
 }
 
-#' Print Options for Double Conditional Smoothing
+#-------------------------------DCS Options------------------------------------#
+
+#' Summarize Options for Double Conditional Smoothing
 #' 
-#' @description \code{print} method for class \code{"dcs_options"}
+#' @description \code{print} and \code{summary} method for class
+#' \code{"dcs_options"}
 #' 
 #' @section Details:
-#' \code{print.dcs_options} prints the obptions used for the \code{\link{dcs}} 
-#' function, which should be an object of class \code{"dcs_options"}.
+#' \code{print.dcs_options} prints the main options and 
+#' \code{summary.dcs_options} prints main and advanced (IPI) options used for
+#' the \code{\link{dcs}} function. Arguments which should be an object of class
+#' \code{"dcs_options"}.
 #' 
-#' @param object an object of class "dcs_options", usually, a result of a call to 
-#' \code{\link{set_options}}.
+#' @param object an object of class "dcs_options", usually, a result of a call
+#' to \code{\link{set_options}}.
 #' 
 #' @seealso \code{\link{print.dcs}}
 #' 
@@ -203,15 +207,50 @@ print.dcs = function(object)
 #' ## Default options
 #' myOpt <- set.options()
 #' print(myOpt)
+#' summary(myOpt)
 #' 
 #' ## Use Kernel regression
 #' myOpt <- set.options(type = "KR")
 #' print(myOpt)
+#' summary(myOpt)
 #' 
 #' @export
-#' 
 
 print.dcs_options = function(object)
+{
+  cat(class(object), "\n")
+  cat("---------------------------------------", "\n")
+  cat("options for DCS \trows \tcols \n")
+  cat("---------------------------------------", "\n")
+  
+  # when Kernel Regression is selected
+  if (object$type == "KR")
+  {
+    cat("type: kernel regression \n", sep = "")
+    cat("kernels used: \t \t", object$kerns[1], "\t", object$kerns[2], 
+        "\n", sep = "")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
+    cat("variance model: \t", object$var_est, "\n", sep = "")
+    cat("---------------------------------------", "\n", sep = "")
+  } else if (object$type == "LP") {  
+    # when Local Polynomial Regression is selected
+    cat("type: local polynomial regression \n", sep = "")
+    cat("kernel order: \t \t", object$kerns[1], "\t", object$kerns[2], "\n",
+        sep = "")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
+    cat("polynomial order: \t", object$p_order[1], "\t", object$p_order[2], 
+        "\n", sep = "")
+    cat("variance model: \t", object$var_est, "\n", sep = "")
+    cat("---------------------------------------", "\n")
+  }
+}
+
+#'
+#' @rdname print.dcs_options
+#' 
+#' @export
+
+summary.dcs_options = function(object)
 {
   cat(class(object), "\n")
   cat("---------------------------------------", "\n")
@@ -221,47 +260,33 @@ print.dcs_options = function(object)
   # when Kernel Regression is selected
   if (object$type == "KR")
   {
-    cat("type: kernel regression \n")
-    cat("kernels used: \t \t", object$kerns[1], "\t", object$kerns[2], "\n")
-    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n")
-    cat("inflation exponent: \t", object$infl_exp[1],
-        "\t", object$infl_exp[2], "\n")
-    cat("inflation parameters: \t", object$infl_par[1],
-        "\t", object$infl_par[2], "\n")
-    cat("boundary factor: \t", object$delta[1], "\t", object$delta[2], "\n")
-    cat("constant window: \t", object$const_window, "\n")
-    cat("---------------------------------------", "\n")
+    cat("type: kernel regression \n", sep = "")
+    cat("kernels used: \t \t", object$kerns[1], "\t", object$kerns[2], 
+        "\n", sep = "")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
+    cat("variance model: \t", object$var_est, "\n", sep = "")
+    cat("---------------------------------------", "\n", sep = "")
   } else if (object$type == "LP") {  
-  # when Local Polynomial Regression is selected
-    cat("type: local polynomial regression \n")
-    cat("kernel order: \t \t", object$kerns[1], "\t", object$kerns[2], "\n")
-    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n")
-    cat("polynomial order: \t", object$p_order[1], "\t", object$p_order[2], "\n")
-    cat("inflation exponent: \t", object$infl_exp[1],
-        "\t", object$infl_exp[2], "\n")
-    cat("inflation parameters: \t", object$infl_par[1],
-        "\t", object$infl_par[2], "\n")
-    cat("boundary factor: \t", object$delta[1], "\t", object$delta[2], "\n")
-    cat("constant window: \t", object$const_window, "\n")
+    # when Local Polynomial Regression is selected
+    cat("type: local polynomial regression \n", sep = "")
+    cat("kernel order: \t \t", object$kerns[1], "\t", object$kerns[2], "\n",
+        sep = "")
+    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
+    cat("polynomial order: \t", object$p_order[1], "\t", object$p_order[2], 
+        "\n", sep = "")
+    cat("variance model: \t", object$var_est, "\n", sep = "")
     cat("---------------------------------------", "\n")
   }
-  if (object$var_est == "iid")
-  {
-    cat("variance estimation: \t  iid. \n")
-  } else if (object$var_est == "qarma")
-  {
-    cat("variance estimation: \t  qarma \n")
-    if (!(is.list(object$qarma_order)) && 
-        object$qarma_order %in% c("gpac", "bic"))
-    {
-      cat("order selection: \t", object$qarma_order, "\n")
-    } else {
-      cat("model order: \t ar: \t", object$qarma_order$ar[1], 
-          "\t", object$qarma_order$ar[2], "\n")
-      cat("\t \t ma: \t", object$qarma_order$ma[1], 
-          "\t", object$qarma_order$ma[2], "\n")
-    }
-  }
+  
+  ipi = object$IPI_options
+  
+  cat("IPI options:\n")
+  cat("inflation parameters \t", ipi$infl_par[1], "\t", ipi$infl_par[2], "\n",
+      sep = "")
+  cat("inflation exponents \t", ipi$infl_exp[1], "\t", ipi$infl_exp[2], "\n",
+      sep = "")
+  cat("delta \t \t \t", ipi$delta[1], "\t", ipi$delta[2], "\n", sep = "")
+  cat("constant window width \t", ipi$const_window, "\n", sep = "")
   cat("---------------------------------------", "\n")
 }
 
@@ -353,10 +378,5 @@ plot.dcs = function(object, plot_choice = "choice", ...)
   graphics::plot(vec_XT[, 1], vec_XT[, 2], pch = 15, col = col_vec,
        xlab = "T", ylab = "X", main = main_title)
 }
-
-# .onLoad = function(libname, pkgname)
-# {
-#   data("model1", "mydata", package=pkgname, envir=parent.env(environment()))
-# }
 
 .onUnload <- function(libpath) { library.dynam.unload("DCSmooth", libpath) }

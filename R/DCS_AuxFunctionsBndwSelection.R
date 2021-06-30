@@ -42,13 +42,16 @@ h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kern_fcn_x,
 }
 
 # Kernel Regression
-h.opt.KR = function(mxx, mtt, var_coef, n, n_sub, kernel_prop)
+h.opt.KR = function(mxx, mtt, var_coef, n, n_sub, kernel_prop_x, kernel_prop_t)
 {
   i0x = integral.calc.KR(mxx, mtt, n_sub)[1]
   i0t = integral.calc.KR(mtt, mxx, n_sub)[1]
   
-  hx_opt = (kernel_prop$R^2 * var_coef)/(n * kernel_prop$mu^2 * i0x)
-  ht_opt = (kernel_prop$R^2 * var_coef)/(n * kernel_prop$mu^2 * i0t)
+  R_tot = kernel_prop_x$R * kernel_prop_t$R
+  mu_tot = kernel_prop_x$mu * kernel_prop_t$mu
+  
+  hx_opt = (R_tot * var_coef)/(n * mu_tot * i0x)
+  ht_opt = (R_tot * var_coef)/(n * mu_tot * i0t)
   
   hx_opt = hx_opt^(1/6)
   ht_opt = ht_opt^(1/6)
@@ -98,22 +101,22 @@ kernel.prop.KR = function(kernel_fcn, n_int = 5000)
 
 #-----------------bandwidth inflation for derivative estimations---------------#
 
-inflation.LP = function(h, n, dcs_options)
+inflation.LP = function(h, n, IPI_options)
 {
-  h_infl_xx = c(dcs_options$infl_par[1] * h[1]^dcs_options$infl_exp[1],
-              dcs_options$infl_par[2] * h[2]^dcs_options$infl_exp[2])
-  h_infl_tt = c(dcs_options$infl_par[2] * h[1]^dcs_options$infl_exp[2],
-              dcs_options$infl_par[1] * h[2]^dcs_options$infl_exp[1])
+  h_infl_xx = c(IPI_options$infl_par[1] * h[1]^IPI_options$infl_exp[1],
+              IPI_options$infl_par[2] * h[2]^IPI_options$infl_exp[2])
+  h_infl_tt = c(IPI_options$infl_par[2] * h[1]^IPI_options$infl_exp[2],
+              IPI_options$infl_par[1] * h[2]^IPI_options$infl_exp[1])
   
   return(list(h_xx = h_infl_xx, h_tt = h_infl_tt))
 }
 
-inflation.KR = function(h, n, dcs_options)
+inflation.KR = function(h, n, IPI_options)
 {
-  h_infl_xx = c(dcs_options$infl_par[1] * h[1]^dcs_options$infl_exp[1],
-              dcs_options$infl_par[2] * h[2]^dcs_options$infl_exp[2])
-  h_infl_tt = c(dcs_options$infl_par[2] * h[1]^dcs_options$infl_exp[2],
-              dcs_options$infl_par[1] * h[2]^dcs_options$infl_exp[1])
+  h_infl_xx = c(IPI_options$infl_par[1] * h[1]^IPI_options$infl_exp[1],
+              IPI_options$infl_par[2] * h[2]^IPI_options$infl_exp[2])
+  h_infl_tt = c(IPI_options$infl_par[2] * h[1]^IPI_options$infl_exp[2],
+              IPI_options$infl_par[1] * h[2]^IPI_options$infl_exp[1])
   
   # ensure no bandwidth > 0.5 (or 0.45) as KR cannot handle estimation windows
   # > 1

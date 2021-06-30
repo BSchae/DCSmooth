@@ -10,66 +10,42 @@
   # standard options
   type      = "LP",         # either "LP" for local polynomial regression or
                             # "KR" for kernel regression
+  kerns     = c("MW_220", "MW_220"), # choose a kernel function
   drv       = c(0, 0),
   var_est   = "iid",
-  qarma_order = "auto",
-  order_max = "auto",
   
   # advanced options
-  kerns     = c("MW_220", "MW_220"), # choose a kernel function
-  #bound_mod = FALSE,
-  infl_exp  = "auto",       # inflation exponent
-  infl_par  = "auto",       # inflation parameters c (regression),
-                            # d (2nd derivative)
-  delta     = "auto",       # parameter for shrinking the derivatives
-  const_window = FALSE     # should a constant window be maintained?
-  #bound_imprv  = FALSE      # should estimation at boundaries be improved?
-  
+  IPI_options = list(infl_par = "auto", infl_exp = "auto", delta = "auto",
+                     const_window = FALSE)
   # Options with default value "auto" are dependent on type or var_est and will
   # be selected in the following, if not given a specific value.
 )
 {
+  if (var_est == "lm" && type == "KR")
+  {
+    warning("Long-Memory bandwidth selection only supported for local polynomial
+            regression. Type set to \"LP\".")
+    type = "LP"
+  }
+  
   # Select options according to type ("LP", "KR")
   if (type == "LP")
   {
     p_order = drv + 1
-    if (infl_exp[1] == "auto") { infl_exp = c(0.6, 0.6) }
-    if (infl_par[1] == "auto") { infl_par = c(1, 1) }
-    if (delta[1] == "auto")    { delta = c(0.05, 0.05) }
+    if (IPI_options$infl_exp[1] == "auto") {IPI_options$infl_exp = c(0.6, 0.6)}
+    if (IPI_options$infl_par[1] == "auto") { IPI_options$infl_par = c(1, 1) }
+    if (IPI_options$delta[1] == "auto") { IPI_options$delta = c(0.05, 0.05) }
     
     options_list = list(type = type, kerns = kerns, p_order = p_order,
-                       drv = drv, infl_exp = infl_exp, infl_par = infl_par,
-                       delta = delta, const_window = const_window,
-                       #bound_imprv = bound_imprv,
-                       var_est = var_est)
+                       drv = drv, var_est = var_est, IPI_options = IPI_options)
   } else if (type == "KR") {
-    if (infl_exp[1] == "auto") { infl_exp = c(0.5, 0.5) }
-    if (infl_par[1] == "auto") { infl_par = c(2, 1) }
-    if (delta[1] == "auto")   { delta = c(0.05, 0.05) }
-    options_list = list(type = type, kerns = kerns, drv = drv, 
-                        infl_exp = infl_exp, infl_par = infl_par,
-                        delta = delta, const_window = const_window,
-                        #bound_imprv = bound_imprv,
-                        var_est = var_est)
-  }
-  
-  # Select options according to var_est ("iid", "QARMA")
-  if (var_est == "qarma")
-  {
-    if (qarma_order[1] == "auto")
-    {
-      qarma_order = list(ar = c(1, 1), ma = c(1, 1))
-    }
-    if (any(qarma_order %in% c("gpac", "bic")))
-    {
-      if (order_max == "auto")
-      {
-        order_max = list(ar = c(1, 1), ma = c(1, 1))
-      }
-      options_list = c(options_list, list(order_max = order_max))
-    }
+    p_order = NA
+    if (IPI_options$infl_exp[1] == "auto") {IPI_options$infl_exp = c(0.5, 0.5)}
+    if (IPI_options$infl_par[1] == "auto") { IPI_options$infl_par = c(2, 1) }
+    if (IPI_options$delta[1] == "auto") { IPI_options$delta = c(0.05, 0.05) }
     
-    options_list = c(options_list, list(qarma_order = qarma_order))
+    options_list = list(type = type, kerns = kerns, p_order = p_order,
+                        drv = drv, var_est = var_est, IPI_options = IPI_options)
   }
   
   # apply class to output object
