@@ -86,9 +86,12 @@ qarma.sim = function(n_x, n_t, model = list(ar, ma, sigma))
   error_out = error_mat[(n_mat[1] - n_x + 1):
                           n_mat[1], (n_mat[2] - n_t + 1):n_mat[2]]
   
-  list_out = list(Y = arma_out, innov = error_out,
-                 ar = ar_mat, ma = ma_mat, sigma = model$sigma)
-  return(list_out)
+  coef_out = list(Y = arma_out, innov = error_out, model = model,
+                  stnry = TRUE)
+  class(coef_out) = "qarma"
+  attr(coef_out, "subclass") = "sim"
+  
+  return(coef_out)
 }
 
 #----------------------Calculation of spectral density-------------------------#

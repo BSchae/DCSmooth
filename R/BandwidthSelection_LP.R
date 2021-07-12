@@ -17,6 +17,8 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                   nchar(dcs_options$kern) - 1))
   weight_x = weight_fcn_assign(kern_type_vec[1])
   weight_t = weight_fcn_assign(kern_type_vec[2])
+  kernel_x = kernel_fcn_assign(dcs_options$kerns[1])
+  kernel_t = kernel_fcn_assign(dcs_options$kerns[2])
   
   h_opt = c(0.1, 0.1)         # initial values for h_0, arbitrary chosen
 
@@ -26,13 +28,15 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
   {
     iteration_count = iteration_count + 1
     h_opt_temp = h_opt[1:2]      # store old bandwidths for breaking condition
-    h_infl = inflation.LP(h_opt_temp, c(n_x, n_x), dcs_options$IPI_options)  
+    h_infl = inflation.LP(h_opt_temp, dcs_options)  
                                 # inflation of bandwidths for drv estimation
+    h_defl = deflation.LP(h_opt_temp, dcs_options)
+                                # deflation if estimation of derivatives is consiedered
    
     if (dcs_options$IPI_options$const_window == TRUE)
     {
       # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt_temp, polyOrderVec
+      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
                                   = p_order, drvVec = drv_vec, muVec = mu_vec,
                                   weightFcnPtr_x = weight_x,
                                   weightFcnPtr_t = weight_t)
@@ -47,7 +51,7 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                           weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
     } else {
       # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt_temp, polyOrderVec
+      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
                                   = p_order, drvVec = drv_vec, muVec = mu_vec,
                                   weightFcnPtr_x = weight_x,
                                   weightFcnPtr_t = weight_t)
@@ -59,9 +63,25 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                           c(p_order[1] + 1, drv_vec[2]),  muVec = mu_vec,
                           weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
       mtt = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
-                          c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                          c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
-                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+                         c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+                         c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
+                         weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+    # } else {
+    #   # smoothing of Y for variance factor estimation
+    #   Y_smth = LP_dcs_const0(yMat = Y, hVec = h_defl, polyOrderVec
+    #                         = p_order, drvVec = drv_vec,
+    #                         kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
+    # 
+    #   # smoothing of derivatives m(2,0) and m(0,2)
+    #   # needs update for p even.
+    #   mxx = LP_dcs_const0(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
+    #                       c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
+    #                       c(p_order[1] + 1, drv_vec[2]),
+    #                       kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
+    #   mtt = LP_dcs_const0(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+    #                       c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+    #                       c(drv_vec[1], p_order[2] + 1),
+    #                       kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
     }
       
     # shrink mxx, mtt from boundaries
@@ -86,7 +106,7 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
     {
       # calculate variance factor
       var_est = suppressWarnings(cf.estimation.LM(Y - Y_smth, 
-                             model_order = list(ar = c(0, 0), ma = c(0, 0))))
+                                                  add_options$model_order))
       var_coef = var_est$cf_est
       var_model = var_est$var_model
       
@@ -105,7 +125,6 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                        kernel_t)
     }
 
-    
     # break condition
     if( all(!is.nan(h_opt)) &&
         ((h_opt[1]/h_opt_temp[1] - 1 < 0.001) &&

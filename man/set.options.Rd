@@ -7,44 +7,31 @@
 set.options(...)
 }
 \arguments{
-\item{kern_par}{integer vector of length 2, containing the kernel parameters
-\eqn{k} and \eqn{\mu}. Default is \code{c(2, 0)}.}
+\item{type}{either local polynomial regression (\code{"LP"}, the default) or kernel
+regression (\code{"KR"}).}
+
+\item{kerns}{a character vector of length 2 containing the identifier for the
+kernels to be used in kernel regression. Weighting functions in local
+polynomial regression are computed accoring to the identifier. Default value
+is \code{MW_220}, the Müller-Wang kernel of order \eqn{(2, 2, 0)}.}
 
 \item{drv}{A non-negative vector of length 2, containing the derivative
 orders to be estimated from the given data. Default ist \code{c(0, 0)}. For
 LP-regression, polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}.}
 
-\item{infl_exp}{A vector for the inflation exponents for bandwidth selection, 
-with default values depending on the regression type.}
-
-\item{infl_par}{A vector for the inflation parameters for bandwidth selection, 
-with default values depending on the regression type.}
-
-\item{delta}{A vector indicating the percentage of cutting off boundaries.
-Default for kernel regression is 5% (\code{c(0.05, 0.05)}) and 0% for local
-polynomial regression.}
-
-\item{const_window}{logical. Should a constant window be used at the 
-boundaries? Default is \code{FALSE}.}
-
 \item{var_est}{the method of estimating the variance coefficient \eqn{c_f}. 
-Currently available are \code{var_est = "iid"} (the default), where an iid. error strucutre
-is modeled and \code{var_est = "qarma"}, where a spatial ARMA model is applied.}
+Currently available are \code{var_est = "iid"} (the default), where an iid. 
+error structure is modeled and \code{var_est = "qarma"}, where a spatial
+ARMA model is applied. Use \code{"qarma_gpac"} for automated order selection.}
 
-\item{qarma_order}{A list containing the order of the qarma model to be estimated.
-Default is a \eqn{QARMA((1, 1), (1, 1))}-model (\code{qarma_model = list(ar = 
-c(1, 1), ma = c(1, 1))}). Could be also one of \code{c("gpac", "bic")} for
-automatic order selection. If \code{var_est = "iid"}, this argument is ignored.}
-
-\item{order_max}{A list specifying the maximum order, when automatic order
-selection is used. Default is \code{order_max = list(ar = c(1, 1), ma = c(1, 1))}.}
+\item{IPI_options}{a list containing further options used by the iterative
+plug-in algorithm.}
 }
 \value{
 An object of class \code{"dcs_options"}.
 }
 \description{
-either local polynomial regression (\code{"LP"}, the default) or kernel
- regression (\code{"KR"}).
+Set Options for the DCS procedure
 }
 \section{Details}{
 

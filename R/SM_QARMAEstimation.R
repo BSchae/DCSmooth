@@ -18,7 +18,8 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   qarma_model = qarma.est(Y, model_order = model_order)
 
   # get fractions for spectral density
-  cf = sum(qarma_model$ma)^2/sum(qarma_model$ar)^2 * qarma_model$sigma^2
+  cf = sum(qarma_model$model$ma)^2/sum(qarma_model$model$ar)^2 *
+           qarma_model$model$sigma^2
   return_list = list(cf = cf, qarma_model = qarma_model)
   
   return(return_list)
@@ -88,8 +89,8 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_ma = max(model_order$ma)
   
   ### AR-only auxiliary estimation model by YW-estimation ###
-  m1_ar = max(max_lag_x, 1)# + ifelse(total_lag_ma > 0, 0, 0)
-  m2_ar = max(max_lag_t, 1)# + ifelse(total_lag_ma > 0, 0, 0)
+  m1_ar = max(max_lag_x, 1) + ifelse(total_lag_ma > 0, 2, 0) # increase order of aux AR model here
+  m2_ar = max(max_lag_t, 1) + ifelse(total_lag_ma > 0, 2, 0)
   ar_aux = qarma.yw_matrix(Y, ar_order = c(m1_ar, m2_ar))
   
   # calculate residuals from auxiliary AR model
@@ -179,8 +180,10 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   
   stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
                                (nT - max_lag_t - model_order$ar[2])))
-  coef_out = list(ar = ar_mat, ma = ma_mat, sigma = stdev, innov = innov, 
-                  stnry = statTest)
+  coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
+                  sigma = stdev), stnry = statTest)
+  class(coef_out) = "qarma"
+  attr(coef_out, "subclass") = "est"
   return(coef_out)
 }
 
@@ -433,7 +436,7 @@ qarma.auxF = function(z1c, z2c, ar)
 #-------------------------------Model Selection--------------------------------#
 
 # Order selection by GPAC (see Illig/Truong-Van (2006))
-qarma.order_gpac = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
+qarma.order.gpac = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
 {
   # set up vectors for ar and ma
   ar_vec_test = expand.grid(0:order_max$ar[1], 0:order_max$ar[2])
@@ -523,7 +526,7 @@ qarma.order_gpac = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
 }
 
 # Order selection by BIC
-qarma.order_bic = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
+qarma.order.bic = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n = prod(dim(Y))
   ar_matrix = expand.grid(0:order_max$ar[1], 0:order_max$ar[2])
@@ -539,8 +542,8 @@ qarma.order_bic = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
       model_order = list(ar = as.numeric(ar_matrix[i, ]),
                          ma = as.numeric(ma_matrix[j, ]))
       qarma_model = qarma.est(Y, model_order = model_order)
-      log_L = -n/2 * log(4*pi^2*qarma_model$sigma^2) -
-        sum(qarma_model$innov^2)/(2*qarma_model$sigma^2)
+      log_L = -n/2 * log(4*pi^2*qarma_model$model$sigma^2) -
+        sum(qarma_model$innov^2)/(2*qarma_model$model$sigma^2)
       bic_matrix[i, j] = -2*log_L + sum(unlist(model_order)) * log(n)
     }
   }

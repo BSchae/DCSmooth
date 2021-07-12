@@ -29,10 +29,12 @@ the \code{\link{dcs}} function. Arguments which should be an object of class
 ## Default options
 myOpt <- set.options()
 print(myOpt)
+summary(myOpt)
 
 ## Use Kernel regression
 myOpt <- set.options(type = "KR")
 print(myOpt)
+summary(myOpt)
 
 }
 \seealso{

@@ -23,6 +23,17 @@ with respect to the rows.}
 
 \item{T}{An optional numeric vector containing the exogenous covariates
 with respect to the columns.}
+
+\item{qarma_order}{an optional list containing the two dimensional orders for
+the QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}. If
+omitted, the default model is a QARMA((1, 1), (1, 1)). Only used if \code{
+var_est = "qarma"} in \code{dcs_options}.}
+
+\item{order_max}{an optional list containing the two dimensional maximum
+orders for the order selection of the QARMA estimation in the form 
+\code{list(ar = c(1, 1), ma = c(1, 1)}. If omitted, the default values are
+\eqn{(1, 1), (1, 1)}. Only used if \code{var_est = "qarma_gpac"} or 
+\code{var_est = "qarma_bic"} in \code{dcs_options}.}
 }
 \value{
 \code{DCSmooth} returns an object of class "dcs", including

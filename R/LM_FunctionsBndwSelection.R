@@ -18,7 +18,8 @@ h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, p_order, drv_vec,
   kernel_prop_t = kernel.prop.LM(kernel_t, p_order[2], drv_vec[2], d_vec[2])
   
   # compute additional values
-  cb = h.coef.cb(i11, i22, i12, kernel_prop_x, kernel_prop_t, drv_vec, d_vec)
+  cb = h.coef.cb(i11, i22, i12, kernel_prop_x, kernel_prop_t, drv_vec, p_order,
+                 d_vec)
   cn = n_t/n_x
   C1 = 4 * var_coef * var_model$sigma^2 *
        kernel_prop_x$V * kernel_prop_t$V
@@ -42,13 +43,11 @@ h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, p_order, drv_vec,
 cf.estimation.LM = function(R_mat, model_order = 
                               list(ar = c(0, 0), ma = c(0, 0)))
 {
-  sfarima = sfarima.est(R_mat, model_order = list(ar = c(0, 0), ma = c(0, 0)))
+  sfarima = sfarima.est(R_mat, model_order = model_order)
   
-  c_f1 = sum(sfarima$ma$ma_x)^2/sum(sfarima$ar$ar_x)^2
-  c_f2 = sum(sfarima$ma$ma_t)^2/sum(sfarima$ar$ar_t)^2
-  sigma = sqrt(sfarima$sigma[1] * sfarima$sigma[2])
-  cf_est = c_f1 * c_f2
-  var_model = list(d_vec = sfarima$d_vec, sigma = sigma, stnry = TRUE)
+  cf_est = sum(sfarima$ma)^2/sum(sfarima$ar)^2 * sfarima$sigma^2
+  var_model = list(d_vec = sfarima$d_vec, ar = sfarima$ar, ma = sfarima$ma,
+                   sigma = sfarima$sigma, stnry = TRUE)
   
   return(list(cf_est = cf_est, var_model = var_model))
 }
@@ -56,7 +55,7 @@ cf.estimation.LM = function(R_mat, model_order =
 #------------------------Formula for coefficient cb----------------------------#
 
 h.coef.cb = function(i11, i22, i12, kernel_prop_1, kernel_prop_2, drv_vec,
-                       d_vec)
+                     p_order, d_vec)
 {
   denom_value = (1 - 2*d_vec[1] + 2*drv_vec[1]) * kernel_prop_2$mu^2 * i22
   sec_term = (diff(d_vec) - diff(drv_vec)) * kernel_prop_1$mu *
@@ -111,22 +110,26 @@ kernel.prop.LM = function(kernel_fcn, p, drv, d, n_int = 5000)
   
 #----------------------------SFARIMA estimation--------------------------------#
 
-sfarima.est = function(R_mat, model_order = list(ar = c(0, 0), ma = c(0, 0)))
+sfarima.est = function(R_mat, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
-  R_colwise = as.vector(R_mat)
-  R_rowwise = as.vector(t(R_mat))
-  
-  sfarima_x = fracdiff(R_colwise, nar = model_order$ar[1],
-                       nma = model_order$ma[1])
-  sfarima_t = fracdiff(R_rowwise, nar = model_order$ar[2],
+  # coefficient estimation
+  n_x = dim(R_mat)[1]; n_t = dim(R_mat)[2]
+  R_t = as.vector(t(R_mat))
+  sfarima_t = fracdiff::fracdiff(R_t, nar = model_order$ar[2],
                        nma = model_order$ma[2])
+  R_x = as.vector(matrix(sfarima_t$residuals, nrow = n_x, ncol = n_t, 
+                         byrow = TRUE))
+  sfarima_x = fracdiff::fracdiff(R_x, nar = model_order$ar[1],
+                       nma = model_order$ma[1])
   
+  # computing matrices
+  ar_mat = c(1, sfarima_x$ar) %*% t(c(1, sfarima_t$ar))
+  ma_mat = c(1, sfarima_x$ma) %*% t(c(1, sfarima_t$ma))
+  
+  # prepare output
   sfarima_return = list(d_vec = c(sfarima_x$d, sfarima_t$d),
-                        ar = list(ar_x = c(1, sfarima_x$ar),
-                                  ar_t = c(1, sfarima_t$ar)),
-                        ma = list(ma_x = c(1, sfarima_x$ma),
-                                  ma_t = c(1, sfarima_t$ma)),
-                        sigma_vec = c(sfarima_x$sigma, sfarima_t$sigma))
+                        ar = ar_mat, ma = ma_mat,
+                        sigma = sfarima_x$sigma)
   
   return(sfarima_return)
 }

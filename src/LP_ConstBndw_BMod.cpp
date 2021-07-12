@@ -36,7 +36,8 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
     arma::colvec xBound{ arma::regspace(-colIndex, std::min(bndw,
                          nCol - colIndex - 1)) / (nCol - 1) }; // vector for exogenous variables. is [q, -1]
     arma::colvec uBound{ - xBound / h };
-    arma::colvec wBound{ (weightFcn(uBound, q, mu)) };           // computation of weights
+    // TODO. Change "1" back to "q" for boundary modification
+    arma::colvec wBound{ (weightFcn(uBound, 1, mu)) };           // computation of weights
 
     // calculate regression weights for linear regression
     arma::mat    xMatBound{ xMatrix(xBound, polyOrder) };

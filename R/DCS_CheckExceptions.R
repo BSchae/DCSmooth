@@ -88,6 +88,58 @@ exception.check.bndw = function(bndw, dcs_options)
 
 #-----------------------Check for correct Options------------------------------#
 
+# Check input for set.options()
+exception.check.options.input = function(type, kerns, drv, var_est, IPI_options)
+{
+  if (!(type %in% c("LP", "KR")) || length(type) != 1)
+  {
+    stop("Unsupported values in argument \"type\".")
+  }
+  if (!(all(kerns %in% dcs_list_kernels)))
+  {
+    stop("Unsupported values in argument \"kerns\".")
+  }
+  if(!(is.numeric(drv)) || length(drv) != 2)
+  {
+    stop("Unsupported values in argument \"drv\".")
+  }
+  if (!(var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic", "lm", "sarma",
+                       "np")) ||
+      length(var_est) != 1)
+  {
+    stop("Unknown values in argument \"var_est\".")
+  }
+  
+  # IPI_options
+  unknown_IPI = names(IPI_options)[which(!(names(IPI_options)
+                                           %in% dcs_list_IPI))]
+  if (length(unknown_IPI) > 0)
+  {
+    warning("Unknown argument \"", unknown_IPI, "\" will be ignored.")
+  }
+  if (exists("infl_exp", IPI_options) && !(IPI_options$infl_exp[1] == "auto") &&
+      (!is.numeric(IPI_options$infl_exp) || length(IPI_options$infl_exp) != 2))
+  {
+    stop("Unknown values in argument \"IPI_options$infl_exp\".")
+  }
+  if (exists("infl_par", IPI_options) && (!is.numeric(IPI_options$infl_par) ||
+      length(IPI_options$infl_par) != 2))
+  {
+    stop("Unknown values in argument \"IPI_options$infl_par\".")
+  }
+  if (exists("delta", IPI_options) && (!is.numeric(IPI_options$delta) ||
+      length(IPI_options$delta) != 2))
+  {
+    stop("Unknown values in argument \"IPI_options$delta\".")
+  }
+  if (exists("const_window", IPI_options) && 
+      (!is.logical(IPI_options$const_window) ||
+      length(IPI_options$const_window) != 1))
+  {
+    stop("Unknown values in argument \"IPI_options$const_window\".")
+  }
+}
+
 # This function is used in the .setOptions() function for direct check as well
 # as in the dcs() function.
 
@@ -115,9 +167,9 @@ exception.check.options = function(dcs_opt)
   
   # check kernels
   if (!(dcs_opt$kerns[1] %in% DCSmooth:::dcs_list_kernels) || 
-      !(dcs_opt$kerns[1] %in% DCSmooth:::dcs_list_kernels))
+      !(dcs_opt$kerns[2] %in% DCSmooth:::dcs_list_kernels))
   {
-    stop("Unsuppored kernels specified.")
+    stop("Unsupported kernels specified.")
   }
   
   # check regression type
@@ -126,17 +178,36 @@ exception.check.options = function(dcs_opt)
     stop("Unsupported regression type. Choose \"KR\" or \"LP\"")
   }
   
+  # check derivative orders
+  if (!is.numeric(dcs_opt$drv))
+  {
+    stop("Derivative order must be numeric.")
+  }
+  if (any(dcs_opt$drv < 0))
+  {  
+    stop("Derivative order must be at least 0.")
+  }
+  
+  # check delta orders
+  if (!is.numeric(dcs_opt$IPI_options$delta))
+  {
+    stop("Shrink factor \"delta\" must be numeric.")
+  }
+  if (length(dcs_opt$IPI_options$delta) != 2)
+  {
+    stop("Shrink factor \"delta\" must be a numeric vector of length 2.")
+  }
+  if (any(dcs_opt$IPI_options$delta < 0) ||
+      any(dcs_opt$IPI_options$delta > 0.5))
+  {
+    stop("Shrink factor \"delta\" must be between 0 and 0.5.")
+  }
+  
   ### Options for Local Polynomial Regression
   if (dcs_opt$type == "LP")
   {
-    # check derivative orders
-    if (any(dcs_opt$drv < 0))
-    {  
-      stop("Your derivative order is smaller than 0.")
-    }
-    
     # check inflation exponents
-    if (any(dcs_opt$IPI_options$infl_exp != 0.6))
+    if (any(dcs_opt$IPI_options$infl_exp[1] != "auto"))
     {
       warning("Inflation exponents have been changed.")
     }
@@ -151,7 +222,17 @@ exception.check.options = function(dcs_opt)
   ### Options for Kernel Regression
   if (dcs_opt$type == "KR")
   {
-    # 
+    # check derivative orders
+    if (!is.numeric(dcs_opt$drv))
+    {
+      stop("Derivative order must be numeric.")
+    }
+    if (any(dcs_opt$drv != 0))
+    {  
+      stop("Estimation of derivatives currently not supported for kernel ",
+           "regression")
+    }
+    
     # check inflation exponents
     if (any(dcs_opt$IPI_options$infl_exp != 0.5))
     {
@@ -167,7 +248,7 @@ exception.check.options = function(dcs_opt)
   
   ### Options for variance estimation method
   if (!(dcs_opt$var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic",
-                               "lm")))
+                               "lm", "sarma", "np")))
   {
     stop("unsupported method in var_est.")
   }
@@ -175,20 +256,20 @@ exception.check.options = function(dcs_opt)
 
 #---------------------------Check additional Options---------------------------#
 
-exception.check.qarma_order = function(qarma_order, dcs_options)
+exception.check.model_order = function(model_order, dcs_options)
 {
-  if (!(exists("ar", qarma_order) && exists("ma", qarma_order)))
+  if (!(exists("ar", model_order) && exists("ma", model_order)))
   {
-    stop("\"qarma_order\" incorrectly specified.")
+    stop("\"model_order\" incorrectly specified.")
   }
-  if (!is.numeric(qarma_order$ar) || length(qarma_order$ar) != 2 ||
-      any(qarma_order$ar < 0))
+  if (!is.numeric(model_order$ar) || length(model_order$ar) != 2 ||
+      any(model_order$ar < 0))
   {
-    stop("AR order of \"qarma_order\" incorrectly specified")
+    stop("AR order of \"model_order\" incorrectly specified")
   }
-  if (!is.numeric(qarma_order$ma) || length(qarma_order$ma) != 2 ||
-      any(qarma_order$ma < 0))
+  if (!is.numeric(model_order$ma) || length(model_order$ma) != 2 ||
+      any(model_order$ma < 0))
   {
-    stop("MA order of \"qarma_order\" incorrectly specified")
+    stop("MA order of \"model_order\" incorrectly specified")
   }
 }

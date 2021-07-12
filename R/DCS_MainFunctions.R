@@ -4,22 +4,6 @@
 #                                                                              #
 ################################################################################
 
-# @param infl_exp A vector for the inflation exponents for bandwidth selection, 
-#  with default values depending on the regression type.
-# @param infl_par A vector for the inflation parameters for bandwidth selection, 
-#  with default values depending on the regression type.
-# @param delta A vector indicating the percentage of cutting off boundaries.
-#  Default for kernel regression is 5% (\code{c(0.05, 0.05)}) and 0% for local
-#  polynomial regression. 
-# @param const_window logical. Should a constant window be used at the 
-#  boundaries? Default is \code{FALSE}.
-# @param qarma_order A list containing the order of the qarma model to be estimated.
-#  Default is a \eqn{QARMA((1, 1), (1, 1))}-model (\code{qarma_model = list(ar = 
-#  c(1, 1), ma = c(1, 1))}). Could be also one of \code{c("gpac", "bic")} for
-#  automatic order selection. If \code{var_est = "iid"}, this argument is ignored.
-# @param order_max A list specifying the maximum order, when automatic order
-#  selection is used. Default is \code{order_max = list(ar = c(1, 1), ma = c(1, 1))}.
-
 #------------------------Set Options via Function------------------------------#
 
 #' Set Options for the DCS procedure
@@ -155,13 +139,26 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
     exception.check.XT(Y, X, T)
     
     # qarma order if var_est == "qarma"
-    if (exists("qarma_order", where = args_list) &
-        dcs_options$var_est == "qarma")
+    if (exists("model_order", where = args_list) &&
+        dcs_options$var_est %in% c("qarma", "lm", "sarma"))
     {
-      exception.check.qarma_order(args_list$qarma_order, dcs_options)
-      add_options$qarma_order = args_list$qarma_order
-    } else {
-      add_options$qarma_order = list(ar = c(1, 1), ma = c(1, 1))
+      exception.check.model_order(args_list$model_order, dcs_options)
+      add_options$model_order = args_list$model_order
+    } else if (!exists("model_order", where = args_list) &&
+               dcs_options$var_est %in% c("qarma", "lm", "sarma")) {
+      add_options$model_order = list(ar = c(1, 1), ma = c(1, 1))
+    }
+    # maximum order of order selection is applied
+    if (exists("order_max", where = args_list) &&
+        ((dcs_options$var_est == "qarma_gpac") ||
+        (dcs_options$var_est == "qarma_bic")))
+    {
+      exception.check.qarma_order(args_list$order_max, dcs_options)
+      add_options$order_max = args_list$order_max
+    } else if (!exists("order_max", where = args_list) &&
+               ((dcs_options$var_est == "qarma_gpac" ||
+               dcs_options$var_est == "qarma_bic"))) {
+      add_options$order_max = list(ar = c(1, 1), ma = c(1, 1))
     }
   }
   
@@ -223,17 +220,18 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
   if (h_select_auto == TRUE)
   {
     dcs_out = list(Y = Y, X = X, T = T, M = dcs_out, R = R, h = h_opt,
-                   c_f = h_select_obj$var_coef, dcs_options = dcs_options,
-                   iterations = h_select_obj$iterations,
+                   c_f = h_select_obj$var_coef, 
                    var_model = h_select_obj$var_model,
+                   dcs_options = dcs_options,
+                   iterations = h_select_obj$iterations,
                    time_used = difftime(time_end, time_start, units = "secs"))
     attr(dcs_out, "h_select_auto") = h_select_auto
   } else if (h_select_auto == FALSE) {
     # probably unadvised, that the dcs object differs according to the type
     # of h selection
     dcs_out = list(X = X, T = T, Y = Y, M = dcs_out, R = R, h = h_opt,
-                   dcs_options = dcs_options,
-                   timeUsed = difftime(time_end, time_start, units = "secs"))
+                   c_f = NA, var_model = NA, dcs_options = dcs_options,
+                   iterations = NA, time_used = NA)
     attr(dcs_out, "h_select_auto") = h_select_auto
   }
   
@@ -271,9 +269,9 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
 #' @export
 #' 
 
-surface.dcs = function(dcs_object, plot_choice = "choice", ...)
+surface.dcs = function(Y, plot_choice = "choice", ...)
 {
-  if (class(dcs_object)[1] == "dcs")
+  if (class(Y)[1] == "dcs")
   {
     fcn_arg = list(...)
     
@@ -294,18 +292,18 @@ surface.dcs = function(dcs_object, plot_choice = "choice", ...)
     }
     
     if (plot_choice == 1) {
-      Y = dcs_object$Y
+      Y_mat = Y$Y
     } else if (plot_choice == 2) {
-      Y = dcs_object$M
+      Y_mat = Y$M
     } else if (plot_choice == 3) {
-      Y = dcs_object$R
+      Y_mat = Y$R
     } else {
       stop(plot_choice, " is not a valid plot-type.")
     }
     
-    .plotly.3d(Y = Y, X = dcs_object$X, T = dcs_object$T, 
+    .plotly.3d(Y = Y, X = Y$X, T = Y$T, 
               color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"), ...)
   } else {
-    .plotly.3d(Y = dcs_object, ...)
+    .plotly.3d(Y = Y, ...)
   }
 }

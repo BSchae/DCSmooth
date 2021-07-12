@@ -14,38 +14,62 @@
   drv       = c(0, 0),
   var_est   = "iid",
   
-  # advanced options
-  IPI_options = list(infl_par = "auto", infl_exp = "auto", delta = "auto",
-                     const_window = FALSE)
-  # Options with default value "auto" are dependent on type or var_est and will
-  # be selected in the following, if not given a specific value.
+  # advanced options in ellipsis
+  ...
 )
 {
+  # get ellipsis
+  IPI_options = list(...)
+  
+  # check if inputs are vectors
+  if (length(kerns) == 1) { kerns = c(kerns, kerns) }
+  if (length(drv) == 1) { drv = c(drv, drv) }
+  
+  exception.check.options.input(type, kerns, drv, var_est, IPI_options)
+  
   if (var_est == "lm" && type == "KR")
   {
-    warning("Long-Memory bandwidth selection only supported for local polynomial
-            regression. Type set to \"LP\".")
+    warning("Long-Memory bandwidth selection only supported for local ", 
+            "polynomial regression. Type set to \"LP\".")
     type = "LP"
+  }
+  if (var_est == "lm")
+  {
+    message("Estimation under long-memory errors (SFARIMA) is currently in ", 
+            "experimantal state.")
   }
   
   # Select options according to type ("LP", "KR")
   if (type == "LP")
   {
     p_order = drv + 1
-    if (IPI_options$infl_exp[1] == "auto") {IPI_options$infl_exp = c(0.6, 0.6)}
-    if (IPI_options$infl_par[1] == "auto") { IPI_options$infl_par = c(1, 1) }
-    if (IPI_options$delta[1] == "auto") { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("infl_exp", IPI_options))
+    {
+      IPI_options$infl_exp = c("auto", " ")
+    }
+    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par = c(1, 1) }
+    if (!exists("delta", IPI_options)) { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("const_window", IPI_options))
+    {
+      IPI_options$const_window = FALSE
+    }
     
     options_list = list(type = type, kerns = kerns, p_order = p_order,
                        drv = drv, var_est = var_est, IPI_options = IPI_options)
   } else if (type == "KR") {
     p_order = NA
-    if (IPI_options$infl_exp[1] == "auto") {IPI_options$infl_exp = c(0.5, 0.5)}
-    if (IPI_options$infl_par[1] == "auto") { IPI_options$infl_par = c(2, 1) }
-    if (IPI_options$delta[1] == "auto") { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("infl_exp", IPI_options)) { IPI_options$infl_exp = c(0.5, 0.5) }
+    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par = c(2, 1) }
+    if (!exists("delta", IPI_options)) { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("const_window", IPI_options))
+    {
+      IPI_options$const_window = FALSE
+    }
     
     options_list = list(type = type, kerns = kerns, p_order = p_order,
                         drv = drv, var_est = var_est, IPI_options = IPI_options)
+  } else {
+    stop("Unknown type \"", type, "\"")
   }
   
   # apply class to output object
