@@ -48,15 +48,15 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #'   form \code{model_order = list(ar = c(p1, p2), ma = c(q1, q2))}. Default
 #'   value is a \eqn{QARMA((1, 1), (1, 1))} model.
 #' 
-#' @return The function returns a list including
-#' 
-#' \tabular{ll}{
-#'  \code{ar} \tab a \eqn{(p_1 + 1) \times (p_2 + 1)}{(p1 + 1) x (p2 + 1)}-matrix
-#'   containing the estimated AR-parameters \eqn{\phi} of the QARMA-process. \cr
-#'  \code{ma} \tab a \eqn{(q_1 + 1) \times (q_2 + 1)}{(q1 + 1) x (q2 + 1)}-matrix
-#'   containing the estimated MA-parameters \eqn{\theta} of the QARMA-process. \cr
-#'  \code{sigma} \tab the estimated standard deviation \eqn{\sigma} of the QARMA-model.\cr
-#'  \code{innov} \tab the matrix of innovations resulting from the QARMA estimation. \cr
+#' @return The function returns an object of class \code{"qarma"} including
+#'  \tabular{ll}{
+#'   \code{Y} \tab The matrix of observations, inherited from input.\cr
+#'   \code{innov} The estimated innovations.\cr
+#'   \code{model} \tab The estimated model consisting of the coefficient 
+#'   matrices \code{ar} and \code{ma} and standard deviation of innovations
+#'   \code{sigma}.\cr
+#'   \code{stnry} \tab An logical variable indicating whether the estimated
+#'   model is stationary.\cr
 #' }
 #' 
 #' @seealso \code{\link{qarma.sim}}
@@ -67,12 +67,13 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
 #' sigma = 0.5
 #' q_model = list(ar = ar, ma = ma, sigma = sigma)
-#' qarma_simulated = qarma.sim(100, 100, model = model)
-#' qarma_simulated
+#' qarma_simulated = qarma.sim(100, 100, model = q_model)
+#' qarma_simulated$model
 #' 
 #' ## estimation of QARMA process
-#' qarma.est(qarma_simulated)
-#' qarma.est(qarma._simulated, model_order = list(ar = c(1, 1), ma = c(0, 0))
+#' qarma.est(qarma_simulated$Y)$model
+#' qarma.est(qarma_simulated$Y, 
+#'            model_order = list(ar = c(1, 1), ma = c(0, 0)))$model
 #' 
 #' @export
 
@@ -118,7 +119,7 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
                             name_prefix = "ma"))
     
     # regression for QARMA model
-    arma_reg = lm(ar_00 ~ . + 0, data = matrix_arma)
+    arma_reg = stats::lm(ar_00 ~ . + 0, data = matrix_arma)
     
     # fill ar and ma matrices
     # updated to lag-order (phi_00/psi_00 in upper left corner)
@@ -263,7 +264,7 @@ qarma.est_3rdstep = function(Y, ar_mat, ma_mat, model_order)
   }
   
   # linear regression
-  zvw_lm = lm(Z ~ . + 0, data = zvw_lm_matrix)
+  zvw_lm = stats::lm(Z ~ . + 0, data = zvw_lm_matrix)
   
   return(zvw_lm$coef)
 }
@@ -398,8 +399,8 @@ qarma.statTest = function(ar)
     for (k in 1:1000)
     {
       # draw random point inside unit circle
-      phi = runif(2) * 2*pi
-      rad = sqrt(runif(2)) * 1.01
+      phi = stats::runif(2) * 2*pi
+      rad = sqrt(stats::runif(2)) * 1.01
       x = rad * cos(phi)
       y = rad * sin(phi)
       z1c = complex(real = x[1], imaginary = y[1])
@@ -476,7 +477,7 @@ qarma.order.gpac = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
   gpac_count = gpac_mat*0 + 1
   
   # values chosen by hand, might be improved  
-  gpac_count[which(abs(gpac_mat) < max(quantile(abs(gpac_mat), 0.35), 0.1)
+  gpac_count[which(abs(gpac_mat) < max(stats::quantile(abs(gpac_mat), 0.35), 0.1)
                    , arr.ind = TRUE)] = 0
   
   count_zeros = 1:nRow*0

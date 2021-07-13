@@ -16,18 +16,18 @@ exception.check.Y = function(Y)
   # check for missing values
   if (any(is.na(Y)))
   {
-    stop("Y contains missing values (NAs)")
+    stop("Y contains missing values (NAs).")
   }
   
   # check if Y is numeric
   if (!is.numeric(Y) || !is.matrix(Y))
   {
-    stop("Y must be a numeric matrix")
+    stop("Y must be a numeric matrix.")
   }
   
   # check for correct dimension of Y
-  if (any(dim(Y) < 3)) {
-    stop("Y has to be at least of dimension 3 in each direction.")
+  if (any(dim(Y) < 5)) {
+    stop("Y has to be at least of dimension 5 in each direction.")
   }
 }
 
@@ -91,7 +91,7 @@ exception.check.bndw = function(bndw, dcs_options)
 # Check input for set.options()
 exception.check.options.input = function(type, kerns, drv, var_est, IPI_options)
 {
-  if (!(type %in% c("LP", "KR")) || length(type) != 1)
+  if (length(type) != 1 || !(type %in% c("LP", "KR")))
   {
     stop("Unsupported values in argument \"type\".")
   }
@@ -166,8 +166,8 @@ exception.check.options = function(dcs_opt)
   }
   
   # check kernels
-  if (!(dcs_opt$kerns[1] %in% DCSmooth:::dcs_list_kernels) || 
-      !(dcs_opt$kerns[2] %in% DCSmooth:::dcs_list_kernels))
+  if (!(dcs_opt$kerns[1] %in% dcs_list_kernels) || 
+      !(dcs_opt$kerns[2] %in% dcs_list_kernels))
   {
     stop("Unsupported kernels specified.")
   }

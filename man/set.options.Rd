@@ -4,7 +4,13 @@
 \alias{set.options}
 \title{Set Options for the DCS procedure}
 \usage{
-set.options(...)
+set.options(
+  type = "LP",
+  kerns = c("MW_220", "MW_220"),
+  drv = c(0, 0),
+  var_est = "iid",
+  ...
+)
 }
 \arguments{
 \item{type}{either local polynomial regression (\code{"LP"}, the default) or kernel
@@ -24,8 +30,9 @@ Currently available are \code{var_est = "iid"} (the default), where an iid.
 error structure is modeled and \code{var_est = "qarma"}, where a spatial
 ARMA model is applied. Use \code{"qarma_gpac"} for automated order selection.}
 
-\item{IPI_options}{a list containing further options used by the iterative
-plug-in algorithm.}
+\item{...}{Additional arguments passed to \code{set.options()}. This includes
+\code{IPI_options}, a list containing further options used by the iterative
+plug-in algorithm. (See vignette)}
 }
 \value{
 An object of class \code{"dcs_options"}.
@@ -36,7 +43,7 @@ Set Options for the DCS procedure
 \section{Details}{
 
 This function is used to set the options for bandwidth selection in the 
-\code{dcs} function. Detailed information can be found in the vignette
+\code{dcs} function. Detailed information can be found in the vignette.
 }
 
 \examples{

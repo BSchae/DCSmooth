@@ -4,10 +4,13 @@
 \alias{residuals.dcs}
 \title{Residuals of "dcs"-object}
 \usage{
-\method{residuals}{dcs}(dcs_object)
+\method{residuals}{dcs}(x, ...)
 }
 \arguments{
-\item{dcs_object}{an object of class \code{"dcs"}, usually the result of a call to \code{\linl{dcs}}}
+\item{x}{an object of class \code{"dcs"}, usually the result of a call to
+\code{\link{dcs}}.}
+
+\item{...}{Additional arguments passed to \code{residuals.dcs}.}
 }
 \description{
 Returns the residuals of an object of class \code{"dcs"}.

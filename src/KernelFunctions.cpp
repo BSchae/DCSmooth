@@ -29,7 +29,6 @@ arma::vec weights_MW(arma::vec& u, double q = 1, int mu = 2)
   return weights_out;
 }
 
-//' @export
 // [[Rcpp::export]]
 XPtr<weightPtr> weight_fcn_assign(std::string fstr) {
   if (fstr == "T")
@@ -70,7 +69,7 @@ arma::vec kernFkt_MW210(arma::vec& u, double q = 1)
 // [[Rcpp::export]]
 arma::vec kernFkt_MW220(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -108,7 +107,7 @@ arma::vec kernFkt_MW320(arma::vec& u, double q = 1)
 // [[Rcpp::export]]
 arma::vec kernFkt_MW420(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -137,7 +136,7 @@ arma::vec kernFkt_MW420(arma::vec& uVec, double q)
 // [[Rcpp::export]]
 arma::vec kernFkt_MW421(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -171,7 +170,7 @@ arma::vec kernFkt_MW421(arma::vec& uVec, double q)
 // [[Rcpp::export]]
 arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -200,7 +199,7 @@ arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 // [[Rcpp::export]]
 arma::vec kernFkt_TR420(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -249,7 +248,7 @@ arma::vec kernFkt_TR420(arma::vec& uVec, double q)
 // [[Rcpp::export]]
 arma::vec kernFkt_TR422(arma::vec& uVec, double q)
 {
-  int nBound{ uVec.size() };
+  arma::uword nBound{ uVec.size() };
   
   arma::vec uOut(nBound);
   
@@ -291,7 +290,6 @@ arma::vec kernFkt_TR422(arma::vec& uVec, double q)
   return uOut;
 }
 
-//' @export
 // [[Rcpp::export]]
 XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
   if (fstr == "MW_200")

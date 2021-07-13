@@ -33,7 +33,6 @@ KR_dcs_const1 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
     .Call('_DCSmooth_KR_dcs_const1', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
-#' @export
 weight_fcn_assign <- function(fstr) {
     .Call('_DCSmooth_weight_fcn_assign', PACKAGE = 'DCSmooth', fstr)
 }
@@ -70,7 +69,6 @@ kernFkt_TR422 <- function(uVec, q) {
     .Call('_DCSmooth_kernFkt_TR422', PACKAGE = 'DCSmooth', uVec, q)
 }
 
-#' @export
 kernel_fcn_assign <- function(fstr) {
     .Call('_DCSmooth_kernel_fcn_assign', PACKAGE = 'DCSmooth', fstr)
 }

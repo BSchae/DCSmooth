@@ -4,11 +4,13 @@
 \alias{print.dcs}
 \title{Summarize Results from Double Conditional Smoothing}
 \usage{
-\method{print}{dcs}(object)
+\method{print}{dcs}(x, ...)
 }
 \arguments{
-\item{object}{an object of class "dcs", usually, a result of a call to 
+\item{x}{an object of class "dcs", usually, a result of a call to 
 \code{\link{dcs}}.}
+
+\item{...}{Additional arguments passed to \code{print.dcs}.}
 }
 \description{
 \code{print} method for class \code{"dcs"}

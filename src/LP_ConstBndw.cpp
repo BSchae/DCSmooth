@@ -13,8 +13,8 @@ arma::mat LPSmooth_matrix2(const arma::mat yMat, const double h,
                            const int polyOrder, const int drv, SEXP kernFcnPtr)
 {
   // get additional information on nX, nT, bndw etc.
-  int nRow{ yMat.n_rows };
-  int nCol{ yMat.n_cols };
+  int nRow{ static_cast<int>(yMat.n_rows) };
+  int nCol{ static_cast<int>(yMat.n_cols) };
   int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };
                         // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };  // width of estimation window

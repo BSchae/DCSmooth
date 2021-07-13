@@ -12,8 +12,8 @@ cf.estimation = function(Y, dcs_options, add_options)
 {
   if (dcs_options$var_est == "iid")
   {
-    cf_est = sd(Y)^2
-    var_model = list(sigma = sd(Y), stnry = TRUE)
+    cf_est = stats::sd(Y)^2
+    var_model = list(sigma = stats::sd(Y), stnry = TRUE)
   } else if (dcs_options$var_est == "qarma") {
     qarma = qarma.cf(Y, model_order = add_options$model_order)
     cf_est = qarma$cf

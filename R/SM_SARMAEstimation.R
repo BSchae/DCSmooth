@@ -2,11 +2,11 @@ sarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   Y_t = as.vector(t(Y))
-  arma_t = arima(Y_t, order = c(model_order$ar[2], 0, model_order$ma[2]), 
+  arma_t = stats::arima(Y_t, order = c(model_order$ar[2], 0, model_order$ma[2]), 
                  include.mean = FALSE)
   Y_x = as.vector(matrix(arma_t$residuals, nrow = n_x, ncol = n_t,
                          byrow = TRUE))
-  arma_x = arima(Y_x, order = c(model_order$ar[1], 0, model_order$ma[1]), 
+  arma_x = stats::arima(Y_x, order = c(model_order$ar[1], 0, model_order$ma[1]), 
                  include.mean = FALSE)
   
   ar_coefs_x = arma_x$coef[1:model_order$ar[1]]

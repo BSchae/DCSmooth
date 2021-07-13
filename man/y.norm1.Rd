@@ -5,7 +5,7 @@
 \alias{y.norm1}
 \title{Single Gaussian Peak}
 \format{
-A numeric matrix with 100 rows and 100 columns.
+A numeric matrix with 101 rows and 101 columns.
 }
 \usage{
 y.norm1
@@ -14,6 +14,7 @@ y.norm1
 Example data for using the DCSmooth functions. Data resembles a single
   gaussian peak on the interval \eqn{[0,1] \times [0,1]}{[0,1] x [0,1]}
   with maximum at \eqn{(0.5, 0.5)} and variance matrix \eqn{0.1 \cdot
-  \mathbb{I}}{0.1 I}.
+  \mathbb{I}}{0.1 I}, where 
+  \eqn{\mathbb{I}}{I} represents the \eqn{2 \times 2}{2 x 2} identity matrix.
 }
 \keyword{datasets}

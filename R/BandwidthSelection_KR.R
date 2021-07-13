@@ -26,7 +26,7 @@ KR.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
   {
     iteration_count = iteration_count + 1
     h_opt_temp   = pmin(h_opt[1:2], c(0.45, 0.45))
-    h_infl  = inflation.KR(h_opt_temp, c(nX, nT), dcs_options$IPI_options)
+    h_infl  = inflation.KR(h_opt_temp, c(n_x, n_t), dcs_options$IPI_options)
     
     if (dcs_options$IPI_options$const_window == TRUE)
     {

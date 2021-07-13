@@ -23,8 +23,8 @@ arma::vec kernFkt_MW422(arma::vec&, double);
 // [[Rcpp::export]]
 arma::mat KRSmooth_matrix(arma::mat yMat, double h, int drv, SEXP kernFcnPtr) 
 {
-  int nRow{ yMat.n_rows };                // number of conditional Time-Series
-  int nCol{ yMat.n_cols };                // number of observations per Time-Series
+  int nRow{ static_cast<int>(yMat.n_rows) };                // number of conditional Time-Series
+  int nCol{ static_cast<int>(yMat.n_cols) };                // number of observations per Time-Series
   int bndw{ std::max(static_cast<int>(h * nCol), 2) }; // calculate absolute bandwidth, decimals will be dumped
   int windowWidth{ 2*bndw + 1 };          // width of estimation window
 

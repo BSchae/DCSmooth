@@ -18,22 +18,15 @@ two-valued numerical vector with bandwidths in row- and column-direction.
 If the value is \code{"auto"} (the default), bandwidth selection will be 
 carried out by the iterative plug-in algorithm.}
 
-\item{X}{An optional numeric vector containing the exogenous covariates
-with respect to the rows.}
-
-\item{T}{An optional numeric vector containing the exogenous covariates
-with respect to the columns.}
-
-\item{qarma_order}{an optional list containing the two dimensional orders for
-the QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}. If
-omitted, the default model is a QARMA((1, 1), (1, 1)). Only used if \code{
-var_est = "qarma"} in \code{dcs_options}.}
-
-\item{order_max}{an optional list containing the two dimensional maximum
-orders for the order selection of the QARMA estimation in the form 
-\code{list(ar = c(1, 1), ma = c(1, 1)}. If omitted, the default values are
-\eqn{(1, 1), (1, 1)}. Only used if \code{var_est = "qarma_gpac"} or 
-\code{var_est = "qarma_bic"} in \code{dcs_options}.}
+\item{...}{Additional arguments passed to \code{dcs}. These might include
+numerical vectors \code{X} and/or \code{T} containing the exogenous
+covariates with respect to the rows and columns. If \code{var_est} is any of
+\code{"qarma"}, \code{"sarma"} or \code{"lm"}, \code{model_order} is an 
+optional list containing the two-dimensional model orders in the form 
+\code{list(ar = c(1, 1), ma = c(1, 1)}. If \code{var_est} is any of
+\code{"qarma_gpac"} or \code{"qarma_bic"}, \code{order_max} an optional list
+containing the two dimensional maximum orders for the order selection of the
+QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
 }
 \value{
 \code{DCSmooth} returns an object of class "dcs", including

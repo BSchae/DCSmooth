@@ -7,11 +7,11 @@
 ### Test exception handling (positives)
 context("set.options() exception handling (positives)")
 
-test_that("set.options() gets \"type\" correclty.", {
+test_that("set.options() gets \"type\" correctly.", {
   expect_equal(set.options()$type, "LP")
   expect_equal(set.options(type = "LP")$type, "LP")
   expect_equal(set.options(type = "KR")$type, "KR")
-  expect_equal(set.options(type = "test"), "Unsupported values in argument \"type")
+  expect_error(set.options(type = "test"), "Unsupported values in argument")
 })
 
 test_that("set.options() gets \"kerns\" correctly.",{
@@ -44,9 +44,15 @@ test_that("set.options() gets \"IPI_options\" correctly.",{
                 delta = c(0.05, 0.05), const_window = FALSE)
   IPI_KR = list(infl_exp = c(0.5, 0.5), infl_par = c(2, 1), 
                 delta = c(0.05, 0.05), const_window = FALSE)
-  IPI_test 
   expect_equal(set.options(type = "LP")$IPI_options, IPI_LP)
   expect_equal(set.options(type = "KR")$IPI_options, IPI_KR)
 })
 
+### Test exception handling (negatives)
+context("set.options() exception handling (positives)")
 
+test_that("set.options() gives correct error messages for problems", {
+  expect_error(set.options(type = "test"), "Unsupported values in argument")
+  expect_error(set.options(type = c("KR", "LP")),
+               "Unsupported values in argument")
+})

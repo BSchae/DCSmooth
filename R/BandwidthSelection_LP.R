@@ -37,7 +37,7 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
     {
       # smoothing of Y for variance factor estimation
       Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                  = p_order, drvVec = drv_vec, muVec = mu_vec,
+                                  = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
                                   weightFcnPtr_x = weight_x,
                                   weightFcnPtr_t = weight_t)
       # smoothing of derivatives m(2,0) and m(0,2)
@@ -52,7 +52,7 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
     } else {
       # smoothing of Y for variance factor estimation
       Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                  = p_order, drvVec = drv_vec, muVec = mu_vec,
+                                  = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
                                   weightFcnPtr_x = weight_x,
                                   weightFcnPtr_t = weight_t)
 

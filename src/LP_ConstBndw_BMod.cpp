@@ -14,8 +14,8 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
                                 const int mu, SEXP weightFcnPtr)
 {
   // get additional information on nX, nT, bndw etc.
-  int nRow{ yMat.n_rows };
-  int nCol{ yMat.n_cols };
+  int nRow{ static_cast<int>(yMat.n_rows) };
+  int nCol{ static_cast<int>(yMat.n_cols) };
   int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };    // calculate absolute bandwidth, decimals will be dumped
   arma::mat yMatOut(nRow, nCol);   // result matrix
   

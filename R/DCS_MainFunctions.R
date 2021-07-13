@@ -21,12 +21,13 @@
 #'  Currently available are \code{var_est = "iid"} (the default), where an iid. 
 #'  error structure is modeled and \code{var_est = "qarma"}, where a spatial
 #'  ARMA model is applied. Use \code{"qarma_gpac"} for automated order selection.
-#' @param IPI_options a list containing further options used by the iterative
-#'  plug-in algorithm.
+#' @param ... Additional arguments passed to \code{set.options()}. This includes
+#'  \code{IPI_options}, a list containing further options used by the iterative
+#'  plug-in algorithm. (See vignette)
 #' 
 #' @section Details:
 #' This function is used to set the options for bandwidth selection in the 
-#' \code{dcs} function. Detailed information can be found in the vignette
+#' \code{dcs} function. Detailed information can be found in the vignette.
 #' 
 #' @return  An object of class \code{"dcs_options"}.
 #' 
@@ -42,9 +43,78 @@
 #' dcs(y, dcs_options = myOpt)
 #'
 
-set.options = function(...) # user friendly wrapper function for .setOptions
+set.options = function(    # inside function with default values in arguments
+  # standard options
+  type      = "LP",         # either "LP" for local polynomial regression or
+  # "KR" for kernel regression
+  kerns     = c("MW_220", "MW_220"), # choose a kernel function
+  drv       = c(0, 0),
+  var_est   = "iid",
+  
+  # advanced options in ellipsis
+  ...
+)
 {
-  .set.options(...)
+  # get ellipsis
+  IPI_options = list(...)
+  
+  # check if inputs are vectors
+  if (length(kerns) == 1) { kerns = c(kerns, kerns) }
+  if (length(drv) == 1) { drv = c(drv, drv) }
+  
+  exception.check.options.input(type, kerns, drv, var_est, IPI_options)
+  
+  if (var_est == "lm" && type == "KR")
+  {
+    warning("Long-Memory bandwidth selection only supported for local ", 
+            "polynomial regression. Type set to \"LP\".")
+    type = "LP"
+  }
+  if (var_est == "lm")
+  {
+    message("Estimation under long-memory errors (SFARIMA) is currently in ", 
+            "experimantal state.")
+  }
+  
+  # Select options according to type ("LP", "KR")
+  if (type == "LP")
+  {
+    p_order = drv + 1
+    if (!exists("infl_exp", IPI_options))
+    {
+      IPI_options$infl_exp = c("auto", " ")
+    }
+    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par = c(1, 1) }
+    if (!exists("delta", IPI_options)) { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("const_window", IPI_options))
+    {
+      IPI_options$const_window = FALSE
+    }
+    
+    options_list = list(type = type, kerns = kerns, p_order = p_order,
+                        drv = drv, var_est = var_est, IPI_options = IPI_options)
+  } else if (type == "KR") {
+    p_order = NA
+    if (!exists("infl_exp", IPI_options)) { IPI_options$infl_exp = c(0.5, 0.5) }
+    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par = c(2, 1) }
+    if (!exists("delta", IPI_options)) { IPI_options$delta = c(0.05, 0.05) }
+    if (!exists("const_window", IPI_options))
+    {
+      IPI_options$const_window = FALSE
+    }
+    
+    options_list = list(type = type, kerns = kerns, p_order = p_order,
+                        drv = drv, var_est = var_est, IPI_options = IPI_options)
+  } else {
+    stop("Unknown type \"", type, "\"")
+  }
+  
+  # apply class to output object
+  class(options_list) = "dcs_options"
+  
+  exception.check.options(options_list)
+  
+  return(options_list)
 }
 
 #--------------Function for smoothing and bandwidth estimation----------------#
@@ -63,19 +133,15 @@ set.options = function(...) # user friendly wrapper function for .setOptions
 #'  two-valued numerical vector with bandwidths in row- and column-direction.
 #'  If the value is \code{"auto"} (the default), bandwidth selection will be 
 #'  carried out by the iterative plug-in algorithm.
-#' @param X An optional numeric vector containing the exogenous covariates
-#'  with respect to the rows.
-#' @param T An optional numeric vector containing the exogenous covariates
-#'  with respect to the columns.
-#' @param qarma_order an optional list containing the two dimensional orders for
-#'  the QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}. If
-#'  omitted, the default model is a QARMA((1, 1), (1, 1)). Only used if \code{
-#'  var_est = "qarma"} in \code{dcs_options}.
-#' @param order_max an optional list containing the two dimensional maximum
-#'  orders for the order selection of the QARMA estimation in the form 
-#'  \code{list(ar = c(1, 1), ma = c(1, 1)}. If omitted, the default values are
-#'  \eqn{(1, 1), (1, 1)}. Only used if \code{var_est = "qarma_gpac"} or 
-#'  \code{var_est = "qarma_bic"} in \code{dcs_options}.
+#' @param ... Additional arguments passed to \code{dcs}. These might include
+#'  numerical vectors \code{X} and/or \code{T} containing the exogenous
+#'  covariates with respect to the rows and columns. If \code{var_est} is any of
+#'  \code{"qarma"}, \code{"sarma"} or \code{"lm"}, \code{model_order} is an 
+#'  optional list containing the two-dimensional model orders in the form 
+#'  \code{list(ar = c(1, 1), ma = c(1, 1)}. If \code{var_est} is any of
+#'  \code{"qarma_gpac"} or \code{"qarma_bic"}, \code{order_max} an optional list
+#'  containing the two dimensional maximum orders for the order selection of the
+#'  QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.
 #' 
 #' @return \code{DCSmooth} returns an object of class "dcs", including
 #'  \tabular{ll}{
@@ -153,7 +219,7 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
         ((dcs_options$var_est == "qarma_gpac") ||
         (dcs_options$var_est == "qarma_bic")))
     {
-      exception.check.qarma_order(args_list$order_max, dcs_options)
+      exception.check.model_order(args_list$order_max, dcs_options)
       add_options$order_max = args_list$order_max
     } else if (!exists("order_max", where = args_list) &&
                ((dcs_options$var_est == "qarma_gpac" ||

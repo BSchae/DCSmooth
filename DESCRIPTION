@@ -1,7 +1,7 @@
 Package: DCSmooth
 Type: Package
-Title: Nonparametric regression and bandwidth selection for spatial models.
-Version: 0.5.1
+Title: Nonparametric regression and bandwidth selection for spatial models
+Version: 0.6.0
 Date: 2021-05-20
 Author: Bastian Schaefer
 Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>
@@ -14,8 +14,8 @@ Description: This package provides nonparametric smoothing techniques for
     of the nonparametric regression model.
 License: GPL-3
 LazyData: true
-Imports: Rcpp, RcppArmadillo, RcppEigen, plotly, fracdiff
-LinkingTo: Rcpp, RcppArmadillo, RcppEigen, plotly, fracdiff
+Imports: Rcpp, RcppArmadillo, RcppEigen, plotly, fracdiff, stats
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr

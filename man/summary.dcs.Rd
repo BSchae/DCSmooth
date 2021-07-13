@@ -2,18 +2,15 @@
 % Please edit documentation in R/DCS_Methods.R
 \name{summary.dcs}
 \alias{summary.dcs}
-\alias{print.summary_dcs}
 \title{Summarizing Results from Double Conditional Smoothing}
 \usage{
-\method{summary}{dcs}(object)
-
-\method{print}{summary_dcs}(object, digits = max(3, getOption("digits") - 3))
+\method{summary}{dcs}(object, ...)
 }
 \arguments{
 \item{object}{an object of class "dcs", usually, a result of a call to 
 \code{\link{dcs}}.}
 
-\item{digits}{the number of significant digits to use when printing.}
+\item{...}{Additional arguments passed to the \code{summary.dcs} function.}
 }
 \value{
 The function \code{summary.dcs} returns an object of class \code{summary_dcs}

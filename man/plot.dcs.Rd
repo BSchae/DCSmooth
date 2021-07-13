@@ -4,13 +4,14 @@
 \alias{plot.dcs}
 \title{Contour Plot for the Double Conditional Smoothing}
 \usage{
-\method{plot}{dcs}(object, plot_choice = "choice", ...)
+\method{plot}{dcs}(x, ...)
 }
 \arguments{
-\item{object}{an object of class "dcs_options", usually, a result of a call to 
-\code{\link{set_options}}.}
+\item{x}{an object of class "dcs_options", usually, a result of a call to 
+\code{\link{set.options}}.}
 
-\item{plot_choice}{override the prompt to specify a plot, can be 
+\item{...}{Additional arguments passed to \code{print.dcs_options}. The
+argument \code{plot_choice} overrides the prompt to specify a plot, can be 
 \code{c(1, 2, 3)}.}
 }
 \description{
@@ -30,5 +31,5 @@ plot(dcs_object, plot_choice = 2)
 
 }
 \seealso{
-\code{\link{dcs.3d}} to plot the surface.
+\code{\link{surface.dcs}} to plot the surface.
 }

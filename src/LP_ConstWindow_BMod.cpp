@@ -15,8 +15,8 @@ arma::mat LPSmooth_matrix_BMod(const arma::mat yMat, const double h,
                                const int polyOrder, const int drv,
                                const int mu, SEXP weightFcnPtr)
 {
-  int nRow{ yMat.n_rows };    // number of conditional Time-Series
-  int nCol{ yMat.n_cols };    // number of observations per Time-Series
+  int nRow{ static_cast<int>(yMat.n_rows) };    // number of conditional Time-Series
+  int nCol{ static_cast<int>(yMat.n_cols) };    // number of observations per Time-Series
   int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };
   // calculate absolute bandwidth
   int windowWidth{ std::min(2*bndw + 1, nCol) };  // width of estimation window

@@ -6,7 +6,7 @@
 #' 
 #' @param object an object of class "dcs", usually, a result of a call to 
 #'  \code{\link{dcs}}.
-#' @param digits the number of significant digits to use when printing.
+#' @param ... Additional arguments passed to the \code{summary.dcs} function.
 #' 
 #' @section Details:
 #' \code{summary.dcs} strips an object of class \code{"dcs"} from all large
@@ -45,12 +45,10 @@
 #' dcs_object <- dcs(y)
 #' summary(dcs_object)
 #' 
-#' @name summary.dcs
-#' 
 #' @export
 #' 
 
-summary.dcs = function(object)
+summary.dcs = function(object, ...)
 {
   if (exists("qarma", object)) {
     summary_dcs = list(h = object$h, c_f = object$c_f,
@@ -72,61 +70,72 @@ summary.dcs = function(object)
 
 #----------------------------Print (Summary) Methods---------------------------#
 
-#'
-#' @rdname summary.dcs
+#' Print the Summary of a DCS estimation
+#' 
+#' @description \code{print} method for class \code{"summary_dcs"}
+#' 
+#' @param x An object of class \code{"summary_dcs"}.
+#' @param ... Additional arguments passed to \code{print.summary_dcs}.
+#' 
+#' @seealso \code{\link{summary.dcs}}
 #' 
 #' @export
 
-print.summary_dcs = function(object, digits = max(3, getOption("digits") - 3))
+print.summary_dcs = function(x, ...)
 {
-  name_kern_fcn = paste0("MW", object$dcs_options$kern_par[1],
-                       object$dcs_options$kern_par[2], "0")
-  if (object$dcs_options$type == "KR")
+  args_list = list(...)
+  if (!exists("digits", args_list))
+  {
+    digits = max(3, getOption("digits") - 3)
+  }
+  name_kern_fcn = paste0("MW", x$dcs_options$kern_par[1],
+                       x$dcs_options$kern_par[2], "0")
+  if (x$dcs_options$type == "KR")
   {
     reg_type = paste0("kernel regression")
-  } else if (object$dcs_options$type == "LP") {
+  } else if (x$dcs_options$type == "LP") {
     reg_type = paste0("local polynomial regression")
   }
   
   # when automatic bandwidth selection is selected
-  if (attr(object, "h_select_auto") == TRUE)
+  if (attr(x, "h_select_auto") == TRUE)
   {
-    cat(class(object), "\n")
+    cat(class(x), "\n")
     cat("------------------------------------------", "\n")
     cat("DCS with automatic bandwidth selection:\n")
     cat("------------------------------------------", "\n")
     cat("Results of ", reg_type, ":\n", sep = "")
-    cat("Estimated Bandwidths: \t h_x:\t", signif(object$h[1], 
+    cat("Estimated Bandwidths: \t h_x:\t", signif(x$h[1], 
                                                   digits = digits), "\n")
-    cat("\t \t \t h_t:\t", signif(object$h[2], digits = digits), "\n")
-    cat("Variance Factor: \t c_f:\t", signif(object$c_f, digits = digits), "\n")
-    cat("Iterations:\t\t\t", object$iterations, "\n")
-    cat("Time used (seconds):\t \t", signif(object$time_used, 
+    cat("\t \t \t h_t:\t", signif(x$h[2], digits = digits), "\n")
+    cat("Variance Factor: \t c_f:\t", signif(x$c_f, digits = digits), "\n")
+    cat("Iterations:\t\t\t", x$iterations, "\n")
+    cat("Time used (seconds):\t \t", signif(x$time_used, 
                                            digits = digits), "\n")
     cat("------------------------------------------", "\n")
-    if (object$dcs_options$var_est == "iid")
+    if (x$dcs_options$var_est == "iid")
     {
       cat("Variance Estimation: \t iid.\n")
-    } else if (object$dcs_options$var_est == "qarma") {
+    } else if (x$dcs_options$var_est == "qarma") {
       cat("Variance Estimation: \t qarma\n")
       cat("Estimated Parameters:\n")
       cat("ar:\n")
-      print(signif(object$qarma$ar, digits = 5))
+      print(signif(x$qarma$ar, digits = 5))
       cat("ma:\n")
-      print(signif(object$qarma$ma, digits = 5))
+      print(signif(x$qarma$ma, digits = 5))
     }
     cat("------------------------------------------", "\n")
     cat("See used parameter with \"$dcs_options\".\n")
     cat("------------------------------------------", "\n")
     
   # when given bandwidths are used.
-  } else if (attr(object, "h_select_auto") == FALSE) {
-    cat(class(object), "\n")
+  } else if (attr(x, "h_select_auto") == FALSE) {
+    cat(class(x), "\n")
     cat("------------------------------------------", "\n")
     cat("DCS with given bandwidths:\n")
     cat("------------------------------------------", "\n")
-    cat("Used bandwidths: \t h_x:\t", object$h[1], "\n")
-    cat("\t \t \t h_t:\t", object$h[2], "\n")
+    cat("Used bandwidths: \t h_x:\t", x$h[1], "\n")
+    cat("\t \t \t h_t:\t", x$h[2], "\n")
     cat("------------------------------------------", "\n")
     cat("See used parameter with \"$dcs_options\".\n")
     cat("------------------------------------------", "\n")
@@ -142,8 +151,9 @@ print.summary_dcs = function(object, digits = max(3, getOption("digits") - 3))
 #' only including bandwidths and the estimated variance coefficient (only if
 #' automatic bandwidth selection is used).
 #' 
-#' @param object an object of class "dcs", usually, a result of a call to 
+#' @param x an object of class "dcs", usually, a result of a call to 
 #' \code{\link{dcs}}.
+#' @param ... Additional arguments passed to \code{print.dcs}.
 #' 
 #' @seealso \code{\link{plot.dcs}}, \code{\link{print.dcs_options}}
 #' 
@@ -156,52 +166,52 @@ print.summary_dcs = function(object, digits = max(3, getOption("digits") - 3))
 #' @export
 #'
 
-print.dcs = function(object)
+print.dcs = function(x, ...)
 {
   # when automatic bandwidth selection is selected
-  if (attr(object, "h_select_auto") == TRUE)
+  if (attr(x, "h_select_auto") == TRUE)
   {
-    cat(class(object), "\n")
+    cat(class(x), "\n")
     cat("--------------------------------------", "\n")
     cat("DCS with automatic bandwidth selection\n")
     cat("--------------------------------------", "\n")
     cat(" Selected Bandwidths:\n")
-    cat("\t\th_x:", signif(object$h[1], digits = 5), "\n")
-    cat("\t\th_t:", signif(object$h[2], digits = 5), "\n")
+    cat("\t\th_x:", signif(x$h[1], digits = 5), "\n")
+    cat("\t\th_t:", signif(x$h[2], digits = 5), "\n")
     cat(" Variance Factor:\n")
-    cat("\t\tc_f:", signif(object$c_f, digits = 5), "\n")
+    cat("\t\tc_f:", signif(x$c_f, digits = 5), "\n")
     cat("--------------------------------------", "\n")
     
   # when given bandwidths are used.
-  } else if (attr(object, "h_select_auto") == FALSE) {
-    cat(class(object), "\n")
+  } else if (attr(x, "h_select_auto") == FALSE) {
+    cat(class(x), "\n")
     cat("---------------------------", "\n")
     cat("DCS with given bandwidths\n")
     cat("---------------------------", "\n")
     cat("Used Bandwidths:\n")
-    cat("\th_x:", object$h[1], "\n")
-    cat("\th_t:", object$h[2], "\n")
+    cat("\th_x:", x$h[1], "\n")
+    cat("\th_t:", x$h[2], "\n")
     cat("---------------------------")
   }
 }
 
 #-------------------------------DCS Options------------------------------------#
 
-#' Summarize Options for Double Conditional Smoothing
+#' Print and Summarize Options for Double Conditional Smoothing
 #' 
-#' @description \code{print} and \code{summary} method for class
-#' \code{"dcs_options"}
+#' @description \code{summary} method for class \code{"dcs_options"}
 #' 
 #' @section Details:
 #' \code{print.dcs_options} prints the main options and 
 #' \code{summary.dcs_options} prints main and advanced (IPI) options used for
-#' the \code{\link{dcs}} function. Arguments which should be an object of class
+#' the \code{\link{dcs}} function. Arguments should be an object of class
 #' \code{"dcs_options"}.
 #' 
 #' @param object an object of class "dcs_options", usually, a result of a call
-#' to \code{\link{set_options}}.
+#' to \code{\link{set.options}}.
+#' @param ... Additional arguments passed to \code{summary.dcs_options}.
 #' 
-#' @seealso \code{\link{print.dcs}}
+#' @seealso \code{\link{print.dcs}}, \code{\link{print.dcs_options}}
 #' 
 #' @examples
 #' ## Default options
@@ -216,41 +226,7 @@ print.dcs = function(object)
 #' 
 #' @export
 
-print.dcs_options = function(object)
-{
-  cat(class(object), "\n")
-  cat("---------------------------------------", "\n")
-  cat("options for DCS \trows \tcols \n")
-  cat("---------------------------------------", "\n")
-  
-  # when Kernel Regression is selected
-  if (object$type == "KR")
-  {
-    cat("type: kernel regression \n", sep = "")
-    cat("kernels used: \t \t", object$kerns[1], "\t", object$kerns[2], 
-        "\n", sep = "")
-    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
-    cat("variance model: \t", object$var_est, "\n", sep = "")
-    cat("---------------------------------------", "\n", sep = "")
-  } else if (object$type == "LP") {  
-    # when Local Polynomial Regression is selected
-    cat("type: local polynomial regression \n", sep = "")
-    cat("kernel order: \t \t", object$kerns[1], "\t", object$kerns[2], "\n",
-        sep = "")
-    cat("derivative: \t \t", object$drv[1], "\t", object$drv[2], "\n", sep = "")
-    cat("polynomial order: \t", object$p_order[1], "\t", object$p_order[2], 
-        "\n", sep = "")
-    cat("variance model: \t", object$var_est, "\n", sep = "")
-    cat("---------------------------------------", "\n")
-  }
-}
-
-#'
-#' @rdname print.dcs_options
-#' 
-#' @export
-
-summary.dcs_options = function(object)
+summary.dcs_options = function(object, ...)
 {
   cat(class(object), "\n")
   cat("---------------------------------------", "\n")
@@ -290,13 +266,74 @@ summary.dcs_options = function(object)
   cat("---------------------------------------", "\n")
 }
 
+
+#' Print and Summarize Options for Double Conditional Smoothing
+#' 
+#' @description \code{print} method for class \code{"dcs_options"}
+#' 
+#' @section Details:
+#' \code{print.dcs_options} prints the main options and 
+#' \code{summary.dcs_options} prints main and advanced (IPI) options used for
+#' the \code{\link{dcs}} function. Arguments should be an object of class
+#' \code{"dcs_options"}.
+#' 
+#' @param x an object of class "dcs_options", usually, a result of a call
+#' to \code{\link{set.options}}.
+#' @param ... Additional arguments passed to \code{print.dcs_options}.
+#' 
+#' @seealso \code{\link{print.dcs}}, \code{\link{summary.dcs_options}}
+#' 
+#' @examples
+#' ## Default options
+#' myOpt <- set.options()
+#' print(myOpt)
+#' summary(myOpt)
+#' 
+#' ## Use Kernel regression
+#' myOpt <- set.options(type = "KR")
+#' print(myOpt)
+#' summary(myOpt)
+#' 
+#' @export
+
+print.dcs_options = function(x, ...)
+{
+  cat(class(x), "\n")
+  cat("---------------------------------------", "\n")
+  cat("options for DCS \trows \tcols \n")
+  cat("---------------------------------------", "\n")
+  
+  # when Kernel Regression is selected
+  if (x$type == "KR")
+  {
+    cat("type: kernel regression \n", sep = "")
+    cat("kernels used: \t \t", x$kerns[1], "\t", x$kerns[2], 
+        "\n", sep = "")
+    cat("derivative: \t \t", x$drv[1], "\t", x$drv[2], "\n", sep = "")
+    cat("variance model: \t", x$var_est, "\n", sep = "")
+    cat("---------------------------------------", "\n", sep = "")
+  } else if (x$type == "LP") {  
+    # when Local Polynomial Regression is selected
+    cat("type: local polynomial regression \n", sep = "")
+    cat("kernel order: \t \t", x$kerns[1], "\t", x$kerns[2], "\n",
+        sep = "")
+    cat("derivative: \t \t", x$drv[1], "\t", x$drv[2], "\n", sep = "")
+    cat("polynomial order: \t", x$p_order[1], "\t", x$p_order[2], 
+        "\n", sep = "")
+    cat("variance model: \t", x$var_est, "\n", sep = "")
+    cat("---------------------------------------", "\n")
+  }
+}
+
 #----------------------------------Other Methods-------------------------------#
 
 #' Residuals of "dcs"-object
 #' 
 #' @description Returns the residuals of an object of class \code{"dcs"}.
 #' 
-#' @param dcs_object an object of class \code{"dcs"}, usually the result of a call to \code{\linl{dcs}}
+#' @param x an object of class \code{"dcs"}, usually the result of a call to
+#'  \code{\link{dcs}}.
+#' @param ... Additional arguments passed to \code{residuals.dcs}.
 #' 
 #' @seealso \code{\link{dcs}}
 #' 
@@ -306,9 +343,9 @@ summary.dcs_options = function(object)
 #' residuals(dcs_object)
 #' 
 
-residuals.dcs = function(dcs_object)
+residuals.dcs = function(x, ...)
 {
-  return(dcs_object$R)
+  return(x$R)
 }
 
 #' Contour Plot for the Double Conditional Smoothing
@@ -319,12 +356,13 @@ residuals.dcs = function(dcs_object)
 #' \code{plot.dcs} provides a contour plot of either the original data (1),
 #'  smoothed surface (2) or residuals (3).
 #' 
-#' @param object an object of class "dcs_options", usually, a result of a call to 
-#' \code{\link{set_options}}.
-#' @param plot_choice override the prompt to specify a plot, can be 
+#' @param x an object of class "dcs_options", usually, a result of a call to 
+#' \code{\link{set.options}}.
+#' @param ... Additional arguments passed to \code{print.dcs_options}. The
+#'  argument \code{plot_choice} overrides the prompt to specify a plot, can be 
 #'  \code{c(1, 2, 3)}.
 #' 
-#' @seealso \code{\link{dcs.3d}} to plot the surface.
+#' @seealso \code{\link{surface.dcs}} to plot the surface.
 #' 
 #' @examples
 #' ## Contour plot of smoothed surface
@@ -335,11 +373,16 @@ residuals.dcs = function(dcs_object)
 #' @export
 #' 
 
-plot.dcs = function(object, plot_choice = "choice", ...)
+plot.dcs = function(x, ...)
 {
-  fcn_arg = list(...)
+  if(all(class(x) != "dcs"))
+  {
+    stop("Object is not of class \"dcs\".")
+  }
   
-  if (plot_choice == "choice")
+  args_list = list(...)
+  
+  if (!exists("plot_choice", args_list))
   {
     cat("Plot choices for dcs object:", fill = TRUE)
     choices <- c(1, 2, 3)
@@ -351,28 +394,30 @@ plot.dcs = function(object, plot_choice = "choice", ...)
     print.data.frame(choices_df)
     plot_choice <- readline(prompt="Please enter the corresponding number: ")
     plot_choice <- as.numeric(plot_choice)
-  } else if (!(plot_choice %in% 1:3)) {
+  } else if (!(args_list$plot_choice %in% 1:3)) {
     stop("Invalid value in argument \"plot_choice\". Use c(1, 2, 3).")
+  } else {
+    plot_choice = args_list$plot_choice
   }
   
   if (plot_choice == 1) {
-    Y = object$Y
+    Y = x$Y
   } else if (plot_choice == 2) {
-    Y = object$M
+    Y = x$M
   } else if (plot_choice == 3) {
-    Y = object$R
+    Y = x$R
   } else {
     stop(plot_choice, " is not a valid plot-type.")
   }
   
-  if (exists("color", fcn_arg))
+  if (exists("color", args_list))
   {
-    color = fcn_arg$color
+    color = args_list$color
   } else {
     color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57")
   }
   
-  vec_XT = base::expand.grid(object$X, object$T)
+  vec_XT = base::expand.grid(x$X, x$T)
   col_vec = plot.dcs.colors(Y, color = color)
   main_title = paste("Contour plot of ", choice_names[plot_choice])
   graphics::plot(vec_XT[, 1], vec_XT[, 2], pch = 15, col = col_vec,
