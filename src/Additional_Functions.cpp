@@ -23,7 +23,6 @@ arma::mat weightMatrix(arma::colvec weights, arma::mat matrix)
 
 // rewrite x-Vector as x-Matrix for lm model, x can be a vector before this function
 
-
 // [[Rcpp::export]]
 arma::mat xMatrix(arma::colvec xVector, int polyOrder)
 {

@@ -382,12 +382,13 @@ plot.dcs = function(x, ...)
   
   args_list = list(...)
   
+  choice_names <- c("original observations", "smoothed surface",
+                    "residuals")
+  
   if (!exists("plot_choice", args_list))
   {
     cat("Plot choices for dcs object:", fill = TRUE)
     choices <- c(1, 2, 3)
-    choice_names <- c("original observations", "smoothed surface",
-                      "residuals")
     choices_df <- data.frame(choices)
     colnames(choices_df) <- ""
     rownames(choices_df) <- choice_names

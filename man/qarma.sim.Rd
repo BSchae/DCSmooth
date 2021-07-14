@@ -22,7 +22,7 @@ The function returns an object of class \code{"qarma"}, consisting of
   \code{Y} \tab A \eqn{n_x \times n_t}{n_x x n_t}-matrix of simulated values
   of the specified QARMA process.\cr
   \code{innov} \tab The innovations used for simulation, iid. drawn from a normal
-  distribution with zero mean and variance \deqn{\sigma^2}{(sigma)^2}.\cr
+  distribution with zero mean and variance \eqn{\sigma^2}{(sigma)^2}.\cr
   \code{model} \tab The model used for simulation, inherited from input.\cr
   \code{stnry} \tab An logical variable indicating whether the simulated 
   model is stationary.\cr

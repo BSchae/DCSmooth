@@ -317,7 +317,7 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
 #' be chosen between plots of the original data (1), smoothed surface (2) and 
 #' residuals (3).
 #' 
-#' @param dcs_object an object of class \code{"dcs"} or a numeric matrix that contains the
+#' @param Y an object of class \code{"dcs"} or a numeric matrix that contains the
 #'   values to be plotted.
 #' @param plot_choice override the prompt to specify a plot, can be 
 #'  \code{c(1, 2, 3)}.
@@ -329,8 +329,8 @@ dcs = function(Y, dcs_options = set.options(), h = "auto", ...)
 #' @seealso \code{\link{plot.dcs}}
 #' 
 #' @examples
-#' smth =  dcs(y.norm1)
-#' dcs.3d(smth)
+#' smth =  dcs(y.norm1 + rnorm(101^2))
+#' surface.dcs(smth, plot_choice = 2)
 #' 
 #' @export
 #' 
