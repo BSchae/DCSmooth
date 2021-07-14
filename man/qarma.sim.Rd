@@ -36,7 +36,8 @@ The function returns an object of class \code{"qarma"}, consisting of
 
 Simulation of a top-left dependent spatial ARMA process (QARMA). This 
 function returns an object of class \code{"qarma"}. The simulated innovations
-are created from a normal distribution with specified variance $\sigma^2$.
+are created from a normal distribution with specified variance
+\eqn{\sigma^2}{sigma^2}.
 
  see the vignette for further details.
 }

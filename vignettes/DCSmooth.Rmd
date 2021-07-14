@@ -13,8 +13,6 @@ bibliography: literature.bib
 csl: journal-of-the-royal-statistical-society.csl
 ---
 
-
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
