@@ -25,7 +25,7 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   return(return_list)
 }
 
-#-------------Hannen-Rissanen Estimation Function for QARMA--------------------#
+#-------------Hannan-Rissanen Estimation Function for QARMA--------------------#
 
 #' Estimation of a QARMA-process
 #'
@@ -34,7 +34,7 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' 
 #' @section Details:
 #' The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
-#' using the Hannen-Rissanen Algorithm (Hannen-Rissanen 1992). The lag-orders of 
+#' using the Hannan-Rissanen Algorithm. The lag-orders of
 #' the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
 #' (p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
 #' rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation
@@ -62,6 +62,8 @@ qarma.cf = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' @seealso \code{\link{qarma.sim}}
 #' 
 #' @examples
+#' # See vignette("DCSmooth") for examples and explanation
+#' 
 #' ## simulation of QARMA process
 #' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
 #' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
@@ -90,7 +92,8 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_ma = max(model_order$ma)
   
   ### AR-only auxiliary estimation model by YW-estimation ###
-  m1_ar = max(max_lag_x, 1) + ifelse(total_lag_ma > 0, 2, 0) # increase order of aux AR model here
+  m1_ar = max(max_lag_x, 1) + ifelse(total_lag_ma > 0, 2, 0) 
+                                          # increase order of aux AR model here
   m2_ar = max(max_lag_t, 1) + ifelse(total_lag_ma > 0, 2, 0)
   ar_aux = qarma.yw_matrix(Y, ar_order = c(m1_ar, m2_ar))
   
@@ -492,8 +495,10 @@ qarma.order.gpac = function(Y, order_max = list(ar = c(1, 1), ma = c(1, 1)))
     {
       ar = as.vector(ar_vec_test[j, ], mode = "numeric")
       jCol = which(ar_test_names[j] == colnames(gpac_count))
-      colIndex = which(as.logical(sapply(ar[1], '<=', ar_vec[, 1]) *
-                                    sapply(ar[2], '<=', ar_vec[, 2])))
+      colIndex = which(as.logical(vapply(ar[1], '<=', 
+                                  logical(length(ar_vec[, 1])), ar_vec[, 1]) *
+                                  vapply(ar[2], '<=', 
+                                  logical(length(ar_vec[, 2])), ar_vec[, 2])))
       gpac_count_sub = gpac_count[i, colIndex]
       if ((gpac_count_sub[1] == 1) & (sum(gpac_count_sub) == 1))
       {

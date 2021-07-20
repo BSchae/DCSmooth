@@ -27,17 +27,17 @@
 #'  If bandwidths are supplied to \code{dcs}, \code{summary.dcs} only prints
 #'  the given bandwidths.
 #' 
-#' @return The function \code{summary.dcs} returns an object of class \code{summary_dcs}
-#'  including \tabular{ll}{
+#' @return The function \code{summary.dcs} returns an object of class 
+#'  \code{summary_dcs} including \tabular{ll}{
 #'  \code{h_opt} \tab estimated optimal bandwidth from the IPI-procedure. \cr
 #'  \code{c_f} \tab estimated variance factor. \cr
 #'  \code{iterations} \tab number of iterations of the IPI-procedure. \cr
-#'  \code{time_used} \tab time spend searching for optimal bandwidths (not overall
-#'   runtime of the function). \cr
-#'  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for estimation
-#'   of the variance factor. Omitted, if \code{"iid"} is used. \cr
-#'  \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
-#'   options of the dcs procedure. \cr
+#'  \code{time_used} \tab time spend searching for optimal bandwidths (not 
+#'   overall runtime of the function). \cr
+#'  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for 
+#'   estimation of the variance factor. Omitted, if \code{"iid"} is used. \cr
+#'  \code{dcs_options} \tab an object of class \code{cds_options} containing the
+#'   initial options of the dcs procedure. \cr
 #' }
 #' 
 #' @examples

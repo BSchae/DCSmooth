@@ -38,15 +38,15 @@ QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
  \code{R} \tab matrix of resudials of estimation, \eqn{Y - M}. \cr
  \code{h} \tab optimized or given bandwidths. \cr
  \code{c_f} \tab estimated variance coefficient. \cr
- \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
-  options of the dcs procedure. \cr
+ \code{dcs_options} \tab an object of class \code{cds_options} containing the
+  initial options of the dcs procedure. \cr
  \code{iterations} \tab number of iterations of the IPI-procedure. \cr
- \code{time_used} \tab time spend searching for optimal bandwidths (not overall
-  runtime of the function). \cr
- \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for estimation
-  of the variance factor. Omitted, if \code{"iid"} is used. \cr
- \code{dcs_options} \tab an object of class \code{cds_options} containing the initial
-  options of the dcs procedure. \cr
+ \code{time_used} \tab time spend searching for optimal bandwidths (not
+  overall runtime of the function). \cr
+ \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for 
+  estimation of the variance factor. Omitted, if \code{"iid"} is used. \cr
+ \code{dcs_options} \tab an object of class \code{cds_options} containing the
+  initial options of the dcs procedure. \cr
 }
 }
 \description{
@@ -60,6 +60,8 @@ See the vignette for a more detailed description of the function.
 }
 
 \examples{
+# See vignette("DCSmooth") for examples and explanation
+
 y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
 dcs(y)
 

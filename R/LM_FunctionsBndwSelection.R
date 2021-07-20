@@ -135,138 +135,139 @@ sfarima.est = function(R_mat, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 }
 
 
-#----------------------------SFARIMA estimation alternativ (SL)--------------------------------#
+#-----------------------SFARIMA estimation alternativ (SL)---------------------#
 
-sfarima.est = function(R_mat, model_order = list(ar = c(1, 1), ma = c(1, 1)),
-                       K1 = 300, K2 = 150)
-{
-  n_x = dim(R_mat)[1]; n_t = dim(R_mat)[2]
-  K1 = min(n_x, K1) ; K2 = min(n_t, K2)
-  nar1 = model_order$ar[1]
-  nar2 = model_order$ar[2]
-  nma1 = model_order$ma[1]
-  nma2 = model_order$ma[2]
-  narma1 = model_order$ar[1] + model_order$ma[1]
-  narma2 = model_order$ar[2] + model_order$ma[2]
+# sfarima.est = function(R_mat, model_order = list(ar = c(1, 1), ma = c(1, 1)),
+#                        K1 = 300, K2 = 150)
+# {
+#   n_x = dim(R_mat)[1]; n_t = dim(R_mat)[2]
+#   K1 = min(n_x, K1) ; K2 = min(n_t, K2)
+#   nar1 = model_order$ar[1]
+#   nar2 = model_order$ar[2]
+#   nma1 = model_order$ma[1]
+#   nma2 = model_order$ma[2]
+#   narma1 = model_order$ar[1] + model_order$ma[1]
+#   narma2 = model_order$ar[2] + model_order$ma[2]
+# 
+#   theta0 = c(0, rep(0, narma1), 0, rep(0, narma2))
+#   k.max = 3
+#   for(k in 1:k.max){
+#     result = optim(theta0, sfarima.rss, R_mat = R_mat,
+#                     model_order = model_order, K1 = K1, K2 = K2)
+#     theta = result$par
+#     rss = result$value
+#     if (max(abs(theta - theta0)) < 5 / 1000) {
+#       k = k
+#       break
+#     }
+#     else {
+#       theta0 = theta
+#     }
+#   }
+# 
+#   #sig_eta = sqrt(rss / (n_x * n_t))
+#   sig_eta = sqrt(rss / (K1 * K2))
+# 
+  # ar_mat = c(1, theta[-1][0:nar1]) %*% t(c(1, theta[-(1:(2 + narma1))][0:nar2]))
+# 
+#   ma_mat = c(1, theta[-(1 :(1 + nar1))][0:nma1]) %*%
+#     t(c(1, theta[-(1:(2 + narma1 + nar2))][0:nma2]))
+# 
+#   sfarima_return = list(d_vec = c(theta[1], theta[narma1 + 2]),
+#                         ar = ar_mat, ma = ma_mat,
+#                         sigma = sig_eta)
+#   return(sfarima_return)
+# }
 
-  theta0 = c(0, rep(0, narma1), 0, rep(0, narma2))
-  k.max = 3
-  for(k in 1:k.max){
-    result = optim(theta0, sfarima.rss, R_mat = R_mat, model_order = model_order,
-                   K1 = K1, K2 = K2)
-    theta = result$par
-    rss = result$value
-    if (max(abs(theta - theta0)) < 5 / 1000) {
-      k = k
-      break
-    }
-    else {
-      theta0 = theta
-    }
-  }
-
-  #sig_eta = sqrt(rss / (n_x * n_t))
-  sig_eta = sqrt(rss / (K1 * K2))
-
-  ar_mat = c(1, theta[-1][0:nar1]) %*% t(c(1, theta[-(1:(2 + narma1))][0:nar2]))
-
-  ma_mat = c(1, theta[-(1 :(1 + nar1))][0:nma1]) %*%
-    t(c(1, theta[-(1:(2 + narma1 + nar2))][0:nma2]))
-
-  sfarima_return = list(d_vec = c(theta[1], theta[narma1 + 2]),
-                        ar = ar_mat, ma = ma_mat,
-                        sigma = sig_eta)
-  return(sfarima_return)
-}
-
-sfarima.rss = function(theta, R_mat,
-                       model_order = list(ar = c(1, 1), ma = c(1, 1)),
-                       K1 = 300, K2 = 150)
-{
-
-  nar1 = model_order$ar[1]
-  nar2 = model_order$ar[2]
-  nma1 = model_order$ma[1]
-  nma2 = model_order$ma[2]
-  narma1 = model_order$ar[1] + model_order$ma[1]
-  narma2 = model_order$ar[2] + model_order$ma[2]
-
-  d1 = theta[1]
-  phi1 = theta[-1][0:nar1]
-  psi1 = theta[-(1 :(1 + nar1))][0:nma1]
-  d2 = theta[narma1 + 2]
-  phi2 = theta[-(1:(2 + narma1))][0:nar2]
-  psi2 = theta[-(1:(2 + narma1 + nar2))][0:nma2]
-
-  n1 = nrow(R_mat)
-  n2 = ncol(R_mat)
-  K1 = min(K1, n1)
-  K2 = min(K2, n2)
-
-  bk1 = arcoef(ar = phi1, ma = psi1, d = d1, k = K1)
-
-  bk2 = arcoef(ar = phi2, ma = psi2, d = d2, k = K2)
-
-  ######### calculating the RSS
-
-  RSS = 0
-  e.est = xi.est = matrix(0, K1, K2)
-
-
-  ### 1st stage
-
-  bk2 = t(bk2)
-  R_mat = t(R_mat)
-
-  for(j in 1:K2) {
-    xi.est[, j] = bk2[1:j] %*% R_mat[j:1, 1:K1]
-  }
-
-  ### 2nd stage
-
-  bk1 = as.matrix(t(bk1))
-
-  for(i in 1:K1) {
-    e.est[i, ] = bk1[1:i] %*% xi.est[i:1, ]
-  }
-
-  rss = sum(e.est^2)
-  return(rss)
-}
-
-arcoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
-  p = length(ar[ar != 0])
-  q = length(ma[ma != 0])
-  if (p == 0) {
-    ar = 0
-  }
-  if (q == 0) {
-    ma = 0
-  }
-
-  ar.coef = c(1, -ar, rep(0, k - p))
-  arma.coef = (1:(k + 1)) * 0
-  arma.coef[1] = 1
-
-  if (p | q > 0) {
-    for (i in 2:(k + 1)) {
-      if ((i - q) < 1) {
-        arma.coef[i] = sum(ma[1:(q - abs(i - q) - 1)] * arma.coef[(i - 1):1]) - (-ar.coef[i])
-      } else {
-        arma.coef[i] = sum(ma[1:q] * arma.coef[(i - 1):(i - q)]) - (-ar.coef[i])
-      }
-    }
-  } else {
-    arma.coef + 1
-  }
-
-  d.coef = choose(d, 0:k) * ((-1)^(0:k))
-
-  coef.all = (1:(k + 1)) * 0
-  for (j in 1:(k + 1)) {
-    coef.all[j] = sum(d.coef[1:j] * arma.coef[j:1])
-  }
-  drop(-coef.all)
-}
+# sfarima.rss = function(theta, R_mat,
+#                        model_order = list(ar = c(1, 1), ma = c(1, 1)),
+#                        K1 = 300, K2 = 150)
+# {
+# 
+#   nar1 = model_order$ar[1]
+#   nar2 = model_order$ar[2]
+#   nma1 = model_order$ma[1]
+#   nma2 = model_order$ma[2]
+#   narma1 = model_order$ar[1] + model_order$ma[1]
+#   narma2 = model_order$ar[2] + model_order$ma[2]
+# 
+#   d1 = theta[1]
+#   phi1 = theta[-1][0:nar1]
+#   psi1 = theta[-(1 :(1 + nar1))][0:nma1]
+#   d2 = theta[narma1 + 2]
+#   phi2 = theta[-(1:(2 + narma1))][0:nar2]
+#   psi2 = theta[-(1:(2 + narma1 + nar2))][0:nma2]
+# 
+#   n1 = nrow(R_mat)
+#   n2 = ncol(R_mat)
+#   K1 = min(K1, n1)
+#   K2 = min(K2, n2)
+# 
+#   bk1 = arcoef(ar = phi1, ma = psi1, d = d1, k = K1)
+# 
+#   bk2 = arcoef(ar = phi2, ma = psi2, d = d2, k = K2)
+# 
+#   ######### calculating the RSS
+# 
+#   RSS = 0
+#   e.est = xi.est = matrix(0, K1, K2)
+# 
+# 
+#   ### 1st stage
+# 
+#   bk2 = t(bk2)
+#   R_mat = t(R_mat)
+# 
+#   for(j in 1:K2) {
+#     xi.est[, j] = bk2[1:j] %*% R_mat[j:1, 1:K1]
+#   }
+# 
+#   ### 2nd stage
+# 
+#   bk1 = as.matrix(t(bk1))
+# 
+#   for(i in 1:K1) {
+#     e.est[i, ] = bk1[1:i] %*% xi.est[i:1, ]
+#   }
+# 
+#   rss = sum(e.est^2)
+#   return(rss)
+# }
+# 
+# arcoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
+#   p = length(ar[ar != 0])
+#   q = length(ma[ma != 0])
+#   if (p == 0) {
+#     ar = 0
+#   }
+#   if (q == 0) {
+#     ma = 0
+#   }
+# 
+#   ar.coef = c(1, -ar, rep(0, k - p))
+#   arma.coef = (1:(k + 1)) * 0
+#   arma.coef[1] = 1
+# 
+#   if (p | q > 0) {
+#     for (i in 2:(k + 1)) {
+#       if ((i - q) < 1) {
+#         arma.coef[i] = sum(ma[1:(q - abs(i - q) - 1)] * 
+                              # arma.coef[(i - 1):1]) - (-ar.coef[i])
+#       } else {
+#         arma.coef[i] = sum(ma[1:q] * arma.coef[(i - 1):(i - q)]) - (-ar.coef[i])
+#       }
+#     }
+#   } else {
+#     arma.coef + 1
+#   }
+# 
+#   d.coef = choose(d, 0:k) * ((-1)^(0:k))
+# 
+#   coef.all = (1:(k + 1)) * 0
+#   for (j in 1:(k + 1)) {
+#     coef.all[j] = sum(d.coef[1:j] * arma.coef[j:1])
+#   }
+#   drop(-coef.all)
+# }
 
 

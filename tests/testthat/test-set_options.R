@@ -15,7 +15,7 @@ test_that("set.options() gets \"type\" correctly.", {
 })
 
 test_that("set.options() gets \"kerns\" correctly.",{
-  for (test in 1:length(dcs_list_kernels))
+  for (test in seq_along(length(dcs_list_kernels)))
   {
     expect_equal(set.options(kerns = c(dcs_list_kernels[test], 
                                        dcs_list_kernels[test]))$kerns,

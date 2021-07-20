@@ -9,25 +9,28 @@
 KR.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  n  = n_x * n_t                                # total number of observations is needed later
+  n  = n_x * n_t                            # total number of observations
 
-  kernel_prop_x = kernel.prop.KR(kernel_x)      # calculate properties R and mu_2 of kernel
+  kernel_prop_x = kernel.prop.KR(kernel_x)  # kernel properties R and mu_2
   kernel_prop_t = kernel.prop.KR(kernel_t)
   
   # TODO: more flexibility here
-  kern_fcn_0 = kernel_fcn_assign("MW_220")       # assign kernel for regression surface
-  kern_fcn_2 = kernel_fcn_assign("MW_422")       # assign kernel for 2nd derivative (needed in )
+  kern_fcn_0 = kernel_fcn_assign("MW_220")  # kernel for regression surface
+  kern_fcn_2 = kernel_fcn_assign("MW_422")  # kernel for 2nd derivative
   
-  h_opt = c(0.1, 0.1)                           # initial values for h_0, arbitrary chosen
+  h_opt = c(0.1, 0.1)                       # initial (arbitrary) values for h_0
   
-  iterate = TRUE                                # iteration indicator
+  iterate = TRUE                            # iteration indicator
   iteration_count = 0
-  while(iterate)                                # loop for IPI
+  while(iterate)                            # loop for IPI
   {
     iteration_count = iteration_count + 1
-    h_opt_temp   = pmin(h_opt[1:2], c(0.45, 0.45))
+    h_opt_temp   = pmin(h_opt[1:2], c(0.45, 0.45)) 
+                          # KR can't handle too large bandwidths
     h_infl  = inflation.KR(h_opt_temp, c(n_x, n_t), dcs_options$IPI_options)
+                          # inflation of bndws for estimation of derivatives
     
+    # constant bandwidth only reasonable for estimation of derivatives
     if (dcs_options$IPI_options$const_window == TRUE)
     {
       # pre-smoothing of the surface function m(0,0) for estimation of variance
@@ -51,7 +54,7 @@ KR.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                           kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
     }
 
-    # shrink mxx, mtt from boundaries
+    # shrink mxx, mtt from boundaries if delta > 0
     if (dcs_options$IPI_options$delta[1] != 0 ||
         dcs_options$IPI_options$delta[2] != 0)
     {
@@ -62,9 +65,9 @@ KR.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
 
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
-      n_sub = dim(mxx)[1]*dim(mxx)[2]
+      n_sub = dim(mxx)[1]*dim(mxx)[2]   # number of used observations
     } else {
-      n_sub = n
+      n_sub = n                         # all observations are used
     }
       
     # calculate variance factor

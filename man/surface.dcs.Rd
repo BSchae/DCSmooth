@@ -13,8 +13,7 @@ values to be plotted.}
 \item{plot_choice}{override the prompt to specify a plot, can be 
 \code{c(1, 2, 3)}.}
 
-\item{...}{optional arguments passed to the plot function. See the vignette 
-\code{vignette("DCS", package = "DCSmooth")}}
+\item{...}{optional arguments passed to the plot function.}
 }
 \value{
 \code{dcs.3d} returns an object of class "plotly" and "htmlwidget".
@@ -25,12 +24,14 @@ values to be plotted.}
 \section{Details}{
 
 \code{surface.dcs} uses the plotly device to plot the 3D surface of the given
-\code{"dcs"}-object or matrix. If a "dcs"-object is passed to the function, it can
-be chosen between plots of the original data (1), smoothed surface (2) and 
-residuals (3).
+\code{"dcs"}-object or matrix. If a "dcs"-object is passed to the function, 
+ it can be chosen between plots of the original data (1), smoothed surface 
+ (2) and residuals (3).
 }
 
 \examples{
+# See vignette("DCSmooth") for examples and explanation
+
 smth =  dcs(y.norm1 + rnorm(101^2))
 surface.dcs(smth, plot_choice = 2)
 

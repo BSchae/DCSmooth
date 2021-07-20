@@ -27,13 +27,15 @@ h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kern_fcn_x,
   
   # optimal bandwidths
   I1 = kernel_prop_1$mu^2 * i11 + kernel_prop_1$mu * kernel_prop_2$mu * 
-    i12 * gamma_12^(delta + 1)
-  hx_opt = (2*drv_vec[1] + 1)/(2*(delta + 1)) * (kernel_prop_1$R * kernel_prop_2$R*
-          var_coef)/(n_sub * gamma_12^(2*drv_vec[1] + 1) * I1) 
+            i12 * gamma_12^(delta + 1)
+  hx_opt = (2*drv_vec[1] + 1)/(2*(delta + 1)) * (kernel_prop_1$R *
+           kernel_prop_2$R * var_coef)/
+           (n_sub * gamma_12^(2*drv_vec[1] + 1) * I1) 
   I2 = kernel_prop_2$mu^2 * i22 + kernel_prop_1$mu * kernel_prop_2$mu * 
-    i12 * gamma_21^(delta + 1)
-  ht_opt = (2*drv_vec[2] + 1)/(2*(delta + 1)) * (kernel_prop_1$R * kernel_prop_2$R*
-          var_coef)/(n_sub * gamma_21^(2*drv_vec[2] + 1) * I2) 
+           i12 * gamma_21^(delta + 1)
+  ht_opt = (2*drv_vec[2] + 1)/(2*(delta + 1)) * (kernel_prop_1$R *
+           kernel_prop_2$R * var_coef) /
+           (n_sub * gamma_21^(2*drv_vec[2] + 1) * I2) 
   
   if(hx_opt < 0) { hx_opt = -hx_opt } # ensure positive bandwidth
   if(ht_opt < 0) { ht_opt = -ht_opt }

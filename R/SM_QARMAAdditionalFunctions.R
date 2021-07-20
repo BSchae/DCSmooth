@@ -31,8 +31,9 @@
 #'  \tabular{ll}{
 #'   \code{Y} \tab A \eqn{n_x \times n_t}{n_x x n_t}-matrix of simulated values
 #'   of the specified QARMA process.\cr
-#'   \code{innov} \tab The innovations used for simulation, iid. drawn from a normal
-#'   distribution with zero mean and variance \eqn{\sigma^2}{(sigma)^2}.\cr
+#'   \code{innov} \tab The innovations used for simulation, iid. drawn from a 
+#'    normal distribution with zero mean and variance 
+#'    \eqn{\sigma^2}{(sigma)^2}.\cr
 #'   \code{model} \tab The model used for simulation, inherited from input.\cr
 #'   \code{stnry} \tab An logical variable indicating whether the simulated 
 #'   model is stationary.\cr
@@ -43,6 +44,8 @@
 #' @seealso \code{\link{qarma.est}}
 #' 
 #' @examples
+#' # See vignette("DCSmooth") for examples and explanation
+#'  
 #' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
 #' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
 #' sigma = 0.5

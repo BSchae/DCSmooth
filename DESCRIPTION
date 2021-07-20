@@ -1,10 +1,9 @@
 Package: DCSmooth
 Type: Package
 Title: Nonparametric Regression and Bandwidth Selection for Spatial Models
-Version: 0.7.1
-Date: 2021-07-14
-Author: Bastian Schaefer
-Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>
+Version: 1.0.0
+Authors@R: person("Bastian", "Schaefer",
+    email = "bastian.schaefer@uni-paderborn.de", role = c("aut", "cre"))
 Description: Nonparametric smoothing techniques for
     data on a lattice and functional time series. Smoothing is done via
     kernel regression or local polynomial regression, a bandwidth selection
@@ -14,7 +13,7 @@ Description: Nonparametric smoothing techniques for
 License: GPL-3
 LazyData: true
 Imports: Rcpp, plotly, fracdiff, stats
-LinkingTo: Rcpp, RcppArmadillo, RcppEigen
+LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr

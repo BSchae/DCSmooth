@@ -189,7 +189,7 @@ specIntEstDrv = function(acfMat, drv1, drv2, hLag)
 {
   nX = dim(as.matrix(acfMat))[1]/2 + 0.5
   nT = dim(as.matrix(acfMat))[2]/2 + 0.5
-  Lx = hLag[1]; Lt = hLag[2];
+  Lx = hLag[1]; Lt = hLag[2]
 
   # compute matrix of bartlett weights without "fourier factor"
   w = ((1 - (0:Lx)/max(Lx, 1)) %*% t(1 - (0:Lt)/max(Lt, 1)))^2 *

@@ -92,7 +92,7 @@ summary(set.options(type = "KR"))
 
 Default options for local polynomial regression (`type = "LP"`) are
 ```{r, echo = FALSE, warning = FALSE}
-# library(DCSmooth)
+library(DCSmooth)
 summary(set.options(type = "KR"))
 ```
 
@@ -142,7 +142,7 @@ Arguments of `qarma.sim` are
 
 `qarma.sim` returns an object of class `qarma` with attribute `"subclass" = "sim"` including the following values:
 
-* **Y** The matrix of simulated values with size $n_x \times n_t$ (determined by function arguments `n_x`, `n_t`). The matrix $Y$ is the lower left $n_x \times n_t$ submatrix of the actually simulated matrix $Y'$ of size $2 n_x \times 2 n_t$ to aviod effects from setting the initial values ("burn-in period").
+* **Y** The matrix of simulated values with size $n_x \times n_t$ (determined by function arguments `n_x`, `n_t`). The matrix $Y$ is the lower left $n_x \times n_t$ submatrix of the actually simulated matrix $Y'$ of size $2 n_x \times 2 n_t$ to avoid effects from setting the initial values ("burn-in period").
 * **innov** The $n_x \times n_t$ matrix of iid. normally distributed innovations/errors of the QARMA model with zero mean and variance $\sigma^2$ (determined by the function argument `model\$sigma`). As with `Y`, the original matrix has size $2 n_x \times 2 n_t$.
 * **model** The model used for simulation, inherited from input.
 * **stnry** Indicator variable (boolean) for stationarity of the process.
@@ -178,23 +178,25 @@ There are three simulated example data sets included in the package. Each data s
 * **y.norm2** $$ \mathcal{N} \left( \begin{pmatrix} 0.5 \\ 0.3 \end{pmatrix}, \begin{pmatrix} 0.1 & 0 \\ 0 & 0.1 \end{pmatrix} \right) + \mathcal{N} \left( \begin{pmatrix} 0.2 \\ 0.8 \end{pmatrix}, \begin{pmatrix} 0.05 & 0 \\ 0 & 0.05 \end{pmatrix} \right) $$
 * **y.norm3** $$ \mathcal{N} \left( \begin{pmatrix} 0.25 \\ 0.75 \end{pmatrix}, \begin{pmatrix} 0.01 & 0 \\ 0 & -0.1 \end{pmatrix} \right) + \mathcal{N} \left( \begin{pmatrix} 0.75 \\ 0.5 \end{pmatrix}, \begin{pmatrix} 0.01 & 0 \\ 0 & -0.1 \end{pmatrix} \right)$$
 
-```{r, figures-side, fig.show="hold", out.width="30%", echo = FALSE}
-surface.dcs(y.norm1)
-surface.dcs(y.norm2)
-surface.dcs(y.norm3)
+```{r}
+# surface.dcs(y.norm1)
+# surface.dcs(y.norm2)
+# surface.dcs(y.norm3)
 ```
 
 
 # 3 Application
 The application of the package is demonstrated at the example of the simulated function values `y.norm1` which represent a gaussian peak on $[0,1]^2$ with $n_x = n_t = 101$ evaluation points. Different models are simulated and estimation using `dcs` is demonstrated. Whenever default options are used, they are not explicitly used as function arguments, instead only when deviating from the defaults, the options are changed.
 
+> Due to file size restrictions, the `surface.dcs` commands in this vignette are commented out. Run the complete code used in section 3 of this vignette by `demo("DCS_demo", package = "DCSmooth")`.
+
 ## 3.1 Application of the DCS with iid. errors
 
 ```{r}
-surface.dcs(y.norm1)
+# surface.dcs(y.norm1)
 
 y_iid = y.norm1 + rnorm(101^2)
-surface.dcs(y_iid)
+# surface.dcs(y_iid)
 ```
 
 ###* Kernel Regression with iid. errors
@@ -209,7 +211,7 @@ dcs_iid_KR
 dcs_iid_KR$dcs_options
 
 # plot regression surface
-surface.dcs(dcs_iid_KR, plot_choice = 2)
+# surface.dcs(dcs_iid_KR, plot_choice = 2)
 ```
 
 The summary of the `"dcs"`-object provides some more detailed information:
@@ -225,7 +227,7 @@ dcs_LP_iid
 summary(dcs_LP_iid)
 
 # plot regression surface
-surface.dcs(dcs_LP_iid, plot_choice = 2)
+# surface.dcs(dcs_LP_iid, plot_choice = 2)
 ```
 
 
@@ -249,7 +251,7 @@ sim_qarma = qarma.sim(n_x = 101, n_t = 101, model = model_list)
 
 # QARMA observations
 y_qarma = y.norm1 + sim_qarma$Y
-surface.dcs(y_qarma)
+# surface.dcs(y_qarma)
 ```
 
 Estimation of an QARMA process for a given order works with the `qarma.est` function (note that the simulated matrix can be accessed via `$Y`):
@@ -277,24 +279,24 @@ dcs_qarma_2
 dcs_qarma_2$var_model
 ```
 
-###* Local Polynomial regression with automated order selection
-Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two.
+<!-- ###* Local Polynomial regression with automated order selection -->
+<!-- Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two. -->
 
-```{r}
-# GPAC
-opt_qarma_3 = set.options(var_est = "qarma_gpac")
-dcs_qarma_3 = dcs(y_qarma, opt_qarma_3)
+<!-- ```{r} -->
+<!-- # GPAC -->
+<!-- opt_qarma_3 = set.options(var_est = "qarma_gpac") -->
+<!-- dcs_qarma_3 = dcs(y_qarma, opt_qarma_3) -->
 
-dcs_qarma_3
-dcs_qarma_3$var_model
+<!-- dcs_qarma_3 -->
+<!-- dcs_qarma_3$var_model -->
 
-# BIC
-opt_qarma_4 = set.options(var_est = "qarma_bic")
-dcs_qarma_4 = dcs(y_qarma, opt_qarma_4)
+<!-- # BIC -->
+<!-- opt_qarma_4 = set.options(var_est = "qarma_bic") -->
+<!-- dcs_qarma_4 = dcs(y_qarma, opt_qarma_4) -->
 
-dcs_qarma_4
-dcs_qarma_4$var_model
-```
+<!-- dcs_qarma_4 -->
+<!-- dcs_qarma_4$var_model -->
+<!-- ``` -->
 
 ## 3.3 Modelling errors with long memory
 This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow a process with long memory. This process is modeled as a spatial FARIMA (SFARIMA). Estimation under long-memory errors is currently in a experimental state.
@@ -308,7 +310,7 @@ dcs_lm$var_model
 ```
 
 ## 3.4 Estimation of derivatives
-Local polynomial estimation is suitable for estimation of derivatives of a function or a surface. While estmiation of derivatives works as well under dependent errors, the example uses the iid. model from 3.1. Derivatives can be computed for any derivative vector `drv`, if the values are non-negative. Note that the order of the polynomials for the $\nu$th derivative is chosen to be $p_i = \nu_i + 1, i = x, t$. As bandwidths increase with the order of the derivatives, the bandwidth might be large for higher derivative orders.
+Local polynomial estimation is suitable for estimation of derivatives of a function or a surface. While estimation of derivatives works as well under dependent errors, the example uses the iid. model from 3.1. Derivatives can be computed for any derivative vector `drv`, if the values are non-negative. Note that the order of the polynomials for the $\nu$th derivative is chosen to be $p_i = \nu_i + 1, i = x, t$. As bandwidths increase with the order of the derivatives, the bandwidth might be large for higher derivative orders.
 
 The estimator for $m^{(1, 0)}(x, t)$ is given by
 ```{r}
@@ -316,7 +318,7 @@ opt_drv_1 = set.options(drv = c(1, 0))
 dcs_drv_1 = dcs(y_iid, opt_drv_1)
 
 dcs_drv_1
-surface.dcs(dcs_drv_1, plot_choice = 2)
+# surface.dcs(dcs_drv_1, plot_choice = 2)
 ```
 
 The estimator for $m^{(1, 2)}(x, t)$ is
@@ -325,7 +327,7 @@ opt_drv_2 = set.options(drv = c(1, 2))
 dcs_drv_2 = dcs(y_iid, opt_drv_2)
 
 dcs_drv_2
-surface.dcs(dcs_drv_2, plot_choice = 2)
+# surface.dcs(dcs_drv_2, plot_choice = 2)
 ```
 
 # 4 Mathematical Background
@@ -356,7 +358,7 @@ which is called exponential inflation method (EIM) [@BeranFeng2002a]. The values
 The IPI now starts with an initial bandwidth $h_0$ (chosen to be $h_0 = (0.1, 0.1)$) and calculates in each step $s$ the auxiliary bandwidths $\widetilde{h}_{k,s}$ from $h_{s-1}$ and $h_s$ from the smoothed derivative surfaces using $\widetilde{h}_{k,s}$. The iteration process finishes until a certain threshold is reached.
 
 ## 4.3 Boundary Modification
-In kernel regression, the boundary problem exists, which leads to biased estimated at the boundaries of the regression surface. This problem can (partially) be solved by means of suitable boundary kernels as introduced by @Mueller1991 and @MuellerWang1994. These boundary kernels differ in their degress of smootheness and hence lead to different estimation results at the boundaries. However, all kernels are similar to the classical kernels in the interior region of the regression.
+In kernel regression, the boundary problem exists, which leads to biased estimated at the boundaries of the regression surface. This problem can (partially) be solved by means of suitable boundary kernels as introduced by @Mueller1991 and @MuellerWang1994. These boundary kernels differ in their degrees of smootheness and hence lead to different estimation results at the boundaries. However, all kernels are similar to the classical kernels in the interior region of the regression.
 
 Following @FengSchaefer2021, a boundary modification is also defined for local polynomial regression. In the *DCSmooth* package, the local polynomial regression is always with boundary modification weights. Kernel types available (either for kernel regression or local polynomial regression) are Müller-type, Müller-Wang-type and truncated kernels, denoted by `M`, `MW` and `T`. In most applications, the Müller-Wang type are the preferred weighting functions.
 
