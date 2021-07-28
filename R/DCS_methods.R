@@ -77,6 +77,8 @@ summary.dcs = function(object, ...)
 #' @param x An object of class \code{"summary_dcs"}.
 #' @param ... Additional arguments passed to \code{print.summary_dcs}.
 #' 
+#' @return No return value.
+#' 
 #' @seealso \code{\link{summary.dcs}}
 #' 
 #' @export
@@ -155,6 +157,8 @@ print.summary_dcs = function(x, ...)
 #' \code{\link{dcs}}.
 #' @param ... Additional arguments passed to \code{print.dcs}.
 #' 
+#' @return No return value.
+#' 
 #' @seealso \code{\link{plot.dcs}}, \code{\link{print.dcs_options}}
 #' 
 #' @examples
@@ -210,6 +214,8 @@ print.dcs = function(x, ...)
 #' @param object an object of class "dcs_options", usually, a result of a call
 #' to \code{\link{set.options}}.
 #' @param ... Additional arguments passed to \code{summary.dcs_options}.
+#' 
+#' @return No return value.
 #' 
 #' @seealso \code{\link{print.dcs}}, \code{\link{print.dcs_options}}
 #' 
@@ -281,6 +287,8 @@ summary.dcs_options = function(object, ...)
 #' to \code{\link{set.options}}.
 #' @param ... Additional arguments passed to \code{print.dcs_options}.
 #' 
+#' @return No return value.
+#' 
 #' @seealso \code{\link{print.dcs}}, \code{\link{summary.dcs_options}}
 #' 
 #' @examples
@@ -335,6 +343,8 @@ print.dcs_options = function(x, ...)
 #'  \code{\link{dcs}}.
 #' @param ... Additional arguments passed to \code{residuals.dcs}.
 #' 
+#' @return Returns the \eqn{n_x \times n_t}{n_x x n_t}-matrix of residuals.
+#' 
 #' @seealso \code{\link{dcs}}
 #' 
 #' @examples
@@ -361,6 +371,8 @@ residuals.dcs = function(x, ...)
 #' @param ... Additional arguments passed to \code{print.dcs_options}. The
 #'  argument \code{plot_choice} overrides the prompt to specify a plot, can be 
 #'  \code{c(1, 2, 3)}.
+#'  
+#' @return No return value.
 #' 
 #' @seealso \code{\link{surface.dcs}} to plot the surface.
 #' 

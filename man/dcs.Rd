@@ -35,7 +35,7 @@ QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
  \code{X, T} \tab vectors of covariates over rows (\code{X}) and columns 
   (\code{T}). \cr
  \code{M} \tab resulting matrix of smoothed values. \cr
- \code{R} \tab matrix of resudials of estimation, \eqn{Y - M}. \cr
+ \code{R} \tab matrix of residuals of estimation, \eqn{Y - M}. \cr
  \code{h} \tab optimized or given bandwidths. \cr
  \code{c_f} \tab estimated variance coefficient. \cr
  \code{dcs_options} \tab an object of class \code{cds_options} containing the

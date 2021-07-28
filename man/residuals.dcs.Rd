@@ -12,6 +12,9 @@
 
 \item{...}{Additional arguments passed to \code{residuals.dcs}.}
 }
+\value{
+Returns the \eqn{n_x \times n_t}{n_x x n_t}-matrix of residuals.
+}
 \description{
 Returns the residuals of an object of class \code{"dcs"}.
 }

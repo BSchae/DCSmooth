@@ -33,7 +33,7 @@ Parametric Estimation of a \eqn{QARMA(p, q)}-process on a
 \section{Details}{
 
 The MA- and AR-parameters of a top-left quadrant ARMA process are estimated
-using the Hannen-Rissanen Algorithm (Hannen-Rissanen 1992). The lag-orders of
+using the Hannan-Rissanen Algorithm. The lag-orders of
 the \eqn{QARMA(p, q)} are given by \eqn{p = (p_1, p_2), q = (q_1, q_2)}{p =
 (p1, p2), q = (q1, q2)}, where \eqn{p_1, q_1}{p1, q1} are the lags over the
 rows and \eqn{p_2, q_2}{p2, q2} are the lags over the columns. The estimation

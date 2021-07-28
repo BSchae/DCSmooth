@@ -75,7 +75,7 @@ set.options <- function(    # inside function with default values in arguments
   if (var_est == "lm")
   {
     message("Estimation under long-memory errors (SFARIMA) is currently in ", 
-            "experimantal state.")
+            "experimental state.")
   }
   
   # Select options according to type ("LP", "KR")
@@ -154,7 +154,7 @@ set.options <- function(    # inside function with default values in arguments
 #'  \code{X, T} \tab vectors of covariates over rows (\code{X}) and columns 
 #'   (\code{T}). \cr
 #'  \code{M} \tab resulting matrix of smoothed values. \cr
-#'  \code{R} \tab matrix of resudials of estimation, \eqn{Y - M}. \cr
+#'  \code{R} \tab matrix of residuals of estimation, \eqn{Y - M}. \cr
 #'  \code{h} \tab optimized or given bandwidths. \cr
 #'  \code{c_f} \tab estimated variance coefficient. \cr
 #'  \code{dcs_options} \tab an object of class \code{cds_options} containing the

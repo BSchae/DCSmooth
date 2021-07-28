@@ -12,6 +12,9 @@
 
 \item{...}{Additional arguments passed to \code{print.dcs}.}
 }
+\value{
+No return value.
+}
 \description{
 \code{print} method for class \code{"dcs"}
 }

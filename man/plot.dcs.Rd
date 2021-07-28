@@ -14,6 +14,9 @@
 argument \code{plot_choice} overrides the prompt to specify a plot, can be 
 \code{c(1, 2, 3)}.}
 }
+\value{
+No return value.
+}
 \description{
 \code{plot} method for class \code{"dcs"}
 }

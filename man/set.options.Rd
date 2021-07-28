@@ -18,11 +18,11 @@ kernel regression (\code{"KR"}).}
 
 \item{kerns}{a character vector of length 2 containing the identifier for the
 kernels to be used in kernel regression. Weighting functions in local
-polynomial regression are computed accoring to the identifier. Default value
-is \code{MW_220}, the Müller-Wang kernel of order \eqn{(2, 2, 0)}.}
+polynomial regression are computed according to the identifier. Default value
+is \code{MW_220}, the Mueller-Wang kernel of order \eqn{(2, 2, 0)}.}
 
 \item{drv}{A non-negative vector of length 2, containing the derivative
-orders to be estimated from the given data. Default ist \code{c(0, 0)}. For
+orders to be estimated from the given data. The default is \code{c(0, 0)}. For
 LP-regression, polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}.}
 
 \item{var_est}{the method of estimating the variance coefficient \eqn{c_f}. 

@@ -70,7 +70,7 @@ Arguments of `set.options` are
 * **kerns** A character vector of length 2 stating the identifiers for the kernels in each dimension to use. The first element corresponds to the smoothing conditional on rows, the second conditional on columns. The identifiers are of the form $X\_k\mu\nu$, where $X$ indicates the smoothing method to use, either one of `M`, `MW` or `T`. The value $k$ is the kernel order, $\mu$ is the smoothness degree and $\nu$ the derivative estimated by the kernel. For more information on the kernels see section 4.3, a list of available kernels is given in A.1. The default kernels are `"MW_220` for both dimensions.
 * **drv** Derivative $(\nu_x, \nu_t)$ of $m(x,t)$ to be estimated. Note that $k \geq \nu + 2$, hence, only the regression surface ($\nu = 0$ as default value) and the first and second derivatives can be estimated from the currently available kernels.
 * **var_est** Specifies the model assumption for the errors/innovations $\varepsilon(x, t)$ in the regression model. Currently available are `iid` (independently identically distributed, set as default), `qarma` (spatial ARMA process) and `lm` (spatial FARIMA process with long memory). Methods for automated order selection are available for the QARMA estimation via `qarma_gpac` or `qarma_bic`. For further information see section 4.4.
-* **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and a boundary shrinking parameter for stabilized estimation of the neccessary derivatives (`delta`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the boolean variable `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type selected and are given below.
+* **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and a boundary shrinking parameter for stabilized estimation of the necessary derivatives (`delta`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the boolean variable `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type selected and are given below.
 
 `set.options` returns an object of class `"dcs_options` including the following values
 
@@ -158,7 +158,7 @@ Arguments of `qarma.est` are
 `qarma.est` returns an object of class `qarma` with attribute `"subclass" = "est"` including the following values:
 
 * **Y** The matrix of observations inherited from input.
-* **innov** The matrix of estimated innovations from the Hannan-Rissane algorithm.
+* **innov** The matrix of estimated innovations from the Hannan-Rissanen algorithm.
 * **model** A list of estimated model coefficients containing the matrices `ar` of autoregressive coefficients, the matrix `ma` of moving average coefficients as well as the standard deviation of residuals `sigma`.
 * **stnry** Indicator variable (boolean) for stationarity of the process.
 
@@ -333,7 +333,7 @@ dcs_drv_2
 # 4 Mathematical Background
 
 ## 4.1 Double Conditional Smoothing
-The double conditional smoothing [@FengPeitz2021] is a spatial smoothing technique which effectively reduces the twodimensional estimation to two onedimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
+The double conditional smoothing [@FengPeitz2021] is a spatial smoothing technique which effectively reduces the twodimensional estimation to two one-dimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
 
 Classical bivariate (and multivariate) regression has been considered e.g. by @Herrmann1995 (kernel regression) and @RuppertWand1994 (local polynomial regression). The DCS provides now a faster and, especially for equidistant data, more efficient smoothing scheme, which leads to reduced computation time. For the DCS procedure implemented in this package, consider a $(n_x \times n_t)$-matrix $\mathbf{Y}$ of non-empty observations $u_{i,j}$ and equidistant covariates $X$, $T$ on $[0,1]$, where $X$ has length $n_x$ and $T$ has length $n_t$. The model is then
 $$
@@ -358,7 +358,7 @@ which is called exponential inflation method (EIM) [@BeranFeng2002a]. The values
 The IPI now starts with an initial bandwidth $h_0$ (chosen to be $h_0 = (0.1, 0.1)$) and calculates in each step $s$ the auxiliary bandwidths $\widetilde{h}_{k,s}$ from $h_{s-1}$ and $h_s$ from the smoothed derivative surfaces using $\widetilde{h}_{k,s}$. The iteration process finishes until a certain threshold is reached.
 
 ## 4.3 Boundary Modification
-In kernel regression, the boundary problem exists, which leads to biased estimated at the boundaries of the regression surface. This problem can (partially) be solved by means of suitable boundary kernels as introduced by @Mueller1991 and @MuellerWang1994. These boundary kernels differ in their degrees of smootheness and hence lead to different estimation results at the boundaries. However, all kernels are similar to the classical kernels in the interior region of the regression.
+In kernel regression, the boundary problem exists, which leads to biased estimated at the boundaries of the regression surface. This problem can (partially) be solved by means of suitable boundary kernels as introduced by @Mueller1991 and @MuellerWang1994. These boundary kernels differ in their degrees of smoothness and hence lead to different estimation results at the boundaries. However, all kernels are similar to the classical kernels in the interior region of the regression.
 
 Following @FengSchaefer2021, a boundary modification is also defined for local polynomial regression. In the *DCSmooth* package, the local polynomial regression is always with boundary modification weights. Kernel types available (either for kernel regression or local polynomial regression) are Müller-type, Müller-Wang-type and truncated kernels, denoted by `M`, `MW` and `T`. In most applications, the Müller-Wang type are the preferred weighting functions.
 
