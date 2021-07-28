@@ -378,6 +378,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sfarima_rss
+double sfarima_rss(const arma::vec theta, const arma::mat R_mat, const List model_order, const int K1, const int K2);
+RcppExport SEXP _DCSmooth_sfarima_rss(SEXP thetaSEXP, SEXP R_matSEXP, SEXP model_orderSEXP, SEXP K1SEXP, SEXP K2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type R_mat(R_matSEXP);
+    Rcpp::traits::input_parameter< const List >::type model_order(model_orderSEXP);
+    Rcpp::traits::input_parameter< const int >::type K1(K1SEXP);
+    Rcpp::traits::input_parameter< const int >::type K2(K2SEXP);
+    rcpp_result_gen = Rcpp::wrap(sfarima_rss(theta, R_mat, model_order, K1, K2));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
@@ -407,6 +422,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_LP_dcs_const1", (DL_FUNC) &_DCSmooth_LP_dcs_const1, 6},
     {"_DCSmooth_LPSmooth_matrix_BMod", (DL_FUNC) &_DCSmooth_LPSmooth_matrix_BMod, 6},
     {"_DCSmooth_LP_dcs_const1_BMod", (DL_FUNC) &_DCSmooth_LP_dcs_const1_BMod, 7},
+    {"_DCSmooth_sfarima_rss", (DL_FUNC) &_DCSmooth_sfarima_rss, 5},
     {NULL, NULL, 0}
 };
 

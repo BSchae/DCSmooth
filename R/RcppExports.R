@@ -109,3 +109,7 @@ LP_dcs_const1_BMod <- function(yMat, hVec, polyOrderVec, drvVec, muVec, weightFc
     .Call('_DCSmooth_LP_dcs_const1_BMod', PACKAGE = 'DCSmooth', yMat, hVec, polyOrderVec, drvVec, muVec, weightFcnPtr_x, weightFcnPtr_t)
 }
 
+sfarima_rss <- function(theta, R_mat, model_order, K1, K2) {
+    .Call('_DCSmooth_sfarima_rss', PACKAGE = 'DCSmooth', theta, R_mat, model_order, K1, K2)
+}
+
