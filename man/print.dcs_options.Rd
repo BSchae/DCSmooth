@@ -12,6 +12,9 @@ to \code{\link{set.options}}.}
 
 \item{...}{Additional arguments passed to \code{print.dcs_options}.}
 }
+\value{
+No return value.
+}
 \description{
 \code{print} method for class \code{"dcs_options"}
 }
