@@ -65,24 +65,24 @@ exception.check.bndw = function(bndw, dcs_options)
   {
     if (!(is.numeric(bndw)) || (length(bndw) != 2))
     {
-      stop("bndw must be a numeric vector of length 2.")
+      stop("Bandwidth h must be a numeric vector of length 2.")
     }
       
     if (any(bndw < 0))
     {
-      stop("bndw must be positive")
+      stop("Bandwidth h must be positive")
     }  
       
     if (any(bndw > 0.45) && dcs_options$type == "KR")
     {
-      stop("bndw must be < 0.45 for kernel regression")
-    }  
+      stop("Bandwidth h must be < 0.45 for kernel regression")
+    } 
       
-    if (any(bndw > 0.5))
-    {
-      warning("bandwidth seems unusually high, computation time might be",
-             "increased.")
-    }  
+    # if (any(bndw > 0.5))
+    # {
+    #   warning("Bandwidth h seems unusually high, computation time might be",
+    #          "increased.")
+    # }  
   }
 }
 

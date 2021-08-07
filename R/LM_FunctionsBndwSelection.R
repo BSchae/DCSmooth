@@ -153,7 +153,7 @@ sfarima.est = function(R_mat, model_order = list(ar = c(1, 1), ma = c(1, 1)),
   theta0 = c(0, rep(0, narma1), 0, rep(0, narma2))
   k.max = 3
   for(k in 1:k.max){
-    result = optim(theta0, sfarima_rss, R_mat = R_mat, model_order = model_order,
+    result = stats::optim(theta0, sfarima_rss, R_mat = R_mat, model_order = model_order,
                    K1 = K1, K2 = K2)
     theta = result$par
     rss = result$value

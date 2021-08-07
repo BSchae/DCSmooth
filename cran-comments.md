@@ -1,3 +1,8 @@
+## Resubmission
+This is a resubmission. In this version:
+* References of the main methods used in the package are added to DESCRIPTION
+* All .Rd files for exported methods include a \value 
+
 ## Test environments
 * R-hub windows-x86_64-devel (r-devel)
 * R-hub ubuntu-gcc-devel (r-devel)

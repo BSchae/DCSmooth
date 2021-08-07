@@ -4,7 +4,7 @@
 #                                                                              #
 ################################################################################
 
-LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
+LP.bndw = function(Y, dcs_options, add_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n = n_x * n_t                   # total number of observations
@@ -25,7 +25,8 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
                                   # (equivalent) kernel function for calculation
                                   # of kernel parameters
   
-  h_opt = c(0.1, 0.1)             # initial (arbitrary) values for h_0
+  h_opt = pmax(c(0.1, 0.1), (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
+                                  # initial (arbitrary) values for h_0
 
   iterate = TRUE                  # iteration indicator
   iteration_count   = 0
@@ -33,9 +34,9 @@ LP.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
   {
     iteration_count = iteration_count + 1
     h_opt_temp = h_opt[1:2]       # store old bandwidths for breaking condition
-    h_infl = inflation.LP(h_opt_temp, dcs_options)  
+    h_infl = inflation.LP(h_opt_temp, dcs_options, n_x, n_t)  
                                   # inflation of bandwidths for drv estimation
-    h_defl = deflation.LP(h_opt_temp, dcs_options)
+    h_defl = deflation.LP(h_opt_temp, dcs_options, n_x, n_t)
                                   # deflation if derivatives are estimated from
                                   # function
    

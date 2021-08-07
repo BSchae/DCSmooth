@@ -6,10 +6,14 @@
 
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR.bndw = function(Y, kernel_x, kernel_t, dcs_options, add_options)
+KR.bndw = function(Y, dcs_options, add_options)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n  = n_x * n_t                            # total number of observations
+  
+  # set kernel Function to use in optimization
+  kernel_x = kernel_fcn_assign(dcs_options$kerns[1])
+  kernel_t = kernel_fcn_assign(dcs_options$kerns[2])
 
   kernel_prop_x = kernel.prop.KR(kernel_x)  # kernel properties R and mu_2
   kernel_prop_t = kernel.prop.KR(kernel_t)

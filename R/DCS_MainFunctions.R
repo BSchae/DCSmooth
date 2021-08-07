@@ -190,6 +190,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   exception.check.Y(Y)
   exception.check.bndw(h, dcs_options)
   exception.check.options(dcs_options)
+  n_x = dim(Y)[1]; n_t = dim(Y)[2]
   
   # process ellipsis arguments from (...)
   {
@@ -199,13 +200,13 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
     
     if (!exists("X", where = args_list))
     {
-      X <- 0:(dim(Y)[1] - 1)/(dim(Y)[1] - 1)
+      X <- 0:(n_x - 1)/(n_x - 1)
     } else {
       X <- args_list$X
     }
     if (!exists("T", where = args_list))
     {
-      T <- 0:(dim(Y)[2] - 1)/(dim(Y)[2] - 1)
+      T <- 0:(n_t - 1)/(n_t - 1)
     } else {
       T <- args_list$T
     }
@@ -234,10 +235,6 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
       add_options$order_max <- list(ar = c(1, 1), ma = c(1, 1))
     }
   }
-  
-  # set kernel Function to use in optimization
-  kernel_x <- kernel_fcn_assign(dcs_options$kerns[1])
-  kernel_t <- kernel_fcn_assign(dcs_options$kerns[2])
 
   #-------Bandwidth Selection-------#
   
@@ -253,12 +250,12 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
     {
       ### kernel regression
       # TODO: allow for derivatives in kernel regression
-      h_select_obj <- KR.bndw(Y, kernel_x, kernel_t, dcs_options, add_options)
+      h_select_obj <- KR.bndw(Y, dcs_options, add_options)
       h_opt <- pmin(h_select_obj$h_opt, c(0.45, 0.45)) 
                                           # KR cannot handle larger bandwidths
     } else if (dcs_options$type == "LP") {
       ### local polynomial regression
-      h_select_obj <- LP.bndw(Y, kernel_x, kernel_t, dcs_options, add_options)
+      h_select_obj <- LP.bndw(Y, dcs_options, add_options)
       h_opt <- h_select_obj$h_opt
     }
     
@@ -280,13 +277,45 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   
   if (dcs_options$type == "KR") # kernel regression
   {
+    ### prepare kernel functions
+      kernel_x <- kernel_fcn_assign(dcs_options$kerns[1])
+      kernel_t <- kernel_fcn_assign(dcs_options$kerns[2])
+      
+    ### check bandwidth
+      if (any(h_opt > c(0.45, 0.45)))
+      {
+        h_opt = pmin(h_opt, c(0.45, 0.45))
+        warning("Bandwidth h too large for \"KR\", changed to largest ",
+                "working value.")
+      }
+    
     dcs_out <- KR_dcs_const0(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
                             kernFcnPtrX = kernel_x,
                             kernFcnPtrT = kernel_t)
   } else if (dcs_options$type == "LP") {     # local polynomial regression
-    dcs_out <- LP_dcs_const0(yMat = Y, hVec = h_opt, polyOrderVec = 
+    ### prepare weight functions
+      # set variables for weight type
+      kern_type_vec = sub("^([[:alpha:]]*).*", "\\1", dcs_options$kern)
+      # extract weighting type
+      mu_vec = as.numeric(substr(dcs_options$kern, 
+                                 nchar(dcs_options$kern) - 1,
+                                 nchar(dcs_options$kern) - 1))
+      # extract kernel parameter mu
+      weight_x = weight_fcn_assign(kern_type_vec[1])
+      weight_t = weight_fcn_assign(kern_type_vec[2])
+    
+    ### check bandwidth
+      if (any(h_opt < (dcs_options$p_order + 2)/(c(n_x, n_t) - 1)))
+      {
+        h_opt = pmax(h_opt, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
+        warning("Bandwidth h too small for \"LP\", changed to smallest ",
+                "working value.")
+      }
+      
+    dcs_out <- LP_dcs_const0_BMod(yMat = Y, hVec = h_opt, polyOrderVec = 
                             dcs_options$p_order, drvVec = dcs_options$drv,
-                            kernFcnPtr_x = kernel_x, kernFcnPtr_t = kernel_t)
+                            muVec = mu_vec, weightFcnPtr_x = weight_x,
+                            weightFcnPtr_t = weight_t)
   }
   
   # calculate residuals

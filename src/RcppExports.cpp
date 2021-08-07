@@ -378,6 +378,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ar_coef
+arma::vec ar_coef(const arma::vec ar, const arma::vec ma, const double d, const int k);
+RcppExport SEXP _DCSmooth_ar_coef(SEXP arSEXP, SEXP maSEXP, SEXP dSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec >::type ar(arSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type ma(maSEXP);
+    Rcpp::traits::input_parameter< const double >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(ar_coef(ar, ma, d, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sfarima_rss
 double sfarima_rss(const arma::vec theta, const arma::mat R_mat, const List model_order, const int K1, const int K2);
 RcppExport SEXP _DCSmooth_sfarima_rss(SEXP thetaSEXP, SEXP R_matSEXP, SEXP model_orderSEXP, SEXP K1SEXP, SEXP K2SEXP) {
@@ -422,6 +436,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_LP_dcs_const1", (DL_FUNC) &_DCSmooth_LP_dcs_const1, 6},
     {"_DCSmooth_LPSmooth_matrix_BMod", (DL_FUNC) &_DCSmooth_LPSmooth_matrix_BMod, 6},
     {"_DCSmooth_LP_dcs_const1_BMod", (DL_FUNC) &_DCSmooth_LP_dcs_const1_BMod, 7},
+    {"_DCSmooth_ar_coef", (DL_FUNC) &_DCSmooth_ar_coef, 4},
     {"_DCSmooth_sfarima_rss", (DL_FUNC) &_DCSmooth_sfarima_rss, 5},
     {NULL, NULL, 0}
 };

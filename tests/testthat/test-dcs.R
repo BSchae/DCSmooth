@@ -19,7 +19,7 @@ test_that("Y has exception handling", {
 })
 
 test_that("dcs_options has exception handling", {
-  Y = matrix(rnorm(100), 10, 10)
+  Y = y.norm1 + matrix(rnorm(101^2), 101, 101)
   expect_error(dcs(Y, dcs_options = "test"),
                "Incorrect options specified, please use")
   dcs_options = set.options()
@@ -34,13 +34,13 @@ test_that("dcs_options has exception handling", {
 })
 
 test_that("dcs_options default values are correct", {
-  Y = matrix(rnorm(100), 10, 10)
+  Y = y.norm1 + matrix(rnorm(101^2), 101, 101)
   dcs_options = set.options()
   expect_equal(dcs(Y)$dcs_options, dcs_options)
 })
 
 test_that("dcs_options is correctly used", {
-  Y = matrix(rnorm(100), 10, 10)
+  Y = y.norm1 + matrix(rnorm(101^2), 101, 101)
   dcs_options = set.options()
   expect_equal(dcs(Y, dcs_options)$dcs_options, dcs_options)
   dcs_options = set.options(type = "KR")
@@ -68,4 +68,43 @@ test_that("model order is actually used", {
   expect_equal(dim(dcs_sarma$var_model$ma), c(2, 4))
   expect_equal(dim(dcs_lm$var_model$ar), c(3, 2))
   expect_equal(dim(dcs_lm$var_model$ma), c(2, 4))
+})
+
+# Test if smoothing works correctly
+context("DCS works correctly (smoothing)")
+
+test_that("given bandwidths are used", {
+  Y = matrix(rnorm(101^2), nrow = 101, ncol = 101)
+  dcs_KR = dcs(Y, h = c(0.1, 0.1), dcs_options = set.options(type = "KR"))
+  dcs_LP = dcs(Y, h = c(0.1, 0.1), dcs_options = set.options(type = "LP"))
+  expect_equal(dcs_KR$h, c(0.1, 0.1))
+  expect_equal(is.numeric(dcs_KR$M), TRUE)
+  expect_equal(dim(dcs_KR$M), c(101, 101))
+  expect_equal(dcs_LP$h, c(0.1, 0.1))
+  expect_equal(is.numeric(dcs_LP$M), TRUE)
+  expect_equal(dim(dcs_LP$M), c(101, 101))
+})
+
+test_that("(too) small bandwidths are handled correctly", {
+  Y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
+  dcs_KR_small = dcs(Y, h = c(0.001, 0.001), 
+                     dcs_options = set.options(type = "KR"))
+  expect_equal(dcs_KR_small$h, c(0.001, 0.001))
+  expect_equal(is.numeric(dcs_KR_small$M), TRUE)
+  expect_equal(dim(dcs_KR_small$M), c(101, 101))
+  expect_warning(dcs(Y, h = c(0.001, 0.001), 
+                   dcs_options = set.options(type = "LP")),
+          "Bandwidth h too small for \"LP\", changed to smallest working value.")
+})
+
+test_that("(too) large bandwidths are handled correctly", {
+  Y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
+  dcs_LP_large = dcs(Y, h = c(0.6, 0.6), 
+                     dcs_options = set.options(type = "LP"))
+  expect_equal(dcs_LP_large$h, c(0.6, 0.6))
+  expect_equal(is.numeric(dcs_LP_large$M), TRUE)
+  expect_equal(dim(dcs_LP_large$M), c(101, 101))
+  expect_error(dcs(Y, h = c(0.6, 0.6), 
+                   dcs_options = set.options(type = "KR")),
+               "Bandwidth h must be < 0.45 for kernel regression")
 })

@@ -26,8 +26,8 @@ This vignette describes the use of the *DCSmooth*-package and its functions
 `dcs`, `set.options`, `surface.3d`, `qarma.est` and `qarma.sim`. This package
 provides some tools for nonparametric estimation of the mean surface $m$ of an
 observed sample of some function 
-$$y(x, t) = m(x, t) + \varepsilon(x, t)$$.
-This package is accompanying @SchaeferFeng2020 and @Schaefer2021. Estimation procedures for long-memory errors is based upon the findings of @Fengetal2020. Boundary modification procedures for local polynomial smoothing are considered by @FengSchaefer2021. For a more comprehensive and detailed description of the algorithms than in section 4, please refer to these papers.
+$$y(x, t) = m(x, t) + \varepsilon(x, t).$$
+This package is accompanying @SchaeferFeng2020. Boundary modification procedures for local polynomial smoothing are considered by @FengSchaefer2021. For a more comprehensive and detailed description of the algorithms than in section 4, please refer to these papers.
 
 The *DCSmooth* contains the following functions, methods and data sets:
 
@@ -92,7 +92,6 @@ summary(set.options(type = "KR"))
 
 Default options for local polynomial regression (`type = "LP"`) are
 ```{r, echo = FALSE, warning = FALSE}
-library(DCSmooth)
 summary(set.options(type = "KR"))
 ```
 
@@ -220,7 +219,7 @@ summary(dcs_iid_KR)
 ```
 
 ###* Local Polynomial regression with iid. errors
-This is the default method, specification of options is not necessary.
+This is the default method, specification of options is not necessary. Note that local polynomial regression requires the bandwidth to cover at least the number of observations of the polynomial order plus one. For small bandwidths or too few observation points in one dimension, local polynomial regression might fail ("Bandwidth h must be larger for local polynomial regression."). It is suggested to use kernel regression in this case.
 ```{r}
 dcs_LP_iid = dcs(y_iid)
 dcs_LP_iid
@@ -279,24 +278,24 @@ dcs_qarma_2
 dcs_qarma_2$var_model
 ```
 
-<!-- ###* Local Polynomial regression with automated order selection -->
-<!-- Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two. -->
+###* Local Polynomial regression with automated order selection
+Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two.
 
-<!-- ```{r} -->
-<!-- # GPAC -->
-<!-- opt_qarma_3 = set.options(var_est = "qarma_gpac") -->
-<!-- dcs_qarma_3 = dcs(y_qarma, opt_qarma_3) -->
+```{r}
+# GPAC
+opt_qarma_3 = set.options(var_est = "qarma_gpac")
+dcs_qarma_3 = dcs(y_qarma, opt_qarma_3)
 
-<!-- dcs_qarma_3 -->
-<!-- dcs_qarma_3$var_model -->
+dcs_qarma_3
+dcs_qarma_3$var_model
 
-<!-- # BIC -->
-<!-- opt_qarma_4 = set.options(var_est = "qarma_bic") -->
-<!-- dcs_qarma_4 = dcs(y_qarma, opt_qarma_4) -->
+# BIC
+opt_qarma_4 = set.options(var_est = "qarma_bic")
+dcs_qarma_4 = dcs(y_qarma, opt_qarma_4)
 
-<!-- dcs_qarma_4 -->
-<!-- dcs_qarma_4$var_model -->
-<!-- ``` -->
+dcs_qarma_4
+dcs_qarma_4$var_model
+```
 
 ## 3.3 Modelling errors with long memory
 This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow a process with long memory. This process is modeled as a spatial FARIMA (SFARIMA). Estimation under long-memory errors is currently in a experimental state.
@@ -333,7 +332,7 @@ dcs_drv_2
 # 4 Mathematical Background
 
 ## 4.1 Double Conditional Smoothing
-The double conditional smoothing [@FengPeitz2021] is a spatial smoothing technique which effectively reduces the twodimensional estimation to two one-dimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
+The double conditional smoothing is a spatial smoothing technique which effectively reduces the twodimensional estimation to two one-dimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
 
 Classical bivariate (and multivariate) regression has been considered e.g. by @Herrmann1995 (kernel regression) and @RuppertWand1994 (local polynomial regression). The DCS provides now a faster and, especially for equidistant data, more efficient smoothing scheme, which leads to reduced computation time. For the DCS procedure implemented in this package, consider a $(n_x \times n_t)$-matrix $\mathbf{Y}$ of non-empty observations $u_{i,j}$ and equidistant covariates $X$, $T$ on $[0,1]$, where $X$ has length $n_x$ and $T$ has length $n_t$. The model is then
 $$
@@ -354,7 +353,7 @@ The bandwidth vector $h = (h_x, h_t)$ is selected via an iterative plug-in (IPI)
 $$
 \widetilde{h}_k = c_k \cdot h_k^{\alpha}, \quad k = x, t
 $$
-which is called exponential inflation method (EIM) [@BeranFeng2002a]. The values of $c_k$ are chosen on simulations, that of $alpha$ are subject to the derivative of interest.
+and is called exponential inflation method (EIM). The values of $c_k$ are chosen on simulations, that of $alpha$ are subject to the derivative of interest.
 The IPI now starts with an initial bandwidth $h_0$ (chosen to be $h_0 = (0.1, 0.1)$) and calculates in each step $s$ the auxiliary bandwidths $\widetilde{h}_{k,s}$ from $h_{s-1}$ and $h_s$ from the smoothed derivative surfaces using $\widetilde{h}_{k,s}$. The iteration process finishes until a certain threshold is reached.
 
 ## 4.3 Boundary Modification

@@ -16,7 +16,13 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
   // get additional information on nX, nT, bndw etc.
   int nRow{ static_cast<int>(yMat.n_rows) };
   int nCol{ static_cast<int>(yMat.n_cols) };
-  int bndw{ std::max(static_cast<int>(h * nCol), polyOrder + 1) };    // calculate absolute bandwidth, decimals will be dumped
+  int bndw{ static_cast<int>(std::ceil(h * (nCol - 1)) - 1) };
+                        // calculate absolute bandwidth, decimals will be dumped
+  if (bndw < polyOrder + 1)
+  {
+    stop("Bandwidth h must be larger for local polynomial regression.");
+  }                     // exception to ensure the matrix X^TWX can be inverted
+  
   arma::mat yMatOut(nRow, nCol);   // result matrix
   
   // enable weight function
@@ -30,30 +36,30 @@ arma::mat LPSmooth_matrix2_BMod(const arma::mat yMat, const double h,
     {
       break;
     }
-    
-    // calculate kernel weights
-    double q{ static_cast<double>(colIndex)/(bndw - 1) };
+      // calculate kernel weights
+    double q{ static_cast<double>(colIndex)/bndw };
     arma::colvec xBound{ arma::regspace(-colIndex, std::min(bndw,
-                         nCol - colIndex - 1)) / (nCol - 1) }; // vector for exogenous variables. is [q, -1]
+                         nCol - colIndex - 1)) / (nCol - 1) };
+                                // vector for exogenous variables. is [q, -1]
     arma::colvec uBound{ - xBound / h };
-    // TODO. Change "1" back to "q" for boundary modification
-    arma::colvec wBound{ (weightFcn(uBound, 1, mu)) };           // computation of weights
+    arma::colvec wBound{ (weightFcn(uBound, q, mu)) };
+                                // computation of weights
 
     // calculate regression weights for linear regression
     arma::mat    xMatBound{ xMatrix(xBound, polyOrder) };
     arma::mat    xMatWeight{ weightMatrix(wBound, xMatBound) };
     arma::mat    weightsMat{ arma::inv(xMatWeight.t() * xMatBound) *
                              xMatWeight.t() };
-    
+
     arma::rowvec weightsLeft{ factorialFunction(drv) * weightsMat.row(drv) };
     arma::rowvec weightsRight{ pow(-1, drv) * weightsLeft }; // pow(-1, drv) ensures the correct sign
-
-    // calculation of estimates (complete column)
+      // calculation of estimates (complete column)
     yMatOut.col(colIndex) = yMat.cols(0, xBound.n_rows - 1) * weightsLeft.t();
     yMatOut.col(nCol - colIndex - 1) = arma::reverse(yMat.cols(nCol -
                               uBound.n_rows, nCol - 1), 1) * weightsRight.t();
   }
-  
+
+    // smoothing over the interior
   if (h < 0.5)
   {
     // calculate weights for interior smoothing

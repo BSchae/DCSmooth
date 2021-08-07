@@ -106,7 +106,7 @@ kernel.prop.KR = function(kernel_fcn, n_int = 5000)
 
 #-----------------bandwidth inflation for derivative estimations---------------#
 
-inflation.LP = function(h, dcs_options)
+inflation.LP = function(h, dcs_options, n_x, n_t)
 {
   if (dcs_options$IPI_options$infl_exp[1] == "auto")
   {
@@ -123,15 +123,23 @@ inflation.LP = function(h, dcs_options)
   h_infl_xx = c(infl_par[1] * h[1]^infl_exp[1], infl_par[2] * h[2]^infl_exp[1])
   h_infl_tt = c(infl_par[2] * h[1]^infl_exp[2], infl_par[1] * h[2]^infl_exp[2])
   
-  return(list(h_xx = h_infl_xx, h_tt = h_infl_tt))
+  # minimum values for LPR
+  h_xx = pmax(h_infl_xx, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
+  h_tt = pmax(h_infl_tt, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
+  
+  return(list(h_xx = h_xx, h_tt = h_tt))
 }
 
-deflation.LP = function(h, dcs_options)
+deflation.LP = function(h, dcs_options, n_x, n_t)
 {
   defl_exp = (dcs_options$p_order[1] + dcs_options$drv[2] + 2)/
               (dcs_options$p_order[1] - dcs_options$drv[1] + 2)
   
   h_defl = c(h[1]^defl_exp, h[2]^defl_exp)
+  
+  # minimum values for LPR
+  h_defl = pmax(h_defl, c((dcs_options$p_order[1] + 1)/(n_x - 1), 
+                      (dcs_options$p_order[2] + 1)/(n_t - 1)))
   
   return(h_defl)
 }
