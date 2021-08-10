@@ -15,7 +15,7 @@ Description: Nonparametric smoothing techniques for
     Methods used in this paper are described in
     Beran/Feng (2002) <doi:10.1198/106186002420>,
     Mueller/Wang (1994) <doi:10.2307/2533197>,
-    Feng/Schaefer (2021) <https://ideas.repec.org/p/pdn/ciepap/144.html>.
+    Feng/Schaefer (2021) <https://ideas.repec.org/p/pdn/ciepap/144.html>, 
     Schaefer/Feng (2021) <https://ideas.repec.org/p/pdn/ciepap/143.html>.
 Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb], Yuanhua Feng [ctb]
 Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>

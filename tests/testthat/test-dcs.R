@@ -51,6 +51,7 @@ test_that("dcs_options is correctly used", {
 context("Variance Estimation")
 
 test_that("model order is actually used", {
+  set.seed(123)
   Y = y.norm1 + rnorm(101^2)
   model_order_test = list(ar = c(2, 1), ma = c(1, 3))
   dcs_iid = dcs(Y, set.options(var_est = "iid"), model_order = model_order_test)

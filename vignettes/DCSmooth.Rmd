@@ -278,24 +278,24 @@ dcs_qarma_2
 dcs_qarma_2$var_model
 ```
 
-###* Local Polynomial regression with automated order selection
-Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two.
+<!-- ###* Local Polynomial regression with automated order selection -->
+<!-- Automated order selection is selected with `var_est = "qarma_gpac"` or `var_est = "qarma_bic` in `set.options()`. The first one uses a generalized partial autocorrelation function for order selection, the second one is based on minimization of the BIC. Order selection for large data sets is slowly in general, however, the BIC variant is the slower among these two. -->
 
-```{r}
-# GPAC
-opt_qarma_3 = set.options(var_est = "qarma_gpac")
-dcs_qarma_3 = dcs(y_qarma, opt_qarma_3)
+<!-- ```{r} -->
+<!-- # GPAC -->
+<!-- opt_qarma_3 = set.options(var_est = "qarma_gpac") -->
+<!-- dcs_qarma_3 = dcs(y_qarma, opt_qarma_3) -->
 
-dcs_qarma_3
-dcs_qarma_3$var_model
+<!-- dcs_qarma_3 -->
+<!-- dcs_qarma_3$var_model -->
 
-# BIC
-opt_qarma_4 = set.options(var_est = "qarma_bic")
-dcs_qarma_4 = dcs(y_qarma, opt_qarma_4)
+<!-- # BIC -->
+<!-- opt_qarma_4 = set.options(var_est = "qarma_bic") -->
+<!-- dcs_qarma_4 = dcs(y_qarma, opt_qarma_4) -->
 
-dcs_qarma_4
-dcs_qarma_4$var_model
-```
+<!-- dcs_qarma_4 -->
+<!-- dcs_qarma_4$var_model -->
+<!-- ``` -->
 
 ## 3.3 Modelling errors with long memory
 This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow a process with long memory. This process is modeled as a spatial FARIMA (SFARIMA). Estimation under long-memory errors is currently in a experimental state.

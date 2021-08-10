@@ -1,7 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version:
-* References of the main methods used in the package are added to DESCRIPTION
-* All .Rd files for exported methods include a \value 
+* References of the main methods used in the package are added to DESCRIPTION.
+* All .Rd files for exported methods include a \value.
 
 ## Test environments
 * R-hub windows-x86_64-devel (r-devel)
@@ -12,9 +12,17 @@ This is a resubmission. In this version:
 ## R CMD check results
 There were no ERRORS or WARNINGS.
 
-* There was 1 NOTE for all platforms
+There was 1 NOTE for all platforms:
 
-  checking CRAN incoming feasibility ... NOTE
+* checking CRAN incoming feasibility ... NOTE
   Maintainer: ‘Bastian Schaefer <bastian.schaefer@uni-paderborn.de>’
   
   New submission
+  
+* Found the following (possibly) invalid DOIs:
+  DOI: 10.2307/2533197
+    From: DESCRIPTION
+    Status: Forbidden
+    Message: 403
+
+  This DOI is correct and works.
