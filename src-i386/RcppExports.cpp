@@ -24,18 +24,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cumsum_part_reverse
-NumericVector cumsum_part_reverse(arma::rowvec vec_1, arma::colvec vec_2);
-RcppExport SEXP _DCSmooth_cumsum_part_reverse(SEXP vec_1SEXP, SEXP vec_2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::rowvec >::type vec_1(vec_1SEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type vec_2(vec_2SEXP);
-    rcpp_result_gen = Rcpp::wrap(cumsum_part_reverse(vec_1, vec_2));
-    return rcpp_result_gen;
-END_RCPP
-}
 // acfMatrix_quarter2
 arma::mat acfMatrix_quarter2(const arma::mat y_Mat);
 RcppExport SEXP _DCSmooth_acfMatrix_quarter2(SEXP y_MatSEXP) {
@@ -367,7 +355,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
-    {"_DCSmooth_cumsum_part_reverse", (DL_FUNC) &_DCSmooth_cumsum_part_reverse, 2},
     {"_DCSmooth_acfMatrix_quarter2", (DL_FUNC) &_DCSmooth_acfMatrix_quarter2, 1},
     {"_DCSmooth_KRSmooth_matrix2", (DL_FUNC) &_DCSmooth_KRSmooth_matrix2, 4},
     {"_DCSmooth_KR_dcs_const0", (DL_FUNC) &_DCSmooth_KR_dcs_const0, 5},

@@ -15,7 +15,7 @@ There were no ERRORS or WARNINGS.
 There was 1 NOTE for all platforms:
 
 * checking CRAN incoming feasibility ... NOTE
-  Maintainer: ‘Bastian Schaefer <bastian.schaefer@uni-paderborn.de>’
+  Maintainer: 'Bastian Schaefer <bastian.schaefer@uni-paderborn.de>'
   
   New submission
   

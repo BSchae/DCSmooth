@@ -95,28 +95,19 @@ int factorialFunction(int value)
   int outValue{ 1 };
   
   for(int count{ 1 }; count <= value; ++count)
-  {
     outValue *= count;
-  }
   
   return outValue;
 }
 
-//[[Rcpp::export]]
-NumericVector cumsum_part_reverse(arma::rowvec vec_1, arma::colvec vec_2)
+arma::colvec cumsum_part_reverse(arma::colvec vec_1, arma::colvec vec_2)
 {
+  arma::colvec vec_out;
   if (vec_1.n_elem != vec_2.n_elem)
-  {
     stop("lengths differ");
-  }
-  
-  NumericVector vec_out(vec_1.n_elem);
   
   for(int i{ 0 }; i < vec_1.n_elem; ++i)
-  {
-    vec_out(i) = as_scalar(vec_1.subvec(0, i) *
-                  arma::reverse(vec_2.subvec(0, i)));
-  }
+    vec_out(i) = vec_1.subvec(0, i).t() * vec_2.subvec(0, i);
   
   return vec_out;
 }

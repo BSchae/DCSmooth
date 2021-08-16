@@ -84,12 +84,16 @@ integral.calc.KR = function(m11, m22, n_sub)
 kernel.prop.LP = function(kernel_fcn, p, drv, n_int = 5000)
 {
   u_seq  = seq(from = -1, to = 1, length.out = (2 * n_int + 1))
-  np_matrix = np_matrix(kernel_fcn, p, n_int)
-  add_weights = m_weights(np_matrix, u_seq, drv)
+  # np_matrix = np_matrix(kernel_fcn, p, n_int)
+  # add_weights = m_weights(np_matrix, u_seq, drv)
+  # 
+  # val_R  = sum((add_weights^2 *
+  #                 kernel_fcn_use(u_seq, q = 1, kernel_fcn))^2)/n_int
+  # val_mu = sum((add_weights * kernel_fcn_use(u_seq, q = 1, kernel_fcn)) *
+  #               u_seq^(p + 1)) / (n_int * factorial(p + 1))
   
-  val_R  = sum((add_weights^2 * 
-                  kernel_fcn_use(u_seq, q = 1, kernel_fcn))^2)/n_int
-  val_mu = sum((add_weights * kernel_fcn_use(u_seq, q = 1, kernel_fcn)) *
+  val_R  = sum(kernel_fcn_use(u_seq, q = 1, kernel_fcn)^2)/n_int
+  val_mu = sum(kernel_fcn_use(u_seq, q = 1, kernel_fcn) *
                 u_seq^(p + 1)) / (n_int * factorial(p + 1))
   
   return(list(R = val_R, mu = val_mu))
