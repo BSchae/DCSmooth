@@ -79,7 +79,7 @@ sfarima.sim <- function(n_x, n_t, model)
   
   n_x = n_x + nstart
   n_t = n_t + nstart
-  eps_mat = matrix(rnorm(n_x * n_t), n_x, n_t) * model$sigma
+  eps_mat = matrix(stats::rnorm(n_x * n_t), n_x, n_t) * model$sigma
   
   ma_inf_x = c(1, stats::ARMAtoMA(ar = ar_x, ma = ma_x, lag.max = k_x))
   d_x = choose(-model$d[1], 0:k_x) * ((-1)^(0:k_x))

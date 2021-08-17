@@ -48,7 +48,7 @@
 #' d = c(0.1, 0.1)
 #' sigma = 0.5
 #' sfarima_model = list(ar = ar, ma = ma, d = d, sigma = sigma)
-#' sfarima_sim = sfarima.sim(100, 100, model = q_model)
+#' sfarima_sim = sfarima.sim(50, 50, model = sfarima_model)
 #' 
 #' ## estimation of SFARIMA process
 #' sfarima.est(sfarima_sim$Y)$model
@@ -74,7 +74,7 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   ma_x = c(1, theta_opt$par[2 + sum(model_order$ar) +
                             seq_len(model_order$ma[1])])
   ma_t = c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] + 
-                            seq_len(model_order$ma[1])])
+                            seq_len(model_order$ma[2])])
   
   # prepare results for output
   ar_mat = ar_x %*% t(ar_t)
