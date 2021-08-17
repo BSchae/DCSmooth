@@ -8,7 +8,13 @@
 
 h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, dcs_options, n_x, n_t)
 {
-  p_order = dcs_options$p_order
+  if (dcs_options$type == "LP")
+  {
+    p_order = dcs_options$p_order
+  } else if (dcs_options$type == "KR") {
+    p_order = c(1, 1)
+  }
+  
   drv_vec = dcs_options$drv
   shrink_par = dcs_options$IPI_options$delta
   k_vec = as.numeric(substr(dcs_options$kern, nchar(dcs_options$kern) - 2,
@@ -55,10 +61,9 @@ cf.estimation.LM = function(R_mat, model_order =
 {
   sfarima = sfarima.est(R_mat, model_order = model_order)
   
-  cf_x = 1/(2*pi) * sum(sfarima$model$ma[, 1])^2 / sum(sfarima$model$ar[, 1])^2
-  cf_t = 1/(2*pi) * sum(sfarima$model$ma[1, ])^2 / sum(sfarima$model$ar[1, ])^2
+  cf_est = 1/(2*pi)^2 * sum(sfarima$model$ma)^2 / sum(sfarima$model$ar)^2 *
+            sfarima$model$sigma^2
   
-  cf_est = cf_x * cf_t * sfarima$model$sigma^2
   var_model = sfarima$model
   var_model$stnry = sfarima$stnry
   

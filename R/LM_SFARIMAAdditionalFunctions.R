@@ -46,9 +46,9 @@
 #'  
 #' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
 #' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-#' d_vec = c(0.1, 0.1)
+#' d = c(0.1, 0.1)
 #' sigma = 0.5
-#' sfarima_model = list(ar = ar, ma = ma, d = d_vec, sigma = sigma)
+#' sfarima_model = list(ar = ar, ma = ma, d = d, sigma = sigma)
 #' 
 #' sfarima_sim = sfarima.sim(100, 100, model = sfarima_model)
 #' surface.dcs(sfarima_sim$Y)
@@ -67,9 +67,9 @@ sfarima.sim <- function(n_x, n_t, model)
   {
     warning("Provided coefficient matrices do not specify a separable process.")
   }
-  if (any(abs(model$d) > 0.5))
+  if (!any(is.numeric(model$d)) || any(abs(model$d) > 0.5))
   {
-    stop("Long memory parameter \"d\" incorrect specified.")
+    stop("Long memory parameter \"d\" incorrectly specified.")
   }
   
 
@@ -82,11 +82,11 @@ sfarima.sim <- function(n_x, n_t, model)
   eps_mat = matrix(rnorm(n_x * n_t), n_x, n_t) * model$sigma
   
   ma_inf_x = c(1, stats::ARMAtoMA(ar = ar_x, ma = ma_x, lag.max = k_x))
-  d_x = choose(-d_vec[1], 0:k_x) * ((-1)^(0:k_x))
+  d_x = choose(-model$d[1], 0:k_x) * ((-1)^(0:k_x))
   coef_x = cumsum_part_reverse(d_x, ma_inf_x)
   
   ma_inf_t = t(c(1, stats::ARMAtoMA(ar = ar_t, ma = ma_t, lag.max = k_t)))
-  d_t = choose(-d_vec[2], 0:k_t) * ((-1)^(0:k_t))
+  d_t = choose(-model$d[2], 0:k_t) * ((-1)^(0:k_t))
   coef_t = cumsum_part_reverse(d_t, ma_inf_t)
   
   X1.sim = X2.sim = matrix(0, n_x, n_t)
