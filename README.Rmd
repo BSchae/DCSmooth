@@ -35,15 +35,10 @@ You can install the released version of DCSmooth from
 install.packages("DCSmooth")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("BSchae/DCSmooth")
 ```
 ## Example
 
-This basic example shows the twodimensional estimation of a single gaussian peak
+This basic example shows the two-dimensional estimation of a single gaussian peak
 function (in `y.norm1`).
 
 ```{r example}

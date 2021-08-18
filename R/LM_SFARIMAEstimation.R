@@ -68,8 +68,8 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   
   # put coefficients into matrices
   d_vec = theta_opt$par[1:2]
-  ar_x = c(1, theta_opt$par[2 + seq_len(model_order$ar[1])])
-  ar_t = c(1, theta_opt$par[2 + model_order$ar[1] + 
+  ar_x = c(1, -theta_opt$par[2 + seq_len(model_order$ar[1])])
+  ar_t = c(1, -theta_opt$par[2 + model_order$ar[1] + 
                              seq_len(model_order$ar[2])])
   ma_x = c(1, theta_opt$par[2 + sum(model_order$ar) +
                             seq_len(model_order$ma[1])])
