@@ -58,7 +58,7 @@
 sfarima.sim <- function(n_x, n_t, model)
 {
   ar_mat = as.matrix(model$ar); ma_mat = as.matrix(model$ma)
-  ar_x = -ar_mat[-1, 1]; ar_t = -ar_mat[1, -1]
+  ar_x = ar_mat[-1, 1]; ar_t = ar_mat[1, -1]
   ma_x = ma_mat[-1, 1]; ma_t = ma_mat[1, -1]
   
   # check if provided model is correctly specified

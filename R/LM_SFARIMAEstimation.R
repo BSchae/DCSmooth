@@ -62,19 +62,19 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   
   theta_init = rep(0, times = sum(unlist(model_order)) + 2)
-  theta_opt  = stats::optim(theta_init, sfarima.rss, R_mat = Y, 
+  theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y, 
                             model_order = model_order,
                             method = "Nelder-Mead")
   
   # put coefficients into matrices
   d_vec = theta_opt$par[1:2]
-  ar_x = c(1, -theta_opt$par[2 + seq_len(model_order$ar[1])])
-  ar_t = c(1, -theta_opt$par[2 + model_order$ar[1] + 
+  ar_x = c(1, theta_opt$par[2 + seq_len(model_order$ar[1])])
+  ar_t = c(1, theta_opt$par[2 + model_order$ar[1] + 
                              seq_len(model_order$ar[2])])
   ma_x = c(1, theta_opt$par[2 + sum(model_order$ar) +
                             seq_len(model_order$ma[1])])
   ma_t = c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] + 
-                            seq_len(model_order$ma[1])])
+                            seq_len(model_order$ma[2])])
   
   # prepare results for output
   ar_mat = ar_x %*% t(ar_t)
