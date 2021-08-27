@@ -85,8 +85,8 @@ KR.bndw = function(Y, dcs_options, add_options)
     if (dcs_options$var_est == "lm") ### Long-memory estimation
     {
       # calculate variance factor
-      var_est = suppressWarnings(cf.estimation.LM(Y - Y_smth,
-                                                  add_options$model_order))
+      var_est = suppressWarnings(sfarima.cf(Y - Y_smth,
+                                            add_options$model_order))
       var_coef = var_est$cf_est
       var_model = var_est$var_model
       

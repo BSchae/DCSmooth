@@ -40,6 +40,11 @@ cf.estimation = function(Y, dcs_options, add_options)
     cf_est = sarma$cf
     var_model = sarma$model
     var_model$stnry = TRUE
+  } else if (dcs_options$var_est == "lm") {
+    sfarima = sfarima.cf(Y, model_order = add_options$model_order)
+    cf_est = sfarima$cf
+    var_model = sfarima$var_model
+    var_model$stnry = sfarima$stnry
   }
   
   if (is.na(cf_est))

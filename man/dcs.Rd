@@ -44,9 +44,7 @@ QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
  \code{time_used} \tab time spend searching for optimal bandwidths (not
   overall runtime of the function). \cr
  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for 
-  estimation of the variance factor. Omitted, if \code{"iid"} is used. \cr
- \code{dcs_options} \tab an object of class \code{cds_options} containing the
-  initial options of the dcs procedure. \cr
+  estimation of the variance factor. Omitted, if \code{"iid"} is used.
 }
 }
 \description{

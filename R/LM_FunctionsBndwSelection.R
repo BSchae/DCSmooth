@@ -56,7 +56,7 @@ h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, dcs_options, n_x, n_t)
   return(c(b1A, b2A))
 }
 
-cf.estimation.LM = function(R_mat, model_order =
+sfarima.cf = function(R_mat, model_order =
                               list(ar = c(1, 1), ma = c(1, 1)))
 {
   sfarima = sfarima.est(R_mat, model_order = model_order)

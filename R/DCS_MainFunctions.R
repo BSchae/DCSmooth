@@ -163,9 +163,7 @@ set.options <- function(    # inside function with default values in arguments
 #'  \code{time_used} \tab time spend searching for optimal bandwidths (not
 #'   overall runtime of the function). \cr
 #'  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for 
-#'   estimation of the variance factor. Omitted, if \code{"iid"} is used. \cr
-#'  \code{dcs_options} \tab an object of class \code{cds_options} containing the
-#'   initial options of the dcs procedure. \cr
+#'   estimation of the variance factor. Omitted, if \code{"iid"} is used.
 #' }
 #' 
 #' @section Details:
@@ -318,23 +316,23 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
                             weightFcnPtr_t = weight_t)
   }
   
-  # calculate residuals
+  # calculate residuals and estimate model
   R <- Y - dcs_out
+  var_model_est <- cf.estimation(R, dcs_options, add_options)
   
   if (h_select_auto == TRUE)
   {
     dcs_out <- list(Y = Y, X = X, T = T, M = dcs_out, R = R, h = h_opt,
                    c_f = h_select_obj$var_coef, 
-                   var_model = h_select_obj$var_model,
+                   var_model = var_model_est$var_model,
                    dcs_options = dcs_options,
                    iterations = h_select_obj$iterations,
                    time_used = difftime(time_end, time_start, units = "secs"))
     attr(dcs_out, "h_select_auto") <- h_select_auto
   } else if (h_select_auto == FALSE) {
-    # probably unadvised, that the dcs object differs according to the type
-    # of h selection
     dcs_out <- list(X = X, T = T, Y = Y, M = dcs_out, R = R, h = h_opt,
-                   c_f = NA, var_model = NA, dcs_options = dcs_options,
+                   c_f = NA, var_model = var_model_est$var_model,
+                   dcs_options = dcs_options,
                    iterations = NA, time_used = NA)
     attr(dcs_out, "h_select_auto") <- h_select_auto
   }
