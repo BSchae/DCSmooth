@@ -1,7 +1,7 @@
 Package: DCSmooth
 Type: Package
 Title: Nonparametric Regression and Bandwidth Selection for Spatial Models
-Version: 1.0.2
+Version: 1.0.3.1
 Authors@R: c(person("Bastian", "Schaefer",
     email = "bastian.schaefer@uni-paderborn.de", role = c("aut", "cre")),
     person("Sebastian", "Letmathe", role = "ctb"))
