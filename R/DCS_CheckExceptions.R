@@ -103,8 +103,7 @@ exception.check.options.input = function(type, kerns, drv, var_est, IPI_options)
   {
     stop("Unsupported values in argument \"drv\".")
   }
-  if (!(var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic", "lm", "sarma",
-                       "np")) ||
+  if (!(var_est %in% dcs_list_var_est) ||
       length(var_est) != 1)
   {
     stop("Unknown values in argument \"var_est\".")
@@ -247,8 +246,7 @@ exception.check.options = function(dcs_opt)
   }
   
   ### Options for variance estimation method
-  if (!(dcs_opt$var_est %in% c("iid", "qarma", "qarma_gpac", "qarma_bic",
-                               "lm", "sarma", "np")))
+  if (!(dcs_opt$var_est %in% dcs_list_var_est))
   {
     stop("unsupported method in var_est.")
   }

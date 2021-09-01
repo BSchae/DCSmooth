@@ -114,6 +114,16 @@ set.options <- function(    # inside function with default values in arguments
     stop("Unknown type \"", type, "\"")
   }
   
+  # change IPI_options for long memory estimation
+  if (!exists("infl_exp", IPI_options) && var_est == "lm")
+  {
+    IPI_options$infl_exp <- c(0.5, 0.5)
+  }
+  if (!exists("infl_par", IPI_options) && var_est == "lm")
+  {
+    IPI_options$infl_par <- c(3, 1)
+  }
+  
   # apply class to output object
   class(options_list) <- "dcs_options"
   
@@ -212,12 +222,12 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
     
     # qarma order if var_est == "qarma"
     if (exists("model_order", where = args_list) &&
-        dcs_options$var_est %in% c("qarma", "lm", "sarma"))
+        dcs_options$var_est %in% c("qarma", "lm", "sarma", "sarma2"))
     {
       exception.check.model_order(args_list$model_order, dcs_options)
       add_options$model_order <- args_list$model_order
     } else if (!exists("model_order", where = args_list) &&
-               dcs_options$var_est %in% c("qarma", "lm", "sarma")) {
+               dcs_options$var_est %in% c("qarma", "lm", "sarma", "sarma2")) {
       add_options$model_order <- list(ar = c(1, 1), ma = c(1, 1))
     }
     # maximum order of order selection is applied
@@ -259,7 +269,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
     
     if (h_select_obj$var_model$stnry == FALSE)
     {
-      warning("QARMA model not stationary, a change of the option ",
+      warning("QARMA/SARMA model not stationary, a change of the option ",
               "\"qarma_order\" is advised.")
     }
     
