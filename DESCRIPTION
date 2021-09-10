@@ -4,7 +4,8 @@ Title: Nonparametric Regression and Bandwidth Selection for Spatial Models
 Version: 1.0.3.1
 Authors@R: c(person("Bastian", "Schaefer",
     email = "bastian.schaefer@uni-paderborn.de", role = c("aut", "cre")),
-    person("Sebastian", "Letmathe", role = "ctb"))
+    person("Sebastian", "Letmathe", role = "ctb"),
+    person("Yuanhua Feng", role = "ctb"))
 Description: Nonparametric smoothing techniques for
     data on a lattice and functional time series. Smoothing is done via
     kernel regression or local polynomial regression, a bandwidth selection
@@ -16,7 +17,7 @@ Description: Nonparametric smoothing techniques for
     Mueller/Wang (1994) <doi:10.2307/2533197>,
     Feng/Schaefer (2021) <https://ideas.repec.org/p/pdn/ciepap/144.html>, 
     Schaefer/Feng (2021) <https://ideas.repec.org/p/pdn/ciepap/143.html>.
-Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb]
+Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb], Yuanhua Feng [ctb]
 Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>
 License: GPL-3
 LazyData: true

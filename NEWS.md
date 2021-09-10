@@ -1,4 +1,8 @@
-# DCSmooth 1.0.1
+# DCSmooth 1.0.3
+* New datasets "temp.nunn" and "temp.yuma" added.
+* Estimation for error terms modeled after separable SARMA included.
+
+# DCSmooth 1.0.2
 * Functions for estimation and simulation of SFARIMA(p, q, d) added.
 
 # DCSmooth 1.0.1

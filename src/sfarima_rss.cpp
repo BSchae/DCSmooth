@@ -82,4 +82,3 @@ double sfarima_rss(const arma::vec theta,
   double rss = arma::accu(arma::pow(e_est, 2));
   return rss;
 }
-
