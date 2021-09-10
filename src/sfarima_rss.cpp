@@ -21,7 +21,7 @@ double sfarima_rss(const arma::vec theta,
   int n1 = R_mat.n_rows;
   int n2 = R_mat.n_cols;
   int Kx = std::min(50, n1);
-  int Kt = std::min(100, n2);
+  int Kt = std::min(50, n2);
   
   double d1 = theta(0);
   double d2 = theta(1);
@@ -82,4 +82,3 @@ double sfarima_rss(const arma::vec theta,
   double rss = arma::accu(arma::pow(e_est, 2));
   return rss;
 }
-
