@@ -60,11 +60,12 @@
 sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  
   theta_init = rep(0, times = sum(unlist(model_order)) + 2)
   theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y, 
                             model_order = model_order,
-                            method = "Nelder-Mead")
+                            lower = c(0, 0, rep(-Inf, sum(unlist(model_order)))),
+                            upper = c(0.495, 0.495, rep(Inf, sum(unlist(model_order)))),
+                            method = "L-BFGS-B")
   
   # put coefficients into matrices
   d_vec = theta_opt$par[1:2]
