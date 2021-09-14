@@ -62,8 +62,8 @@ sfarima.sim <- function(n_x, n_t, model)
   ma_x = ma_mat[-1, 1]; ma_t = ma_mat[1, -1]
   
   # check if provided model is correctly specified
-  if (isFALSE(all.equal(as.matrix(ar_mat[-1, -1]), ar_x %*% ar_t))  ||
-      isFALSE(all.equal(as.matrix(ma_mat[-1, -1]), ma_x %*% ma_t)))
+  if (isFALSE(all.equal(as.matrix(ar_mat[-1, -1]), ar_x %*% t(ar_t)))  ||
+      isFALSE(all.equal(as.matrix(ma_mat[-1, -1]), ma_x %*% t(ma_t))))
   {
     warning("Provided coefficient matrices do not specify a separable process.")
   }

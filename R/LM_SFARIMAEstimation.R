@@ -177,3 +177,59 @@ sfarima.residuals = function(R_mat, model)
   
   return(E_fnl)
 }
+
+###################### new functions ##############################
+sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
+                        restr = NULL, sFUN = min) {
+  if(crit == "bic") {
+    crit.fun = stats::BIC
+  }
+  else if (crit == "aic") {
+    crit.fun = stats::AIC
+  }
+  bic_x =  matrix(0, pmax[1] + 1, qmax[1] + 1)
+  bic_t =  matrix(0, pmax[2] + 1, qmax[2] + 1)
+  R_x = as.vector(Rmat)
+  R_t = as.vector(t(Rmat))
+  for (i in 1:(pmax[1] + 1)) {
+    for (j in 1:(qmax[1] + 1)) {
+      
+      # bic_x[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1, nma = j - 1,
+      #                                                            drange = c(0, 0.5))))
+      
+      bic_x[i, j] = mean(apply(Rmat, 2, FUN = function (x) 
+        crit.fun(suppressWarnings(fracdiff::fracdiff(x, nar = i - 1, nma = j - 1,
+                                                     drange = c(0, 0.5))))))
+    }
+  }
+  for (i in 1:(pmax[2] + 1)) {
+    for (j in 1:(qmax[2] + 1)) {
+      
+      # bic_t[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1, nma = j - 1,
+      #                                                            drange = c(0, 0.5))))
+      
+      bic_t[i, j] = mean(apply(Rmat, 1, FUN = function (x)
+        crit.fun(suppressWarnings(fracdiff::fracdiff(x, nar = i - 1, nma = j - 1,
+                                                     drange = c(0, 0.5))))))
+    }
+  }
+
+  restr = substitute(restr)
+  if(!is.null(restr)){
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x[eval(restr)]), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t[eval(restr)]), arr.ind = TRUE) - 1)
+  } else {
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t), arr.ind = TRUE) - 1)
+  }
+  message("The optimal orders are:")
+  message("p_x = ", ord.opt_x[[1]])
+  message("p_t = ", ord.opt_t[[1]])
+  message("q_x = ", ord.opt_x[[2]])
+  message("q_t = ", ord.opt_t[[2]])
+  names(ord.opt_x) = c("p", "q")
+  names(ord.opt_t) = c("p", "q")
+  return(list(ord.opt_x = ord.opt_x,
+              ord.opt_t = ord.opt_t))   
+} 
+
