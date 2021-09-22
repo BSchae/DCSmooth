@@ -129,3 +129,61 @@ qarma.spectral.density = function(Y, ar, ma, st_dev, omega)
   
   return(spectral_dens_out)
 }
+
+#-----------------------------Order Selection by IC----------------------------#
+
+sarma.ord <- function(Rmat, pmax = c(1, 1), qmax = c(1, 1), crit = "bic",
+                      restr = NULL, sFUN = min) {
+  
+  if(crit == "bic") {
+    crit.fun = stats::BIC
+  }
+  else if (crit == "aic") {
+    crit.fun = stats::AIC
+  }
+  bic_x =  matrix(0, pmax[1] + 1, qmax[1] + 1)
+  bic_t =  matrix(0, pmax[2] + 1, qmax[2] + 1)
+  R_x = as.vector(Rmat)
+  R_t = as.vector(t(Rmat))
+  
+  n.cores = parallel::detectCores(logical = TRUE) - 1
+  #cl <- parallel::makeCluster(n.cores)
+  doParallel::registerDoParallel(n.cores)
+  `%dopar%` = foreach::`%dopar%`
+  `%:%` = foreach::`%:%`
+  
+  bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
+    foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar% {
+      bic = crit.fun(suppressWarnings(stats::arima(R_x,
+                order = c(i - 1, 0, j - 1), include.mean = FALSE)))
+    }
+  
+  bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
+    foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar% {
+      bic = crit.fun(suppressWarnings(stats::arima(R_t,
+                order = c(i - 1, 0, j - 1), include.mean = TRUE)))
+    }
+  
+  doParallel::stopImplicitCluster()
+  
+  restr = substitute(restr)
+  if(!is.null(restr)){
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x[eval(restr)]), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t[eval(restr)]), arr.ind = TRUE) - 1)
+  } else {
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t), arr.ind = TRUE) - 1)
+  }
+  # message("The optimal orders are:")
+  # message("p_x = ", ord.opt_x[[1]])
+  # message("p_t = ", ord.opt_t[[1]])
+  # message("q_x = ", ord.opt_x[[2]])
+  # message("q_t = ", ord.opt_t[[2]])
+  names(ord.opt_x) = c("p", "q")
+  names(ord.opt_t) = c("p", "q")
+  # return(list(ord.opt_x = ord.opt_x,
+  #             ord.opt_t = ord.opt_t))   
+  
+  return(list(ar = c(ord.opt_x[1], ord.opt_t[1]),
+              ma = c(ord.opt_x[2], ord.opt_t[2])))
+}

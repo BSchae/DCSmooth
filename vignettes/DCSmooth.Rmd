@@ -55,6 +55,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `y.norm1`          |  A surface with a single gaussian peak.                 |
 | `y.norm2`          |  A surface with two gaussian peaks.                     |
 | `y.norm3`          |  A surface with two gaussian ridges.                    |
+| `temp.nunn`        |  Temperatures in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
+| `temp.yuma`        |  Temperatures in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
 
 
 # 2 Details of Functions
@@ -202,8 +204,9 @@ The *DCSmooth* package contains the following methods
 | `dcs()`            | `plot`, `print`, `print.summary`, `residuals`, `summary`|
 
 ## 2.3 Data
+This package contains three simulated example data sets and two data sets of temperature surfaces.
 
-There are three simulated example data sets included in the package. Each data set is a matrix of size $101 \times 101$ computed on $[0,1]^2$ for the following functions:
+Each of the three simulated example data sets is a matrix of size $101 \times 101$ computed on $[0,1]^2$ for the following functions:
 
 * **y.norm1** $$\mathcal{N} \left( \begin{pmatrix} 0.5 \\ 0.5 \end{pmatrix}, \begin{pmatrix} 0.05 & 0 \\ 0 & 0.05 \end{pmatrix} \right)$$
 * **y.norm2** $$ \mathcal{N} \left( \begin{pmatrix} 0.5 \\ 0.3 \end{pmatrix}, \begin{pmatrix} 0.1 & 0 \\ 0 & 0.1 \end{pmatrix} \right) + \mathcal{N} \left( \begin{pmatrix} 0.2 \\ 0.8 \end{pmatrix}, \begin{pmatrix} 0.05 & 0 \\ 0 & 0.05 \end{pmatrix} \right) $$
@@ -215,11 +218,12 @@ There are three simulated example data sets included in the package. Each data s
 # surface.dcs(y.norm3)
 ```
 
+The application data sets feature the temperature surfaces of Nunn, CO (`temp.nunn`) and Yuma, AZ (`temp.yuma`). The observations are taken in 2020 in 5-minute intervals and are given in Celsius. Both data sets consist therefore of 288 colums (the intraday observations) and 366 rows (the days). The data is from the U.S. Climate Reference Network database at \url{https://www.ncdc.noaa.gov/crn/qcdatasets.html}. (see Diamond et. al. (2013), \href{https://journals.ametsoc.org/view/journals/bams/94/4/bams-d-12-00170.1.xml}{doi:10.1175/BAMS-D-12-00170.1}).
 
 # 3 Application
 The application of the package is demonstrated at the example of the simulated function values `y.norm1` which represent a gaussian peak on $[0,1]^2$ with $n_x = n_t = 101$ evaluation points. Different models are simulated and estimation using `dcs` is demonstrated. Whenever default options are used, they are not explicitly used as function arguments, instead only when deviating from the defaults, the options are changed.
 
-> Due to file size restrictions, the `surface.dcs` commands in this vignette are commented out. Run the complete code used in section 3 of this vignette by `demo("DCS_demo", package = "DCSmooth")`.
+> In order to keep the file size manageable, the `surface.dcs` commands in this vignette are commented out. Run the complete code used in section 3 of this vignette by `demo("DCS_demo", package = "DCSmooth")`.
 
 ## 3.1 Application of the DCS with iid. errors
 

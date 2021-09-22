@@ -180,7 +180,14 @@ sfarima.residuals = function(R_mat, model)
 
 ###################### new functions ##############################
 sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
-                        restr = NULL, sFUN = min) {
+                        lm = TRUE, restr = NULL, sFUN = min) {
+  if (lm == TRUE)
+  {
+    drange = c(0, 0.5)
+  } else {
+    drange = 0
+  }
+  
   if(crit == "bic") {
     crit.fun = stats::BIC
   }
@@ -200,14 +207,14 @@ sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
   
   bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
     foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar% {
-      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1, nma = j - 1,
-                                                                 drange = c(0, 0.5))))
+      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1,
+            nma = j - 1, drange = c(0, 0.5))))
    }
   
   bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
     foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar% {
-      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1, nma = j - 1,
-                                                                 drange = c(0, 0.5))))
+      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1,
+            nma = j - 1, drange = c(0, 0.5))))
     }
   # for (i in 1:(pmax[2] + 1)) {
   #   for (j in 1:(qmax[2] + 1)) {
@@ -239,5 +246,4 @@ sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
   names(ord.opt_t) = c("p", "q")
   return(list(ord.opt_x = ord.opt_x,
               ord.opt_t = ord.opt_t))   
-} 
-
+}

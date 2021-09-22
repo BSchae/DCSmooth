@@ -182,8 +182,7 @@ qarma.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
   colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
   
-  stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
-                               (nT - max_lag_t - model_order$ar[2])))
+  stdev = sd(innov)
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
                   sigma = stdev), stnry = statTest)
   class(coef_out) = "qarma"

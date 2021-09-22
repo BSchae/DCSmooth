@@ -59,6 +59,10 @@ set.options <- function(    # inside function with default values in arguments
 {
   # get ellipsis
   IPI_options <- list(...)
+  if (exists("IPI_options", IPI_options))
+  {
+    IPI_options = IPI_options$IPI_options
+  }
   
   # check if inputs are vectors
   if (length(kerns) == 1) { kerns <- c(kerns, kerns) }

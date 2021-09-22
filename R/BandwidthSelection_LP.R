@@ -29,7 +29,7 @@ LP.bndw = function(Y, dcs_options, add_options)
                                   # initial (arbitrary) values for h_0
 
   iterate = TRUE                  # iteration indicator
-  iteration_count   = 0
+  iteration_count = 0
   while(iterate)                  # loop for IPI
   {
     iteration_count = iteration_count + 1
