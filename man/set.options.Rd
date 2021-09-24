@@ -8,7 +8,7 @@ set.options(
   type = "LP",
   kerns = c("MW_220", "MW_220"),
   drv = c(0, 0),
-  var_est = "iid",
+  var_model = "iid",
   ...
 )
 }
@@ -25,11 +25,10 @@ is \code{MW_220}, the Mueller-Wang kernel of order \eqn{(2, 2, 0)}.}
 orders to be estimated from the given data. The default is \code{c(0, 0)}. For
 LP-regression, polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}.}
 
-\item{var_est}{the method of estimating the variance coefficient \eqn{c_f}. 
-Currently available are \code{var_est = "iid"} (the default), where an iid. 
-error structure is modeled and \code{var_est = "qarma"}, where a spatial
-ARMA model is applied. Use \code{"qarma_gpac"} for automated order 
-selection.}
+\item{var_model}{the method of estimating the variance coefficient \eqn{c_f}. 
+Currently available are \code{var_model = c("iid", "sarma_HR", "sarma_sep",
+"sarma_RSS", "sfarima_RSS")}. Replacing the argument \code{var_model}. For
+code using \code{var_est}, the argument is converted to \code{var_model}.}
 
 \item{...}{Additional arguments passed to \code{set.options()}. This includes
 \code{IPI_options}, a list containing further options used by the iterative
@@ -44,7 +43,8 @@ Set Options for the DCS procedure
 \section{Details}{
 
 This function is used to set the options for bandwidth selection in the 
-\code{dcs} function. Detailed information can be found in the vignette.
+\code{dcs} function.
+Detailed information can be found in the vignette.
 }
 
 \examples{
@@ -52,7 +52,7 @@ This function is used to set the options for bandwidth selection in the
 
 set.options()
 
-myOpt <- set.options(type = "KR", var_est = "qarma")
+myOpt <- set.options(type = "KR", var_model = "iid")
 y <- y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
 dcs(y, dcs_options = myOpt)
 }

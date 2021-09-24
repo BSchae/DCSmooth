@@ -60,5 +60,5 @@ sfarima.est(sfarima_sim$Y,
 
 }
 \seealso{
-\code{\link{qarma.est}, \link{sfarima.sim}}
+\code{\link{sarma.est}, \link{sfarima.sim}}
 }

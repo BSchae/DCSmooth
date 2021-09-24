@@ -30,13 +30,20 @@ test_that("set.options() gets \"drv\" correctly.",{
   expect_equal(set.options(drv = c(2, 1))$drv, c(2, 1))
 })
 
-test_that("set.options() gets \"var_est\" correctly.",{
-  expect_equal(set.options()$var_est, "iid")
-  expect_equal(set.options(var_est = "qarma")$var_est, "qarma")
-  expect_equal(set.options(var_est = "qarma_gpac")$var_est, "qarma_gpac")
-  expect_equal(set.options(var_est = "qarma_bic")$var_est, "qarma_bic")
-  expect_equal(set.options(var_est = "sarma")$var_est, "sarma")
-  expect_equal(set.options(var_est = "lm")$var_est, "lm")
+test_that("set.options() gets \"var_model\" correctly.",{
+  expect_equal(set.options()$var_model, "iid")
+  expect_equal(set.options(var_model = "sarma_HR")$var_model, "sarma_HR")
+  expect_equal(set.options(var_model = "sarma_sep")$var_model, "sarma_sep")
+  expect_equal(set.options(var_model = "sarma_RSS")$var_model, "sarma_RSS")
+  expect_equal(set.options(var_model = "sfarima_RSS")$var_model, "sfarima_RSS")
+})
+
+test_that("set.options() converts \"var_est\" correctly.",{
+  expect_equal(set.options(var_est = "iid")$var_model, "iid")
+  expect_equal(set.options(var_est = "qarma")$var_model, "sarma_HR")
+  expect_equal(set.options(var_est = "sarma")$var_model, "sarma_sep")
+  expect_equal(set.options(var_est = "lm")$var_model, "sfarima_RSS")
+  expect_warning(set.options(var_est = "qarma_gpac")$var_model, "For automatic")
 })
 
 test_that("set.options() gets \"IPI_options\" correctly.",{

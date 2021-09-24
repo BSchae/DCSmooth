@@ -4,52 +4,46 @@
 #                                                                              #
 ################################################################################
 
-# Different methods for estimation of the cf coefficient for bandwidth
-# selection are joined in this function
+# Estimation of the cf coefficient for bandwidth selection
+
+# cf.estimation
+  # cf.from.model
 
 # Y should be the residuals, e.g. Y - YSmth in the estimation codes
 cf.estimation = function(Y, dcs_options, add_options)
 {
-  if (dcs_options$var_est == "iid")
+  if (!is.list(add_options$model_order) && length(add_options$model_order) == 1)
+  {
+    model_order = sarma.order(Y, method = "sep", criterion = "bic",
+                              order_max = add_options$order_max)
+  } else {
+    model_order = add_options$model_order
+  }
+  
+  
+  if (dcs_options$var_model == "iid")
   {
     cf_est = stats::sd(Y)^2
-    var_model = list(sigma = stats::sd(Y), stnry = TRUE)
-  } else if (dcs_options$var_est == "qarma") {
-    qarma = qarma.cf(Y, model_order = add_options$model_order)
-    cf_est = qarma$cf
-    var_model = qarma$qarma_model$model
-    var_model$stnry = qarma$qarma_model$stnry
-  } else if (dcs_options$var_est == "qarma_gpac") {
-    model_order = qarma.order.gpac(Y, order_max = add_options$order_max)
-    qarma = qarma.cf(Y, model_order = model_order)
-    cf_est = qarma$cf
-    var_model = qarma$qarma_model$model
-    var_model$stnry = qarma$qarma_model$stnry
-  } else if (dcs_options$var_est == "qarma_bic") {
-    model_order = qarma.order.bic(Y, order_max = add_options$order_max)
-    qarma = qarma.cf(Y, model_order = model_order)
-    cf_est = qarma$cf
-    var_model = qarma$qarma_model$model
-    var_model$stnry = qarma$qarma_model$stnry
-  } else if (dcs_options$var_est == "np") {
+    model_est = list(model = list(sigma = stats::sd(Y)), stnry = TRUE)
+  } else if (dcs_options$var_model == "sarma_HR") {
+    sarma_HR = sarma.HR.est(Y, model_order = model_order)
+    cf_est = cf.from.model(sarma_HR$model)
+    model_est = sarma_HR
+  } else if (dcs_options$var_model == "np") {
     cf_est = specDens(Y, omega = c(0, 0))$cf
-    var_model = NA
-    var_model$stnry = TRUE
-  } else if (dcs_options$var_est == "sarma") {
-    sarma = sarma.cf(Y, model_order = add_options$model_order)
-    cf_est = sarma$cf
-    var_model = sarma$model
-    var_model$stnry = sarma$model$stnry
-  } else if (dcs_options$var_est == "sarma2") {
-    sarma = sarma2.cf(Y, model_order = add_options$model_order)
-    cf_est = sarma$cf
-    var_model = sarma$model
-    var_model$stnry = sarma$model$stnry
-  } else if (dcs_options$var_est == "lm") {
-    sfarima = sfarima.cf(Y, model_order = add_options$model_order)
+    model_est = list(stnry = TRUE)
+  } else if (dcs_options$var_model == "sarma_sep") {
+    sarma_sep = sarma.sep.est(Y, model_order = model_order)
+    cf_est = cf.from.model(sarma_sep$model)
+    model_est = sarma_sep
+  } else if (dcs_options$var_model == "sarma_RSS") {
+    sarma_RSS = sarma.RSS.est(Y, model_order = model_order)
+    cf_est = cf.from.model(sarma_RSS$model)
+    model_est = sarma_RSS
+  } else if (dcs_options$var_model == "sfarima_RSS") {
+    sfarima = sfarima.cf(Y, model_order = model_order)
     cf_est = sfarima$cf
-    var_model = sfarima$var_model
-    var_model$stnry = sfarima$stnry
+    model_est = sfarima$var_model
   }
   
   if (is.na(cf_est))
@@ -57,5 +51,12 @@ cf.estimation = function(Y, dcs_options, add_options)
     stop("Non-finite variance estimated. Check input matrix Y.")
   }
   
-  return(list(cf_est = cf_est, var_model = var_model))
+  return(list(cf_est = cf_est, model_est = model_est))
+}
+
+# Calculate c_f from estimated model
+
+cf.from.model = function(sarma_model)
+{
+  sum(sarma_model$ma)^2/sum(sarma_model$ar)^2 * sarma_model$sigma^2
 }

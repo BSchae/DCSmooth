@@ -82,7 +82,7 @@ KR.bndw = function(Y, dcs_options, add_options)
     }
     
     ### Estimation of Variance Factor and Model ###
-    if (dcs_options$var_est == "lm") ### Long-memory estimation
+    if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
     {
       # calculate variance factor
       var_est = suppressWarnings(sfarima.cf(Y - Y_smth,
@@ -98,7 +98,7 @@ KR.bndw = function(Y, dcs_options, add_options)
       var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
                                                  add_options))
       var_coef  = var_est$cf_est
-      var_model = var_est$var_model
+      var_model = var_est$model_est
       
       # calculate optimal bandwidths for next step
       h_opt = h.opt.KR(mxx, mtt, var_coef, n, n_sub, kernel_prop_x,

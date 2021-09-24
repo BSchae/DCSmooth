@@ -20,13 +20,15 @@ carried out by the iterative plug-in algorithm.}
 
 \item{...}{Additional arguments passed to \code{dcs}. These might include
 numerical vectors \code{X} and/or \code{T} containing the exogenous
-covariates with respect to the rows and columns. If \code{var_est} is any of
-\code{"qarma"}, \code{"sarma"} or \code{"lm"}, \code{model_order} is an 
-optional list containing the two-dimensional model orders in the form 
-\code{list(ar = c(1, 1), ma = c(1, 1)}. If \code{var_est} is any of
-\code{"qarma_gpac"} or \code{"qarma_bic"}, \code{order_max} an optional list
-containing the two dimensional maximum orders for the order selection of the
-QARMA estimation in the form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
+covariates with respect to the rows and columns. If the error term model in 
+\code{set.options()$var_model} is any of the available parametric models
+(SARMA, SFARIMA), \code{model_order} is either an optional list containing
+the two-dimensional model orders in the form
+\code{list(ar = c(1, 1), ma = c(1, 1)} or a character string specifying
+an order selection criterion by \code{c("AIC", "BIC", "gpac")}. In the case
+of automatic order selection, \code{order_max} is an optional list
+containing the two-dimensional maximum orders for the order selection in the
+form \code{list(ar = c(1, 1), ma = c(1, 1)}.}
 }
 \value{
 \code{DCSmooth} returns an object of class "dcs", including

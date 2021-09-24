@@ -37,7 +37,7 @@
 #'   model is stationary.\cr
 #' }
 #' 
-#' @seealso \code{\link{qarma.est}, \link{sfarima.sim}}
+#' @seealso \code{\link{sarma.est}, \link{sfarima.sim}}
 #' 
 #' @examples
 #' # See vignette("DCSmooth") for examples and explanation
@@ -85,7 +85,7 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   innov = sfarima.residuals(R_mat = Y, model = model)
   
   # check stationarity
-  statTest = qarma.statTest(ar_mat)
+  statTest = sarma.statTest(ar_mat)
   if (!statTest)
   {
     warning("SFARIMA model not stationary, try another order for the AR-parts.")
@@ -93,7 +93,7 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
                                   d = d_vec, sigma = stdev), stnry = statTest)
-  class(coef_out) = "qarma"
+  class(coef_out) = "sfarima"
   attr(coef_out, "subclass") = "est"
   return(coef_out)
 }

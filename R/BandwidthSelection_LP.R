@@ -91,7 +91,7 @@ LP.bndw = function(Y, dcs_options, add_options)
       n_sub = n                           # all observations are used
     }
     
-    if (dcs_options$var_est == "lm") ### Long-memory estimation
+    if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
     {
       # calculate variance factor
       var_est = suppressWarnings(sfarima.cf(Y - Y_smth,
@@ -100,14 +100,14 @@ LP.bndw = function(Y, dcs_options, add_options)
       var_model = var_est$var_model
 
       # calculate optimal bandwidths for next step
-      h_opt = h.opt.LM(mxx, mtt, var_coef, var_model, n_sub, dcs_options, 
+      h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 
                        n_x, n_t)
     } else {                         ### Short-memory or iid. estimation
       # calculate variance factor
       var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
                                                  add_options))
       var_coef  = var_est$cf_est
-      var_model = var_est$var_model
+      var_model = var_est$model_est
       
       # calculate optimal bandwidths for next step
       h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,

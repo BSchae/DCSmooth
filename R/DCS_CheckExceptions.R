@@ -77,19 +77,14 @@ exception.check.bndw = function(bndw, dcs_options)
     {
       stop("Bandwidth h must be < 0.45 for kernel regression")
     } 
-      
-    # if (any(bndw > 0.5))
-    # {
-    #   warning("Bandwidth h seems unusually high, computation time might be",
-    #          "increased.")
-    # }  
   }
 }
 
 #-----------------------Check for correct Options------------------------------#
 
 # Check input for set.options()
-exception.check.options.input = function(type, kerns, drv, var_est, IPI_options)
+exception.check.options.input = function(type, kerns, drv, var_model,
+                                         IPI_options)
 {
   if (length(type) != 1 || !(type %in% c("LP", "KR")))
   {
@@ -103,10 +98,10 @@ exception.check.options.input = function(type, kerns, drv, var_est, IPI_options)
   {
     stop("Unsupported values in argument \"drv\".")
   }
-  if (!(var_est %in% dcs_list_var_est) ||
-      length(var_est) != 1)
+  if (!(var_model %in% dcs_list_var_model) ||
+      length(var_model) != 1)
   {
-    stop("Unknown values in argument \"var_est\".")
+    stop("Unknown values in argument \"var_model\".")
   }
   
   # IPI_options
@@ -246,9 +241,9 @@ exception.check.options = function(dcs_opt)
   }
   
   ### Options for variance estimation method
-  if (!(dcs_opt$var_est %in% dcs_list_var_est))
+  if (!(dcs_opt$var_model %in% dcs_list_var_model))
   {
-    stop("unsupported method in var_est.")
+    stop("unsupported method in \"var_model\".")
   }
 }
 
@@ -256,7 +251,24 @@ exception.check.options = function(dcs_opt)
 
 exception.check.model_order = function(model_order, dcs_options)
 {
-  if (!(exists("ar", model_order) && exists("ma", model_order)))
+  if (dcs_options$var_model[1] == "iid")
+  {
+    message("argument \"model_order\" is unused for iid. errors.")
+  }
+  
+  if (!is.list(model_order) && (length(model_order) == 1 &&
+      model_order %in% c("aic", "bic", "gpac")))
+  {
+    return(NULL)
+  }
+  
+  if (!is.list(model_order) && (length(model_order) != 1 ||
+      !(model_order %in% c("aic", "bic", "gpac"))))
+  {
+    stop("unknown model selection criterion specified in \"model_order\".")
+  }
+  if (is.list(model_order) && !(exists("ar", model_order) &&
+                                exists("ma", model_order)))
   {
     stop("\"model_order\" incorrectly specified.")
   }
@@ -267,6 +279,24 @@ exception.check.model_order = function(model_order, dcs_options)
   }
   if (!is.numeric(model_order$ma) || length(model_order$ma) != 2 ||
       any(model_order$ma < 0))
+  {
+    stop("MA order of \"model_order\" incorrectly specified")
+  }
+}
+
+exception.check.order_max = function(order_max)
+{
+  if (!(exists("ar", order_max) && exists("ma", order_max)))
+  {
+    stop("\"order_max\" incorrectly specified.")
+  }
+  if (!is.numeric(order_max$ar) || length(order_max$ar) != 2 ||
+      any(order_max$ar < 0))
+  {
+    stop("AR order of \"order_max\" incorrectly specified")
+  }
+  if (!is.numeric(order_max$ma) || length(order_max$ma) != 2 ||
+      any(order_max$ma < 0))
   {
     stop("MA order of \"model_order\" incorrectly specified")
   }
