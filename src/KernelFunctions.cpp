@@ -44,7 +44,8 @@ XPtr<weightPtr> weight_fcn_assign(std::string fstr) {
 // Müller-Wang kernels
 // Form is: Type_k_mu_nu
 
-arma::vec kernFkt_MW200(arma::vec& u, double q = 1)
+// [[Rcpp::export]]
+arma::vec kern_fcn_MW200(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec q2{ pow(qVec, 2) };
@@ -54,7 +55,7 @@ arma::vec kernFkt_MW200(arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW210(arma::vec& u, double q = 1)
+arma::vec kern_fcn_MW210(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) };
@@ -65,7 +66,7 @@ arma::vec kernFkt_MW210(arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW220(arma::vec& uVec, double q)
+arma::vec kern_fcn_MW220(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -87,7 +88,7 @@ arma::vec kernFkt_MW220(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW320(arma::vec& u, double q = 1)
+arma::vec kern_fcn_MW320(arma::vec& u, double q = 1)
 {
   arma::vec qVec{ arma::vec(u.n_rows).fill(q) };
   arma::vec wq{ (1 + u) % (1 + u) % (qVec - u) };
@@ -103,7 +104,7 @@ arma::vec kernFkt_MW320(arma::vec& u, double q = 1)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW420(arma::vec& uVec, double q)
+arma::vec kern_fcn_MW420(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -132,7 +133,7 @@ arma::vec kernFkt_MW420(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW421(arma::vec& uVec, double q)
+arma::vec kern_fcn_MW421(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -166,7 +167,7 @@ arma::vec kernFkt_MW421(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_MW422(arma::vec& uVec, double q)
+arma::vec kern_fcn_MW422(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -195,7 +196,7 @@ arma::vec kernFkt_MW422(arma::vec& uVec, double q)
 // Form is 
 
 // [[Rcpp::export]]
-arma::vec kernFkt_TR420(arma::vec& uVec, double q)
+arma::vec kern_fcn_TR420(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -244,7 +245,7 @@ arma::vec kernFkt_TR420(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-arma::vec kernFkt_TR422(arma::vec& uVec, double q)
+arma::vec kern_fcn_TR422(arma::vec& uVec, double q)
 {
   arma::uword nBound{ uVec.size() };
   
@@ -289,27 +290,28 @@ arma::vec kernFkt_TR422(arma::vec& uVec, double q)
 }
 
 // [[Rcpp::export]]
-XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
+Rcpp::XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
   if (fstr == "MW_200")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW200)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW200)));
   else if (fstr == "MW_210")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW210)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW210)));
   else if (fstr == "MW_220")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW220)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW220)));
   else if (fstr == "MW_320")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW320)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW320)));
   else if (fstr == "MW_420")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW420)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW420)));
   else if (fstr == "MW_422")
-    return(XPtr<funcPtr>(new funcPtr(&kernFkt_MW422)));
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW422)));
   else
     return XPtr<funcPtr>(R_NilValue); // runtime error as NULL no XPtr
 }
 
 // [[Rcpp::export]]
-arma::vec kernel_fcn_use(arma::vec x, double q, SEXP xpsexp) {
+arma::vec kernel_fcn_use(arma::vec x, double q, SEXP xpsexp)
+{
   XPtr<funcPtr> xpfun(xpsexp);
   funcPtr fun = *xpfun;
   arma::vec y = fun(x, q);
-  return y;
+  return y; 
 }

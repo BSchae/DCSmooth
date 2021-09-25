@@ -1,3 +1,15 @@
+################################################################################
+#                                                                              #
+#                      DCSmooth Package: Methods for DCS                       #
+#                                                                              #
+################################################################################
+
+# Includes all methods for summarizing, printing and plotting classes "dcs" and
+# "dcs_options".
+
+# summary.dcs
+  # print.summary_dcs
+
 #------------------------------Summary Methods---------------------------------#
 
 #' Summarizing Results from Double Conditional Smoothing
@@ -35,10 +47,10 @@
 #'  \code{time_used} \tab time spend searching for optimal bandwidths (not 
 #'   overall runtime of the function). \cr
 #'  \code{var_est} \tab estimated variance model. Has class "sarma" if an
-#'   SARMA model is used and class "sfarima" if an SFARIMA model is used.
-#'  \code{var_model_id} \tab identifier for the variance model estimated.
+#'   SARMA model is used and class "sfarima" if an SFARIMA model is used.\cr
+#'  \code{var_model_id} \tab identifier for the variance model estimated. \cr
 #'  \code{var_model_order} \tab order of the estimated variance model, if either
-#'   SARMA or SFARIMA is used.
+#'   SARMA or SFARIMA is used. \cr
 #'  \code{dcs_options} \tab an object of class \code{cds_options} containing the
 #'   initial options of the dcs procedure. \cr
 #' }

@@ -10,6 +10,8 @@
 
 # dcs (exported)
 
+# surface.dcs (exported)
+
 
 #------------------------Set Options via Function------------------------------#
 
@@ -185,13 +187,14 @@ set.options <- function(    # inside function with default values in arguments
 #'  \code{R} \tab matrix of residuals of estimation, \eqn{Y - M}. \cr
 #'  \code{h} \tab optimized or given bandwidths. \cr
 #'  \code{c_f} \tab estimated variance coefficient. \cr
+#'  \code{var_est} \tab estimated variance model. If the variance function is
+#'   modeled by an SARMA/SFARIMA, \code{var_est} is an object of class "sarma"/
+#'   "sfarima".\cr
 #'  \code{dcs_options} \tab an object of class \code{cds_options} containing the
 #'   initial options of the dcs procedure. \cr
 #'  \code{iterations} \tab number of iterations of the IPI-procedure. \cr
 #'  \code{time_used} \tab time spend searching for optimal bandwidths (not
 #'   overall runtime of the function). \cr
-#'  \code{qarma} \tab optional return, if method \code{"qarma"} is chosen for 
-#'   estimation of the variance factor. Omitted, if \code{"iid"} is used.
 #' }
 #' 
 #' @section Details:
@@ -346,11 +349,15 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   R <- Y - Y_smth_out
   var_model_est <- cf.estimation(R, dcs_options, add_options)
   
+  # output of var_model for downstream compatibility
+  var_model = var_model_est$model
+  
   if (h_select_auto == TRUE)
   {
     dcs_out <- list(Y = Y, X = X, T = T, M = Y_smth_out, R = R, h = h_opt,
                    c_f = h_select_obj$var_coef, 
                    var_est = var_model_est$model_est,
+                   #var_model = var_model,
                    dcs_options = dcs_options,
                    iterations = h_select_obj$iterations,
                    time_used = difftime(time_end, time_start, units = "secs"))
@@ -358,6 +365,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   } else if (h_select_auto == FALSE) {
     dcs_out <- list(X = X, T = T, Y = Y, M = Y_smth_out, R = R, h = h_opt,
                    c_f = NA, var_est = var_model_est$model_est,
+                   #var_model = var_model,
                    dcs_options = dcs_options,
                    iterations = NA, time_used = NA)
     attr(dcs_out, "h_select_auto") <- h_select_auto
@@ -434,4 +442,55 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
   } else {
     .plotly.3d(Y = Y, ...)
   }
+}
+
+#-------------------Assign Kernel from Package to Function---------------------#
+
+#' Assign a Kernel Function
+#' 
+#' @section Details:
+#' \code{kernel.assign} sets a pointer to a specified kernel function available 
+#'  in the DCSmooth package. The kernels are boundary kernels of the form
+#'  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
+#'  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
+#'  or truncated kernels ("TR"). The following kernels are available:
+#' @eval dcs_list_kernels
+#'  
+#' @param kernel_id a string specifying the kernel identifier as given in the
+#'  details.
+#' 
+#' @return \code{kernel.assign} returns an object of class "function". This
+#'  function takes two arguments, a numeric vector in the first argument and a
+#'  single number in the second.
+#'  
+#' @references
+#'  Müller, H.-G. and Wang, J.-L. (1994). Hazard rate estimation under random
+#'  censoring with varying kernels and bandwidths. Biometrics, 50:61-76.
+#'  
+#'  Müller, H.-G. (1991). Smooth optimum kernel estimators near endpoints.
+#'  Biometrika, 78:521-530.
+#' 
+#' @examples
+#' # See vignette("DCSmooth") for examples and explanation
+#' 
+#' u = seq(from = -1, to = 0.5, length.out = 151)
+#' kern_MW220 = kernel.assign("MW_220")
+#' k = kern_MW220(u, 0.5)
+#' plot(u, k, type = "l") 
+#' 
+#' @export
+#' 
+
+kernel.assign = function(kernel_id)
+{
+  # check for correct input
+  if (!(kernel_id %in% dcs_list_kernels))
+  {
+    stop("unknown kernel identifier. Use one of ", dcs_list_kernels)
+  } else {
+    kernel_fcn_id = paste0("kern_fcn_", gsub("_", "", kernel_id))
+    kern_out = get(kernel_fcn_id)
+  }
+  
+  return(kern_out)
 }
