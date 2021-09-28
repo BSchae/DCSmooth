@@ -56,17 +56,17 @@ test_that("model order is actually used", {
   ma = c(1, 0.5) %*% t(c(1, -0.1))
   Y = y.norm1 + rnorm(101^2)
   model_order_test = list(ar = c(2, 1), ma = c(1, 3))
-  dcs_iid = dcs(Y, set.options(var_model = "iid"),
-                model_order = model_order_test)
+  dcs_iid = dcs(Y, set.options(var_model = "iid",
+                               model_order = model_order_test))
   Y = y.norm1 + sarma.sim(101, 101, model = list(ar = ar, ma = ma, sigma = 1))$Y
-  dcs_qarma = dcs(Y, set.options(var_model = "sarma_HR"), 
-                  model_order = model_order_test)
-  dcs_sarma = dcs(Y, set.options(var_model = "sarma_sep"), 
-                  model_order = model_order_test)
+  dcs_qarma = dcs(Y, set.options(var_model = "sarma_HR", 
+                  model_order = model_order_test))
+  dcs_sarma = dcs(Y, set.options(var_model = "sarma_sep", 
+                  model_order = model_order_test))
   Y = y.norm1 + sfarima.sim(101, 101, model = list(ar = ar, ma = ma, 
                                               d = c(0.1, 0.1), sigma = 1))$Y
-  dcs_lm = dcs(Y, set.options(var_model = "sfarima_RSS"),
-               model_order = model_order_test)
+  dcs_lm = dcs(Y, set.options(var_model = "sfarima_sep",
+               model_order = model_order_test))
   
   expect_equal(dim(dcs_iid$var_est$model$ar), NULL)
   expect_equal(dim(dcs_iid$var_est$model$ma), NULL)
@@ -109,11 +109,11 @@ test_that("error term model is estimated under given bandwidths", {
   Y = y.norm1 + sarma.sim(101, 101, model = list(ar = ar_mat, ma = ma_mat, 
                                                  sigma = 1))$Y
   dcs_KR = dcs(Y, h = c(0.1, 0.1), dcs_options = set.options(type = "KR", 
-                                                      var_model = "sarma_HR"),
-               model_order = list(ar = c(2, 1), ma = c(1, 1)))
+                                                      var_model = "sarma_HR",
+               model_order = list(ar = c(2, 1), ma = c(1, 1))))
   dcs_LP = dcs(Y, h = c(0.1, 0.1), dcs_options = set.options(type = "LP", 
-                                                      var_model = "sarma_HR"),
-               model_order = list(ar = c(2, 1), ma = c(1, 1)))
+                                                      var_model = "sarma_HR",
+               model_order = list(ar = c(2, 1), ma = c(1, 1))))
   expect_equal(length(dcs_KR$var_est$model$sigma), 1)
   expect_equal(dim(dcs_KR$var_est$model$ar), c(3, 2))
   expect_equal(dim(dcs_KR$var_est$model$ma), c(2, 2))

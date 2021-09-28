@@ -35,14 +35,14 @@ test_that("set.options() gets \"var_model\" correctly.",{
   expect_equal(set.options(var_model = "sarma_HR")$var_model, "sarma_HR")
   expect_equal(set.options(var_model = "sarma_sep")$var_model, "sarma_sep")
   expect_equal(set.options(var_model = "sarma_RSS")$var_model, "sarma_RSS")
-  expect_equal(set.options(var_model = "sfarima_RSS")$var_model, "sfarima_RSS")
+  expect_equal(set.options(var_model = "sfarima_sep")$var_model, "sfarima_sep")
 })
 
 test_that("set.options() converts \"var_est\" correctly.",{
   expect_equal(set.options(var_est = "iid")$var_model, "iid")
   expect_equal(set.options(var_est = "qarma")$var_model, "sarma_HR")
   expect_equal(set.options(var_est = "sarma")$var_model, "sarma_sep")
-  expect_equal(set.options(var_est = "lm")$var_model, "sfarima_RSS")
+  expect_equal(set.options(var_est = "lm")$var_model, "sfarima_sep")
   expect_warning(set.options(var_est = "qarma_gpac")$var_model, "For automatic")
 })
 
@@ -62,4 +62,22 @@ test_that("set.options() gives correct error messages for problems", {
   expect_error(set.options(type = "test"), "Unsupported values in argument")
   expect_error(set.options(type = c("KR", "LP")),
                "Unsupported values in argument")
+})
+
+test_that("set.options() gets additional options correctly.",{
+  order_list = list(ar = c(1, 1), ma = c(1, 1))
+  
+  expect_message(set.options(model_order = order_list), "unused for iid.")
+  expect_message(set.options(model_order = "bic"), "unused for iid.")
+  expect_equal(set.options(var_model = "sarma_sep", 
+                           model_order = order_list)$add_options$model_order,
+               order_list)
+  expect_equal(set.options(var_model = "sarma_sep", 
+                           model_order = "bic")$add_options$model_order, "bic")
+  expect_equal(set.options(var_model = "sarma_sep", 
+                           model_order = "bic")$add_options$order_max,
+               order_list)
+  expect_equal(set.options(var_model = "sarma_sep", 
+                           model_order = "bic")$add_options$order_max,
+               order_list)
 })

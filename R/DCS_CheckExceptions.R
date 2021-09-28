@@ -245,13 +245,25 @@ exception.check.options = function(dcs_opt)
   {
     stop("unsupported method in \"var_model\".")
   }
+  
+  ### Model selection options
+  if (exists("model_order", dcs_opt$add_options))
+  {
+    exception.check.model_order(dcs_opt$add_options$model_order,
+                                dcs_opt$var_model)
+  }
+  if (exists("order_max", dcs_opt$add_options))
+  {
+    exception.check.order_max(dcs_opt$add_options$order_max)
+  }
+  
 }
 
 #---------------------------Check additional Options---------------------------#
 
-exception.check.model_order = function(model_order, dcs_options)
+exception.check.model_order = function(model_order, var_model)
 {
-  if (dcs_options$var_model[1] == "iid")
+  if (var_model[1] == "iid")
   {
     message("argument \"model_order\" is unused for iid. errors.")
   }

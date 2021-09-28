@@ -1,15 +1,11 @@
 # DCSmooth 1.1.1
 * Estimation of variance model revised.
-* set.options takes argument var_model = c("iid", "sarma_HR", "sarma_sep",
-  "sarma_RSS", "sfarima_RSS") instead of var_est. However, var_est is still 
-  available for downstream compatibility, with the old identifiers.
-* The notation "QARMA" and "SARMA" has been unified to "SARMA" for all spatial  
-  ARMA models.
-* Functions qarma.est(), qarma.sim() have been replaced by sarma.est() and 
-  sarma.sim(). They are still available and link to the new functions.
+* set.options takes argument var_model = c("iid", "sarma_HR", "sarma_sep", "sarma_RSS", "sfarima_RSS") instead of var_est. However, var_est is still available for downstream compatibility, with the old identifiers.
+* The notation "QARMA" and "SARMA" has been unified to "SARMA" for all spatial ARMA models.
+* Functions qarma.est(), qarma.sim() have been replaced by sarma.est() and sarma.sim(). They are still available and link to the new functions.
 * Added summary and print methods for classes "sarma" and "sfarima".
-* Output "var_est" of dcs() contains now the complete estimation of error terms
-  of class "sarma" or "sfarima".
+* Output "var_est" of dcs() contains now the complete estimation of error terms of class "sarma" or "sfarima".
+* Arguments "model_order" and "order_max" controlling the orders of the variance models are now passed to "set.options()" as additional arguments in the functions ellipsis. 
 
 # DCSmooth 1.0.3
 * New datasets "temp.nunn" and "temp.yuma" added.

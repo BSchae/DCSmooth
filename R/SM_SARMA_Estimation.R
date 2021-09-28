@@ -129,14 +129,14 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_t = max(model_order$ar[2], model_order$ma[2])
   
   # estimate coefficients
-  arma_x = arima(as.vector(Y),
-                 order = c(model_order$ar[1], 0, model_order$ma[1]),
-                 include.mean = FALSE)
-  resid_x = matrix(arma_x$resid, nrow = n_x, ncol = n_t)
-  arma_t = arima(as.vector(t(resid_x)),
+  arma_t = arima(as.vector(t(Y)),
                  order = c(model_order$ar[2], 0, model_order$ma[2]),
                  include.mean = FALSE)
-  innov = matrix(arma_t$resid, nrow = n_x, ncol = n_t, byrow = TRUE)
+  resid_t = matrix(arma_t$resid, nrow = n_x, ncol = n_t, byrow = TRUE)
+  arma_x = arima(as.vector(resid_t),
+                 order = c(model_order$ar[1], 0, model_order$ma[1]),
+                 include.mean = FALSE)
+  innov = matrix(arma_x$resid, nrow = n_x, ncol = n_t, byrow = TRUE)
   
   # build result matrices
   ar_mat = c(1, -arma_x$coef[seq_len(model_order$ar[1])]) %*%

@@ -22,17 +22,28 @@
 #' @param kerns a character vector of length 2 containing the identifier for the
 #'  kernels to be used in kernel regression. Weighting functions in local
 #'  polynomial regression are computed according to the identifier. Default value
-#'  is \code{MW_220}, the Mueller-Wang kernel of order \eqn{(2, 2, 0)}.
+#'  is \code{MW_220}, the Mueller-Wang kernel of order \eqn{(2, 2, 0)}. If only
+#'  a single value is provided, it is used as kernel in both directions.
 #' @param drv A non-negative vector of length 2, containing the derivative
 #'  orders to be estimated from the given data. The default is \code{c(0, 0)}. For
 #'  LP-regression, polynomial order is selected as \eqn{(\nu_1 + 1, \nu_2 + 1)}.
+#'  If only a single value is provided, it is used as derivative in both 
+#'  directions.
 #' @param var_model the method of estimating the variance coefficient \eqn{c_f}. 
 #'  Currently available are \code{var_model = c("iid", "sarma_HR", "sarma_sep",
 #'  "sarma_RSS", "sfarima_RSS")}. Replacing the argument \code{var_model}. For
 #'  code using \code{var_est}, the argument is converted to \code{var_model}.
 #' @param ... Additional arguments passed to \code{set.options()}. This includes
 #'  \code{IPI_options}, a list containing further options used by the iterative
-#'  plug-in algorithm.
+#'  plug-in algorithm. For convenience, any of the options usually included in 
+#'  the list \code{IPI_options} can be passed as argument directly to 
+#'  \code{set.options} and will be converted into the \code{IPI_options} list.
+#'  Further arguments accepted are \code{model_order} controlling the order of
+#'  the variance model, if either an SARMA or SFARIMA model is used. This 
+#'  argument is either a list of the form \code{list(ar = c(1, 1), ma = c(1, 1))}
+#'  or specifies an order selection criterion from \code{c("aic", "bic", "gpac")}.
+#'  If an order selection criterion is used, the argument \code{order_max} 
+#'  controls the maximum order to be tested.
 #' 
 #' @section Details:
 #' This function is used to set the options for bandwidth selection in the 
@@ -67,35 +78,77 @@ set.options <- function(    # inside function with default values in arguments
 )
 {
   # get ellipsis
-  add_options <- list(...)
-  # include old var_est options
-  if (exists("var_est", add_options))
+  args_list <- list(...)
+  
+  ### include old var_est options
+  if (exists("var_est", args_list))
   {
     message("Note: option \"var_est\" is deprecated, argument is converted to ",
             "\"var_model\" automatically.")
-    if (add_options$var_est == "iid") { var_model = "iid" }
-    if (add_options$var_est == "qarma") { var_model = "sarma_HR" }
-    if (add_options$var_est == "sarma") { var_model = "sarma_sep" }
-    if (add_options$var_est == "sarma2") { var_model = "sarma_RSS" }
-    if (add_options$var_est == "lm") { var_model = "sfarima_RSS" }
-    if (add_options$var_est %in% c("qarma_gpac", "qarma_bic"))
+    if (args_list$var_est == "iid") { var_model = "iid" }
+    if (args_list$var_est == "qarma") { var_model = "sarma_HR" }
+    if (args_list$var_est == "sarma") { var_model = "sarma_sep" }
+    if (args_list$var_est == "sarma2") { var_model = "sarma_RSS" }
+    if (args_list$var_est == "lm") { var_model = "sfarima_RSS" }
+    if (args_list$var_est %in% c("qarma_gpac", "qarma_bic"))
     {
-      add_options$var_model = "sarma_HR"
+      args_list$var_model = "sarma_HR"
       warning("For automatic order selection, use \"model_order\" in ",
               "\"dcs()\".")
-    }  
-  }
-  if (exists("IPI_options", add_options))
-  {
-    IPI_options = add_options$IPI_options
-  } else {
-    IPI_options = list()
+    } else {
+      stop("Unknown argument in \"var_est\". Use \"var_model\" instead.")
+    }
   }
   
-  # check if inputs are vectors
+  ### set IPI_options
+  if (exists("IPI_options", args_list))
+  {
+    IPI_options = args_list$IPI_options
+  } else {
+    IPI_options = list()
+    # get IPI_options from higher-ranking list "args_list"
+    if (exists("delta", args_list))
+    {
+      IPI_options$delta = args_list$delta
+    }
+    if (exists("infl_par", args_list))
+    {
+      IPI_options$infl_par = args_list$infl_par
+    }
+    if (exists("infl_exp", args_list))
+    {
+      IPI_options$infl_exp = args_list$infl_exp
+    }
+  }
+  
+  ### set model orders
+  add_options = list()
+  
+  if (exists("model_order", where = args_list))
+  {
+    exception.check.model_order(args_list$model_order, var_model)
+    add_options$model_order = args_list$model_order
+  } else if (var_model %in% dcs_list_var_model && var_model != "iid") {
+    add_options$model_order = list(ar = c(1, 1), ma = c(1, 1))
+  }
+  if (exists("order_max", where = args_list) && 
+      length(add_options$model_order) == 1 &&
+      !is.list(add_options$model_order) &&
+      add_options$model_order %in% c("aic", "bic", "gpac"))
+  {
+    exception.check.order_max(args_list$order_max)
+    add_options$order_max = args_list$order_max
+  } else if (length(add_options$model_order) == 1 &&
+             !is.list(add_options$model_order) &&
+             add_options$model_order %in% c("aic", "bic", "gpac")) {
+    add_options$order_max = list(ar = c(1, 1), ma = c(1, 1))
+  }
+  
+  ### check if inputs are vectors
   if (length(kerns) == 1) { kerns <- c(kerns, kerns) }
   if (length(drv) == 1) { drv <- c(drv, drv) }
   
+  ### check inputs
   exception.check.options.input(type, kerns, drv, var_model, IPI_options)
   
   # Select options according to type ("LP", "KR")
@@ -140,7 +193,8 @@ set.options <- function(    # inside function with default values in arguments
   
   options_list <- list(type = type, kerns = kerns, p_order = p_order,
                        drv = drv, var_model = var_model,
-                       IPI_options = IPI_options)
+                       IPI_options = IPI_options,
+                       add_options = add_options)
   
   # apply class to output object
   class(options_list) <- "dcs_options"
@@ -168,15 +222,7 @@ set.options <- function(    # inside function with default values in arguments
 #'  carried out by the iterative plug-in algorithm.
 #' @param ... Additional arguments passed to \code{dcs}. These might include
 #'  numerical vectors \code{X} and/or \code{T} containing the exogenous
-#'  covariates with respect to the rows and columns. If the error term model in 
-#'  \code{set.options()$var_model} is any of the available parametric models
-#'  (SARMA, SFARIMA), \code{model_order} is either an optional list containing
-#'  the two-dimensional model orders in the form
-#'  \code{list(ar = c(1, 1), ma = c(1, 1)} or a character string specifying
-#'  an order selection criterion by \code{c("AIC", "BIC", "gpac")}. In the case
-#'  of automatic order selection, \code{order_max} is an optional list
-#'  containing the two-dimensional maximum orders for the order selection in the
-#'  form \code{list(ar = c(1, 1), ma = c(1, 1)}.
+#'  covariates with respect to the rows and columns.
 #' 
 #' @return \code{DCSmooth} returns an object of class "dcs", including
 #'  \tabular{ll}{
@@ -225,7 +271,6 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   {
     # set up vectors for X and T if neccessary
     args_list <- list(...)
-    add_options <- list() # additional options depending on type and var_model
     
     if (!exists("X", where = args_list))
     {
@@ -240,28 +285,11 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
       T <- args_list$T
     }
     exception.check.XT(Y, X, T)
-    
-    # model order
-    if (exists("model_order", where = args_list))
-    {
-      exception.check.model_order(args_list$model_order, dcs_options)
-      add_options$model_order = args_list$model_order
-    } else if (dcs_options$var_model %in% dcs_list_var_model &&
-               dcs_options$var_model != "iid") {
-      add_options$model_order = list(ar = c(1, 1), ma = c(1, 1))
-    }
-    if (exists("order_max", where = args_list) &&
-        length(add_options$model_order) == 1 &&
-        !is.list(add_options$model_order) &&
-        add_options$model_order %in% c("aic", "bic", "gpac"))
-    {
-      exception.check.order_max(args_list$order_max)
-      add_options$order_max = args_list$order_max
-    } else if (length(add_options$model_order) == 1 &&
-               !is.list(add_options$model_order) &&
-               add_options$model_order %in% c("aic", "bic", "gpac")) {
-      add_options$order_max = list(ar = c(1, 1), ma = c(1, 1))
-    }
+  }
+  
+  if (exists("add_options", dcs_options))
+  {
+    add_options = dcs_options$add_options
   }
 
   #-------Bandwidth Selection-------#

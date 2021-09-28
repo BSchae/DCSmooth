@@ -36,8 +36,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `set.options()`    | Define options for the `dcs()`-function.                |
 | `dcs()`            | Nonparametric estimation of the expectation function of a matrix `Y`. Includes automatic iterative plug-in bandwidth selection.          |
 | `surface.dcs()`    | Plot for the surface from an `"dcs"`-object.            |
-| `qarma.sim()`      | Simulate a QARMA-model.                                 |
-| `qarma.est()`      | Estimate the parameters of a QARMA-model.               |
+| `sarma.sim()`      | Simulate a SARMA-model.                                 |
+| `sarma.est()`      | Estimate the parameters of a SARMA-model.               |
 | `sfarima.sim()`    | Simulate a SFARIMA-model.                               |
 | `sfarima.est()`    | Estimate the parameters of a SFARIMA-model.             |
 
@@ -49,6 +49,10 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `residuals.dcs()`  | Returns the residuals of the regression from an `"dcs"`-object.|
 | `print.summary_dcs()`| Print an object of class `"summary_dcs"`, which inherits from `summary.dcs()`.|
 | `print.set_options()`| Prints an object of class `"dcs_options"`, which inherits from `set.options()` |
+| `summary.sarma()`| Summary statistics for an object of class `"sarma"` |
+| `print.summary_sarma()`| Prints an object of class `"summary_sarma"`, which inherits from `summary.sarma()` |
+| `summary.sfarima()`| Summary statistics for an object of class `"sfarima"` |
+| `print.summary_sfarima()`| Prints an object of class `"summary_sfarima"`, which inherits from `summary.sfarima()` |
 
 | <span style="display: inline-block; width:170px">Data</span>|<span style="display: inline-block; width:510px"> </span>|
 |:-------------------|:--------------------------------------------------------|
@@ -57,6 +61,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `y.norm3`          |  A surface with two gaussian ridges.                    |
 | `temp.nunn`        |  Temperatures in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `temp.yuma`        |  Temperatures in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
+| `wind.nunn`        |  Windspeed in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
+| `wind.yuma`        |  Windspeed in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
 
 
 # 2 Details of Functions
@@ -73,19 +79,33 @@ Arguments of `set.options` are
 * **type** Specifies the regression type. Supported methods are kernel regression (`"KR"`) and local polynomial regression (`"LP"`), which is the default value.
 * **kerns** A character vector of length 2 stating the identifiers for the kernels in each dimension to use. The first element corresponds to the smoothing conditional on rows, the second conditional on columns. The identifiers are of the form $X\_k\mu\nu$, where $X$ indicates the smoothing method to use, either one of `M`, `MW` or `T`. The value $k$ is the kernel order, $\mu$ is the smoothness degree and $\nu$ the derivative estimated by the kernel. For more information on the kernels see section 4.3, a list of available kernels is given in A.1. The default kernels are `"MW_220` for both dimensions.
 * **drv** Derivative $(\nu_x, \nu_t)$ of $m(x,t)$ to be estimated. Note that $k \geq \nu + 2$, hence, only the regression surface ($\nu = 0$ as default value) and the first and second derivatives can be estimated from the currently available kernels.
-* **var_est** Specifies the model assumption for the errors/innovations $\varepsilon(x, t)$ in the regression model. Currently available are `iid` (independently identically distributed, set as default), `qarma` (spatial ARMA process) and `lm` (spatial FARIMA process with long memory). Methods for automated order selection are available for the QARMA estimation via `qarma_gpac` or `qarma_bic`. For further information see section 4.4.
-* **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and a boundary shrinking parameter for stabilized estimation of the necessary derivatives (`delta`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the boolean variable `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type selected and are given below.
+* **var_model** Specifies the model assumption and estimation method for the errors/innovations $\varepsilon(x, t)$ in the regression model. The form is given by `"model_method"` Currently available are 
++`"iid"` (independently identically distributed errors with variance estimation from the residuals, set as default)
++`"sarma_sep"` (separable spatial ARMA (SARMA) process, two univariate processes in both directions are estimated via `stats::arima`)
++`"sarma_HR"` (fast estimation of an SARMA process by the Hannan-Rissanen algorithm)
++`"sarma_RSS` (estimation of an SARMA process by numerical minimization of the RSS)
++`"sfarima_RSS"` (estimation of a separable spatial ARIMA (SFARIMA) model by numerical minimization of the RSS)
+The models and estimation methods are described in more detail in ???
+
+> The option **var_est** with values `c("iid", "qarma", "sarma", "lm")` has been replaced by **var_model**. For compatibility reasons, the option can still be used in `set.options` but will be converted to **var_model**
+
+* **...** Additional arguments passed to `set.options`. The defaul values of these options typically depend on other options and thus are put in an ellipsis. Accepted arguments are
++ **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and a boundary shrinking parameter for stabilized estimation of the necessary derivatives (`delta`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the boolean variable `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type selected and are given below.
++ **model_order** controls the order of the parametric error term model if an SARMA or SFARIMA model is used. This can be either a list of the form `list(ar = c(1, 1), ma = c(1, 1))` (the default for SARMA and SFARIMA) specifying the model order, or any of `c("aic", "bic", "gpac")` specifying an order selection criterion.
++ **order_max** Controls the maximum order if an order selection process is chosen in `model_order`. Is a list of the form `list(ar = c(1, 1), ma = c(1, 1))` (the default).
+
 
 `set.options` returns an object of class `"dcs_options` including the following values
 
 * **type** Inherited from input.
 * **kerns** Inherited from input.
 * **drv** Inherited from input.
-* **p_order** A numeric vector of length 2, computed from `drv`. It is $p_k = \nu_k + 1, k = x, t$.
-* **var_est** Inherited from input.
+* **p_order** A numeric vector of length 2, computed from `drv` by $p_k = \nu_k + 1, k = x, t$.
+* **var_model** Inherited from input.
 * **IPI_options** Options for the iterative-plug in algorithm for bandwidth selection. If unchanged, values are set conditional on `type` (see default values for `KR` and `LP` below).
+* **add_options** A list containing the additional options `model_order` and `order_max` if available.
 
-> Every argument of the `set.options` function has a default value. Hence, a just using `set.options()` will produce a complete set of options for double conditional smoothing regression in `dcs` (which is also implemented as default options in `dcs`, if the argument `dcs_options` is omitted).
+> Every argument of the `set.options` function has a default value. Hence, just using `set.options()` will produce a complete set of options for double conditional smoothing regression in `dcs` (which is also implemented as default options in `dcs`, if the argument `dcs_options` is omitted).
 
 Default options for kernel regression (`type = "KR"`) are
 ```{r, echo = FALSE, warning = FALSE}
@@ -96,19 +116,19 @@ summary(set.options(type = "KR"))
 
 Default options for local polynomial regression (`type = "LP"`) are
 ```{r, echo = FALSE, warning = FALSE}
-summary(set.options(type = "KR"))
+summary(set.options(type = "LP"))
 ```
 
 
 ### `dcs` {-}
-The `dcs`-function serves as main function of the package and includes IPI-bandwidth selection and non-parametric smoothing using the selected bandwidths. This function creates an object of class `dcs`, which includes the results of the DCS procedure.
+The `dcs`-function is the main function of the package and includes IPI-bandwidth selection and non-parametric smoothing using the selected bandwidths. This function creates an object of class `dcs`, which includes the results of the DCS procedure.
 
 Arguments of `dcs` are
 
 * **Y** The matrix of observations to be smoothed via the DCS procedure. This matrix should only contain numeric values and no missing observations. For computational reasons, `Y` has to have at least three rows and columns, however, for reliable results the size should be larger.
 * **dcs_options** The options used for the smoothing and bandwidth selection. This should be an object of class `dcs_options` created by `set.options`. This argument is optional, if omitted, all options will be set to their default values from the `set.options` function.
 * **h** Either a two-value vector of bandwidths or `"auto"` if bandwidth selection should be employed (the default).
-* **...** Further arguments to be passed to the function. This includes the covariates `X` and `T` which should be ordered numerical vectors whose length matches the number of rows of `Y` for `X` and the number of columns of `Y` for `T`. If `var_est = "qarma"`, additional arguments can be set to determine the order of the $QARMA((p_1, p_2), (q_1, q_2))$ with `qarma_order = list(ar = c(1, 1), ma = c(1, 1))`. If a order selection procedure is used, the maximum order can be set with `order_max = list(ar = c(1, 1), ma = c(1, 1))`. Common sense applies when selection these parameters, they should be nonzero integers. Too large orders might lead to (heavily) increased computation time.
+* **...** Further arguments to be passed to the function. This includes the covariates `X` and `T` which should be ordered numerical vectors whose length matches the number of rows of `Y` for `X` and the number of columns of `Y` for `T`.
 
 `dcs` returns an object of class `"dcs` including the following values
 
@@ -350,7 +370,7 @@ sim_sfarima = sfarima.sim(n_x = 101, n_t = 101, model = model_list)
 y_sfarima = y.norm1 + sim_sfarima$Y
 # surface.dcs(y_sfarima)
 
-opt_lm = set.options(var_est = "lm")
+opt_lm = set.options(var_model = "sfarima_RSS")
 dcs_lm = dcs(y_sfarima, opt_lm)
 
 dcs_lm
