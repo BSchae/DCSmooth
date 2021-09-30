@@ -12,10 +12,10 @@ LP.bndw = function(Y, dcs_options, add_options)
   drv_vec = dcs_options$drv
   
   # set variables for weight type
-  kern_type_vec = sub("^([[:alpha:]]*).*", "\\1", dcs_options$kern)
+  kern_type_vec = sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns)
                                   # extract weighting type
-  mu_vec = as.numeric(substr(dcs_options$kern, nchar(dcs_options$kern) - 1,
-                  nchar(dcs_options$kern) - 1))
+  mu_vec = as.numeric(substr(dcs_options$kerns, nchar(dcs_options$kerns) - 1,
+                  nchar(dcs_options$kerns) - 1))
                                   # extract kernel parameter mu
   weight_x = weight_fcn_assign(kern_type_vec[1])
   weight_t = weight_fcn_assign(kern_type_vec[2])

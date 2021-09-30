@@ -7,15 +7,15 @@
 #----------------------Formula for optimal bandwidths--------------------------#
 
 # Local Polynomial Regression
-h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kern_fcn_x,
-                    kern_fcn_t)
+h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
+                    kernel_t)
 {
   # calculation of integrals
   i11 = sum(mxx^2)/n_sub; i22 = sum(mtt^2)/n_sub; i12 = sum(mxx * mtt)/n_sub
   
   # kernel constants (kernel Functions may also depend on p, drv)
-  kernel_prop_1 = kernel.prop.LP(kern_fcn_x, p_order[1], drv_vec[1])
-  kernel_prop_2 = kernel.prop.LP(kern_fcn_t, p_order[2], drv_vec[2])
+  kernel_prop_1 = kernel.prop.LP(kernel_x, p_order[1], drv_vec[1])
+  kernel_prop_2 = kernel.prop.LP(kernel_t, p_order[2], drv_vec[2])
   
   # relation factor gamma_21 (h_1 = gamma_21 * h_2)
   delta = (p_order - drv_vec)[1] # should be the same for both entries

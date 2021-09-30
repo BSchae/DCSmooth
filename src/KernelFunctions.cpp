@@ -301,6 +301,8 @@ Rcpp::XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
     return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW320)));
   else if (fstr == "MW_420")
     return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW420)));
+  else if (fstr == "MW_421")
+    return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW421)));
   else if (fstr == "MW_422")
     return(XPtr<funcPtr>(new funcPtr(&kern_fcn_MW422)));
   else

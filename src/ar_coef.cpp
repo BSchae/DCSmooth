@@ -34,4 +34,3 @@ arma::vec ar_coef(const arma::vec ar,
     }
   return coef_all;
 }
-

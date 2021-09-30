@@ -113,6 +113,10 @@ ar_coef <- function(ar, ma, d, k) {
     .Call('_DCSmooth_ar_coef', PACKAGE = 'DCSmooth', ar, ma, d, k)
 }
 
+ARMA_to_AR <- function(phi, psi, K) {
+    .Call('_DCSmooth_ARMA_to_AR', PACKAGE = 'DCSmooth', phi, psi, K)
+}
+
 sarma_rss <- function(theta, R_mat, model_order) {
     .Call('_DCSmooth_sarma_rss', PACKAGE = 'DCSmooth', theta, R_mat, model_order)
 }

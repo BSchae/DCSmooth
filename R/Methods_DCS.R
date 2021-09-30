@@ -142,8 +142,8 @@ print.summary_dcs = function(x, ...)
     cat("Variance Model:\t", x$var_model_id, "\n")
     if (x$var_model_id == "iid") {
       cat("------------------------------------------", "\n")
-      cat("SD (sigma):\t", x$var_est$sigma)
-      cat("------------------------------------------", "\n")
+      cat("sigma:\t", x$var_est$model$sigma, "\n")
+      cat("stationary:\tTRUE\n")
     } else if (x$var_model_id == "sarma") {
       print.summary_sarma(summary.sarma(x$var_est))
     } else if (x$var_model_id == "sfarima") {

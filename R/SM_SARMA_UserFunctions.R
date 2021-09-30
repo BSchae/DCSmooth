@@ -72,8 +72,8 @@ sarma.est = function(Y, method = "HR",
                      model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   exception.check.Y(Y)
-  exception.check.model_order(model_order, dcs_options =  list(var_model = 
-                              c("sarma_HR", "sarma_sep", "sarma_RSS")))
+  exception.check.model_order(model_order, var_model = 
+                              c("sarma_HR", "sarma_sep", "sarma_RSS"))
   
   if (method == "HR")
   {

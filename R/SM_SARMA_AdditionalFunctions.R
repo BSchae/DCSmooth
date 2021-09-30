@@ -30,43 +30,42 @@ sarma.statTest = function(ar)
   old_state = get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   on.exit(assign(".Random.seed", old_state, envir = .GlobalEnv, 
                  inherits = FALSE))
-  
-  ar = as.matrix(ar)
-  ar[1, 1] = 1
-  outValue = TRUE
-  
-  # compute reference sign at center (0, 0)
-  signRef = sign(sarma.charactF(0, 0, ar))
-  
-  # check for random numbers inside unit circle
-  
-  set.seed(314)
-  if (outValue == TRUE)
+
+  l_bound = c(0, 0, 0, 0)
+  u_bound = c(2*pi, 2*pi, 1, 1)
+
+  # set.seed(123)
+  for (k in 1:50)
   {
-    for (k in 1:1000)
+    phi = stats::runif(2) * 2*pi
+    rad = sqrt(stats::runif(2)) * 1.0
+    
+    theta_init = c(phi, rad)
+    opt = optim(theta_init, sarma.charactF, ar = ar, method = "L-BFGS-B",
+                lower = l_bound, upper = u_bound)
+    
+    z1c = complex(modulus = opt$par[3], argument = opt$par[1])
+    z2c = complex(modulus = opt$par[4], argument = opt$par[2])
+    
+    if ((abs(z1c) < 1) && (abs(z2c) < 1) && opt$value < 0.000001)
     {
-      # draw random point inside unit circle
-      phi = stats::runif(2) * 2*pi
-      rad = sqrt(stats::runif(2)) * 1.01
-      x = rad * cos(phi)
-      y = rad * sin(phi)
-      z1c = complex(real = x[1], imaginary = y[1])
-      z2c = complex(real = x[2], imaginary = y[2])
-      
-      signTest = sign(Re(sarma.charactF(z1c, z2c, ar)))
-      if (signTest != signRef)
-      {
-        outValue = FALSE
-        break()
-      }
+      return(FALSE)
     }
   }
-  return(outValue)
+    
+    return(TRUE)
 }
 
 # Compute characteristic function of AR part
-sarma.charactF = function(z1c, z2c, ar)
+sarma.charactF = function(theta, ar)
 {
+  phi1 = theta[1]
+  phi2 = theta[2]
+  rad1 = theta[3]
+  rad2 = theta[4]
+  z1c = complex(modulus = rad1, argument = phi1)
+  z2c = complex(modulus = rad2, argument = phi2)
+  
   ar_x = dim(ar)[1] - 1; ar_t = dim(ar)[2] - 1
   
   # set up vectors for z^i
@@ -75,7 +74,19 @@ sarma.charactF = function(z1c, z2c, ar)
   
   out = t(zx_vec) %*% ar %*% zt_vec
   
-  return(out)
+  return(abs(out))
+}
+
+sarma.char = function(z1c, z2c, ar)
+{
+  phi1 = Arg(z1c)
+  phi2 = Arg(z2c)
+  rad1 = Mod(z1c)
+  rad2 = Mod(z2c)
+  
+  theta = c(phi1, phi2, rad1, rad2)
+  
+  return(sarma.charactF(theta, ar))
 }
 
 #---------------------3rd Step for HR-Algorithm (UNUSED)-----------------------#
