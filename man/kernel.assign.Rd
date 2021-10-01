@@ -2,9 +2,12 @@
 % Please edit documentation in R/DCS_MainFunctions.R
 \name{kernel.assign}
 \alias{kernel.assign}
+\alias{kernel.list}
 \title{Assign a Kernel Function}
 \usage{
 kernel.assign(kernel_id)
+
+kernel.list()
 }
 \arguments{
 \item{kernel_id}{a string specifying the kernel identifier as given in the
@@ -13,18 +16,11 @@ details.}
 \value{
 \code{kernel.assign} returns an object of class "function". This
  function takes two arguments, a numeric vector in the first argument and a
- single number in the second.
+ single number in the second. The function itself will return a matrix with
+ one column and the same number of rows as the input vector.
 }
 \description{
 Assign a Kernel Function
-
-MW_200
-MW_210
-MW_220
-MW_320
-MW_420
-MW_421
-MW_422
 }
 \section{Details}{
 
@@ -32,11 +28,13 @@ MW_422
  in the DCSmooth package. The kernels are boundary kernels of the form
  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
- or truncated kernels ("TR"). The following kernels are available:
+ or truncated kernels ("TR").
+\code{kernel.list} prints a list of identifiers \code{kernel_id} of available
+ kernels in the DCSmooth package.
 }
 
 \examples{
-# See vignette("DCSmooth") for examples and explanation
+ # See vignette("DCSmooth") for further examples and explanation
 
 u = seq(from = -1, to = 0.5, length.out = 151)
 kern_MW220 = kernel.assign("MW_220")
@@ -50,4 +48,10 @@ Müller, H.-G. and Wang, J.-L. (1994). Hazard rate estimation under random
  
  Müller, H.-G. (1991). Smooth optimum kernel estimators near endpoints.
  Biometrika, 78:521-530.
+ 
+ Feng, Y. and Schäfer B. (2021). Boundary Modification in Local Regression.
+ Working Papers CIE 144, Paderborn University.
+}
+\seealso{
+\code{\link{kernel_list}}
 }

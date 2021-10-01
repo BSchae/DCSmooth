@@ -29,52 +29,92 @@ KR_dcs_const1 <- function(yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT) {
     .Call('_DCSmooth_KR_dcs_const1', PACKAGE = 'DCSmooth', yMat, hVec, drvVec, kernFcnPtrX, kernFcnPtrT)
 }
 
-weight_fcn_assign <- function(fstr) {
-    .Call('_DCSmooth_weight_fcn_assign', PACKAGE = 'DCSmooth', fstr)
-}
-
-kern_fcn_MW200 <- function(u, q = 1) {
-    .Call('_DCSmooth_kern_fcn_MW200', PACKAGE = 'DCSmooth', u, q)
-}
-
-kern_fcn_MW210 <- function(u, q = 1) {
-    .Call('_DCSmooth_kern_fcn_MW210', PACKAGE = 'DCSmooth', u, q)
-}
-
-kern_fcn_MW220 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_MW220', PACKAGE = 'DCSmooth', uVec, q)
-}
-
-kern_fcn_MW320 <- function(u, q = 1) {
-    .Call('_DCSmooth_kern_fcn_MW320', PACKAGE = 'DCSmooth', u, q)
-}
-
-kern_fcn_MW420 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_MW420', PACKAGE = 'DCSmooth', uVec, q)
-}
-
-kern_fcn_MW421 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_MW421', PACKAGE = 'DCSmooth', uVec, q)
-}
-
-kern_fcn_MW422 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_MW422', PACKAGE = 'DCSmooth', uVec, q)
-}
-
-kern_fcn_TR420 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_TR420', PACKAGE = 'DCSmooth', uVec, q)
-}
-
-kern_fcn_TR422 <- function(uVec, q) {
-    .Call('_DCSmooth_kern_fcn_TR422', PACKAGE = 'DCSmooth', uVec, q)
-}
-
 kernel_fcn_assign <- function(fstr) {
     .Call('_DCSmooth_kernel_fcn_assign', PACKAGE = 'DCSmooth', fstr)
 }
 
 kernel_fcn_use <- function(x, q, xpsexp) {
     .Call('_DCSmooth_kernel_fcn_use', PACKAGE = 'DCSmooth', x, q, xpsexp)
+}
+
+weight_fcn_assign <- function(fstr) {
+    .Call('_DCSmooth_weight_fcn_assign', PACKAGE = 'DCSmooth', fstr)
+}
+
+kern_fcn_M200 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M200', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M210 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M210', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M220 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M220', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M321 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M321', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M420 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M420', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M421 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M421', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_M422 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_M422', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW200 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW200', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW210 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW210', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW220 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW220', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW320 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW320', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW321 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW321', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW420 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW420', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW421 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW421', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_MW422 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_MW422', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_T220 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_T220', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_T321 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_T321', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_T420 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_T420', PACKAGE = 'DCSmooth', uVec, q)
+}
+
+kern_fcn_T422 <- function(uVec, q = 1) {
+    .Call('_DCSmooth_kern_fcn_T422', PACKAGE = 'DCSmooth', uVec, q)
 }
 
 LPSmooth_matrix2 <- function(yMat, h, polyOrder, drv, kernFcnPtr) {

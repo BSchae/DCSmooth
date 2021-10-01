@@ -42,7 +42,7 @@ test_that("set.options() converts \"var_est\" correctly.",{
   expect_equal(set.options(var_est = "iid")$var_model, "iid")
   expect_equal(set.options(var_est = "qarma")$var_model, "sarma_HR")
   expect_equal(set.options(var_est = "sarma")$var_model, "sarma_sep")
-  expect_equal(set.options(var_est = "lm")$var_model, "sfarima_sep")
+  expect_equal(set.options(var_est = "lm")$var_model, "sfarima_RSS")
   expect_warning(set.options(var_est = "qarma_gpac")$var_model, "For automatic")
 })
 
@@ -80,4 +80,12 @@ test_that("set.options() gets additional options correctly.",{
   expect_equal(set.options(var_model = "sarma_sep", 
                            model_order = "bic")$add_options$order_max,
                order_list)
+})
+
+context("set.options() exception handling (negatives)")
+
+test_that("errors for derivative estimation work.", {
+  expect_error(set.options(drv = c(1, "a")), "Unsupported values in argument")
+  expect_error(set.options(drv = c(-1, 1)), "Derivative order must be")
+  expect_error(set.options(drv = c(1, 0)), "Kernel orders not matching")
 })

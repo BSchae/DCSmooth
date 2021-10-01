@@ -12,6 +12,10 @@
 
 # surface.dcs (exported)
 
+# kernel.assign (exported)
+
+# kernel.list (exported)
+
 
 #------------------------Set Options via Function------------------------------#
 
@@ -85,13 +89,17 @@ set.options <- function(    # inside function with default values in arguments
   {
     message("Note: option \"var_est\" is deprecated, argument is converted to ",
             "\"var_model\" automatically.")
-    if (args_list$var_est == "iid") { var_model = "iid" }
-    if (args_list$var_est == "qarma") { var_model = "sarma_HR" }
-    if (args_list$var_est == "sarma") { var_model = "sarma_sep" }
-    if (args_list$var_est == "sarma2") { var_model = "sarma_RSS" }
-    if (args_list$var_est == "lm") { var_model = "sfarima_RSS" }
-    if (args_list$var_est %in% c("qarma_gpac", "qarma_bic"))
-    {
+    if (args_list$var_est == "iid") {
+      var_model = "iid"
+    } else if (args_list$var_est == "qarma") {
+      var_model = "sarma_HR"
+    } else if (args_list$var_est == "sarma") {
+      var_model = "sarma_sep"
+    } else if (args_list$var_est == "sarma2") {
+      var_model = "sarma_RSS"
+    } else if (args_list$var_est == "lm") {
+      var_model = "sfarima_RSS"
+    } else if (args_list$var_est %in% c("qarma_gpac", "qarma_bic")) {
       args_list$var_model = "sarma_HR"
       warning("For automatic order selection, use \"model_order\" in ",
               "\"dcs()\".")
@@ -208,7 +216,7 @@ set.options <- function(    # inside function with default values in arguments
 
 #' Nonparametric Double Conditional Smoothing for 2D Surfaces
 #' 
-#' \code{DCSmooth} provides a double conditional nonparametric smoothing of the
+#' \code{dcs} provides a double conditional nonparametric smoothing of the
 #' expectation surface of a functional time series or a random field on a
 #' lattice. Bandwidth selection is done via an iterative plug-in method.
 #' 
@@ -224,7 +232,7 @@ set.options <- function(    # inside function with default values in arguments
 #'  numerical vectors \code{X} and/or \code{T} containing the exogenous
 #'  covariates with respect to the rows and columns.
 #' 
-#' @return \code{DCSmooth} returns an object of class "dcs", including
+#' @return \code{dcs} returns an object of class "dcs", including
 #'  \tabular{ll}{
 #'  \code{Y} \tab matrix of original observations. \cr
 #'  \code{X, T} \tab vectors of covariates over rows (\code{X}) and columns 
@@ -245,6 +253,11 @@ set.options <- function(    # inside function with default values in arguments
 #' 
 #' @section Details:
 #' See the vignette for a more detailed description of the function.
+#' 
+#' @references
+#'  Schäfer, B. and Feng, Y. (2021). Fast Computation and Bandwidth Selection 
+#'  Algorithms for Smoothing Functional Time Series. Working Papers CIE 143, 
+#'  Paderborn University.
 #' 
 #' @seealso \code{\link{set.options}}
 #' 
@@ -481,15 +494,17 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #'  in the DCSmooth package. The kernels are boundary kernels of the form
 #'  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
 #'  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
-#'  or truncated kernels ("TR"). The following kernels are available:
-#' @eval dcs_list_kernels
+#'  or truncated kernels ("TR").
+#' \code{kernel.list} prints a list of identifiers \code{kernel_id} of available
+#'  kernels in the DCSmooth package.
 #'  
 #' @param kernel_id a string specifying the kernel identifier as given in the
 #'  details.
 #' 
 #' @return \code{kernel.assign} returns an object of class "function". This
 #'  function takes two arguments, a numeric vector in the first argument and a
-#'  single number in the second.
+#'  single number in the second. The function itself will return a matrix with
+#'  one column and the same number of rows as the input vector.
 #'  
 #' @references
 #'  Müller, H.-G. and Wang, J.-L. (1994). Hazard rate estimation under random
@@ -497,9 +512,14 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #'  
 #'  Müller, H.-G. (1991). Smooth optimum kernel estimators near endpoints.
 #'  Biometrika, 78:521-530.
+#'  
+#'  Feng, Y. and Schäfer B. (2021). Boundary Modification in Local Regression.
+#'  Working Papers CIE 144, Paderborn University.
+#' 
+#' @seealso \code{\link{kernel_list}}
 #' 
 #' @examples
-#' # See vignette("DCSmooth") for examples and explanation
+#'  # See vignette("DCSmooth") for further examples and explanation
 #' 
 #' u = seq(from = -1, to = 0.5, length.out = 151)
 #' kern_MW220 = kernel.assign("MW_220")
@@ -514,11 +534,28 @@ kernel.assign = function(kernel_id)
   # check for correct input
   if (!(kernel_id %in% dcs_list_kernels))
   {
-    stop("unknown kernel identifier. Use one of ", dcs_list_kernels)
+    stop("unknown kernel identifier.  See available kernels with ",
+         "\"kernel.list()\".")
   } else {
     kernel_fcn_id = paste0("kern_fcn_", gsub("_", "", kernel_id))
     kern_out = get(kernel_fcn_id)
   }
   
   return(kern_out)
+}
+
+#' @rdname kernel.assign
+#' @export
+
+kernel.list = function()
+{
+  MW_kerns = dcs_list_kernels[grepl("MW_", dcs_list_kernels)]
+  M_kerns = dcs_list_kernels[grepl("M_", dcs_list_kernels)]
+  
+  cat("Kernels available in the DCSmooth package:\n")
+  cat("------------------------------------------", "\n")
+  cat(" Müller-Wang type kernels:\n")
+  cat(MW_kerns, "\n", fill = 42)
+  cat(" Müller type kernels:\n")
+  cat(M_kerns, "\n", fill = 42)
 }

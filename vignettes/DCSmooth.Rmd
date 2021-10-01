@@ -40,6 +40,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `sarma.est()`      | Estimate the parameters of a SARMA-model.               |
 | `sfarima.sim()`    | Simulate a SFARIMA-model.                               |
 | `sfarima.est()`    | Estimate the parameters of a SFARIMA-model.             |
+| `kernel.assign()`  | Assigns a pointer to a kernel function.                 |
+| `kernel.list()`    | Print list of available kernels.                        |
 
 | <span style="display: inline-block; width:170px">Methods/Generics</span>|<span style="display: inline-block; width:500px"> </span>|
 |:-------------------|:--------------------------------------------------------|
@@ -71,12 +73,12 @@ The *DCSmooth* contains the following functions, methods and data sets:
 
 ## 2.1 Functions
 
-### `set.options` {-}
+### `set.options()` {-}
 This auxiliary function simplifies the settings of the `dcs` function. An object
 of class `dcs_options` is created and should be used as `dcs_options`-argument 
 in the `dcs` function.
 
-Arguments of `set.options` are
+Arguments of `set.options()` are
 
 * **type** Specifies the regression type. Supported methods are kernel regression (`"KR"`) and local polynomial regression (`"LP"`), which is the default value.
 * **kerns** A character vector of length 2 stating the identifiers for the kernels in each dimension to use. The first element corresponds to the smoothing conditional on rows, the second conditional on columns. The identifiers are of the form $X\_k\mu\nu$, where $X$ indicates the smoothing method to use, either one of `M`, `MW` or `T`. The value $k$ is the kernel order, $\mu$ is the smoothness degree and $\nu$ the derivative estimated by the kernel. For more information on the kernels see section 4.3, a list of available kernels is given in A.1. The default kernels are `"MW_220` for both dimensions.
@@ -97,7 +99,7 @@ The models and estimation methods are described in more detail in ???
 + **order_max** Controls the maximum order if an order selection process is chosen in `model_order`. Is a list of the form `list(ar = c(1, 1), ma = c(1, 1))` (the default).
 
 
-`set.options` returns an object of class `"dcs_options` including the following values
+`set.options()` returns an object of class `"dcs_options` including the following values
 
 * **type** Inherited from input.
 * **kerns** Inherited from input.
@@ -146,7 +148,7 @@ Arguments of `dcs` are
 * **time_used** A number reporting the time (in seconds) used for the IPI algorithm (total including all iterations). Is set to `NA`', if no bandwidth selection is used.
 
 
-### `surface.dcs` {-}
+### `surface.dcs()` {-}
 This function is a convenient wrapper for the `plotly::plot_ly` function of the *plotly* package, for easy display of the considered surfaces. Direct plotting is available for any object of class `"dcs"` or any numeric matrix.
 
 Arguments of `surface.dcs` are
@@ -201,9 +203,9 @@ Arguments of `sfarima.sim` are
 * **Y** The matrix of simulated values with size $n_x \times n_t$ (determined by function arguments `n_x`, `n_t`). The matrix $Y$ is the lower left $n_x \times n_t$ submatrix of the actually simulated matrix $Y'$ of size $2 n_x \times 2 n_t$ to avoid effects from setting the initial values ("burn-in period").
 * **innov** The $n_x \times n_t$ matrix of iid. normally distributed innovations/errors of the SFARIMA model with zero mean and variance $\sigma^2$ (determined by the function argument `model\$sigma`). As with `Y`, the original matrix has size $2 n_x \times 2 n_t$.
 * **model** The model used for simulation, inherited from input.
-* **stnry** A flag indicating whether themsimulated process is stationary.
+* **stnry** A flag indicating whether the simulated process is stationary.
 
-### `sfarima.est` {-}
+### `sfarima.est()` {-}
 Estimation of an SFARIMA process. This function minimizes the residual sum of squares (RSS) to estimate the SFARIMA-parameters of a given order. It returns an object of class `sfarima` with attribute `"subclass" = "est"`.
 
 Arguments of `sfarima.est` are
@@ -217,6 +219,23 @@ Arguments of `sfarima.est` are
 * **innov** The matrix of estimated innovations from the Hannan-Rissanen algorithm.
 * **model** A list of estimated model coefficients containing the matrices `ar` of autoregressive coefficients, the matrix `ma` of moving average coefficients as well as the vector `d` holding the long-memory parameters and the standard deviation of residuals `sigma`.
 * **stnry** A flag indicating whether the estimated process is stationary.
+
+### `kernel.assign()` {-}
+This function sets an external pointer to a specified boundary kernel available in the DCSmooth package. These kernels are function $K(u, q)$, where $u$ is a vector on $[q, -1]$ and $q \in [0, 1]$. The boundary kernels are as proposed by @MuellerWang1994, @Mueller1991 and constructed via the method described in @FengSchaefer2021. Available types are Müller-Wang (`MW`), Müller (`M`) and truncated kernels (`T`).
+
+Arguments of `kernel.assign()` are
+
+* **kernel_id** The identifier for the kernel to be assigned. It is a character string of the form `"X_abc"`, where `X` is specifies the type (`MW`, `M`, `T`), `a` i the kernel order $k$, `b` is the degree of smootheness $\mu$ and `c` is the order of derivative $\nu$ (see ???). A list of currently useable kernel identifiers can be accessed with the function `kernel.list()`.
+
+`kernel.assign()` returns a pointer to a precompiled kernel function.
+
+### `kernel.list()` {-}
+`kernel.list()` prints the available identifiers for use in `kernel.assign()`. These are
+```{r}
+kernel.list()
+```
+
+`kernel.list()` takes no arguments and has no return.
 
 ## 2.2 Methods
 The *DCSmooth* package contains the following methods
@@ -243,7 +262,7 @@ Each of the three simulated example data sets is a matrix of size $101 \times 10
 # surface.dcs(y.norm3)
 ```
 
-The environmental application data sets feature the temperature, windspeed and solar radiation surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`, `sun.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`, `sun.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in Celsius, windspeed in ??? and solar radiation in ???. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is from the U.S. Climate Reference Network database at \url{https://www.ncdc.noaa.gov/crn/qcdatasets.html}. (see Diamond et. al. (2013), \href{https://journals.ametsoc.org/view/journals/bams/94/4/bams-d-12-00170.1.xml}{doi:10.1175/BAMS-D-12-00170.1}).
+The environmental application data sets feature the temperature, wind speed and solar radiation surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`, `sun.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`, `sun.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in Celsius, wind speed in m/s and solar radiation in W/m^2. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is from the U.S. Climate Reference Network database at \url{https://www.ncdc.noaa.gov/crn/qcdatasets.html}. (see Diamond et. al. (2013), \href{https://journals.ametsoc.org/view/journals/bams/94/4/bams-d-12-00170.1.xml}{doi:10.1175/BAMS-D-12-00170.1}).
 
 # 3 Application
 The application of the package is demonstrated at the example of the simulated function `y.norm1` which represent a gaussian peak on $[0,1]^2$ with $n_x = n_t = 101$ evaluation points. Different models are simulated and estimation using `dcs` is demonstrated. Whenever default options are used, they are not explicitly used as function arguments, instead only when deviating from the defaults, the options are changed.
@@ -397,14 +416,14 @@ dcs_drv_1
 # surface.dcs(dcs_drv_1, plot_choice = 2)
 ```
 
-<!-- The estimator for $m^{(0, 1)}(x, t)$ is -->
-<!-- ```{r} -->
-<!-- opt_drv_2 = set.options(drv = c(0, 1), kerns = c("MW_220", "MW_421")) -->
-<!-- dcs_drv_2 = dcs(y_iid, opt_drv_2) -->
+The estimator for $m^{(0, 1)}(x, t)$ is
+```{r}
+opt_drv_2 = set.options(drv = c(0, 1), kerns = c("MW_220", "MW_321"))
+dcs_drv_2 = dcs(y_iid, opt_drv_2)
 
-<!-- dcs_drv_2 -->
-<!-- # surface.dcs(dcs_drv_2, plot_choice = 2) -->
-<!-- ``` -->
+dcs_drv_2
+# surface.dcs(dcs_drv_2, plot_choice = 2)
+```
 
 # 4 Mathematical Background
 

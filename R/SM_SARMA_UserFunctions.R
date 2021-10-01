@@ -197,6 +197,7 @@ sarma.sim = function(n_x, n_t, model)
 
 #' @rdname sarma.sim
 #' @export
+
 qarma.sim <- function(n_x, n_t, model)
 {
   sarma_sim <- sarma.sim(n_x = n_x, n_t = n_t, model = model)

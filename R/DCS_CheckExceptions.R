@@ -197,47 +197,15 @@ exception.check.options = function(dcs_opt)
     stop("Shrink factor \"delta\" must be between 0 and 0.5.")
   }
   
-  ### Options for Local Polynomial Regression
-  if (dcs_opt$type == "LP")
+  # Options for derivative estimation
+  if (!is.numeric(dcs_opt$drv))
   {
-    # check inflation exponents
-    if (any(dcs_opt$IPI_options$infl_exp[1] != "auto"))
-    {
-      warning("Inflation exponents have been changed.")
-    }
-  
-    # check inflation parameters
-    if (any(dcs_opt$IPI_options$infl_par != c(1, 1)))
-    {
-      warning("Inflation parameters have been changed.")
-    } 
+    stop("Derivative order must be numeric.")
   }
-  
-  ### Options for Kernel Regression
-  if (dcs_opt$type == "KR")
+  if (any(dcs_opt$drv != as.numeric(substr(dcs_opt$kerns,
+                            nchar(dcs_opt$kerns), nchar(dcs_opt$kerns)))))
   {
-    # check derivative orders
-    if (!is.numeric(dcs_opt$drv))
-    {
-      stop("Derivative order must be numeric.")
-    }
-    if (any(dcs_opt$drv != 0))
-    {  
-      stop("Estimation of derivatives currently not supported for kernel ",
-           "regression")
-    }
-    
-    # check inflation exponents
-    if (any(dcs_opt$IPI_options$infl_exp != 0.5))
-    {
-      warning("Inflation exponents have been changed.")
-    }
-    
-    # check inflation parameters
-    if (any(dcs_opt$IPI_options$infl_par != c(2, 1)))
-    {
-      warning("Inflation parameters have been changed.")
-    } 
+    stop("Kernel orders not matching derivative orders.")
   }
   
   ### Options for variance estimation method
