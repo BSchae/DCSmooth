@@ -241,13 +241,18 @@ sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
     ord.opt_x <- c(which(bic_x == sFUN(bic_x), arr.ind = TRUE) - 1)
     ord.opt_t <- c(which(bic_t == sFUN(bic_t), arr.ind = TRUE) - 1)
   }
-  message("The optimal orders are:")
-  message("p_x = ", ord.opt_x[[1]])
-  message("p_t = ", ord.opt_t[[1]])
-  message("q_x = ", ord.opt_x[[2]])
-  message("q_t = ", ord.opt_t[[2]])
-  names(ord.opt_x) = c("p", "q")
-  names(ord.opt_t) = c("p", "q")
-  return(list(ord.opt_x = ord.opt_x,
-              ord.opt_t = ord.opt_t))   
+  # message("The optimal orders are:")
+  # message("p_x = ", ord.opt_x[[1]])
+  # message("p_t = ", ord.opt_t[[1]])
+  # message("q_x = ", ord.opt_x[[2]])
+  # message("q_t = ", ord.opt_t[[2]])
+  # names(ord.opt_x) = c("p", "q")
+  # names(ord.opt_t) = c("p", "q")
+  
+  # put model_orders into list
+  ar = c(ord.opt_x[1], ord.opt_t[1])
+  ma = c(ord.opt_x[2], ord.opt_t[2])
+  model_order = list(ar = ar, ma = ma)
+  
+  return(model_order)   
 }

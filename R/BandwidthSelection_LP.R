@@ -132,8 +132,8 @@ LP.bndw = function(Y, dcs_options, add_options)
     if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
     {
       # calculate variance factor
-      var_est = suppressWarnings(sfarima.cf(Y - Y_smth,
-                                            add_options$model_order))
+      var_est = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
+                                               add_options))
       var_coef = var_est$cf_est
       var_model = var_est$var_model
 

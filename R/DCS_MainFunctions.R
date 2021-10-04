@@ -230,6 +230,7 @@ set.options <- function(    # inside function with default values in arguments
 #'  carried out by the iterative plug-in algorithm.
 #' @param parallel A logical value indicating if parallel computing should be
 #'  used for faster computation. Default value is \code{parallel = FALSE}.
+#'  Parallelization seems to be efficient at above 400,000 observations.
 #' @param ... Additional arguments passed to \code{dcs}. These might include
 #'  numerical vectors \code{X} and/or \code{T} containing the exogenous
 #'  covariates with respect to the rows and columns.

@@ -14,8 +14,17 @@ cf.estimation = function(Y, dcs_options, add_options)
 {
   if (!is.list(add_options$model_order) && length(add_options$model_order) == 1)
   {
-    model_order = sarma.order(Y, method = "sep", criterion = "bic",
-                              order_max = add_options$order_max)
+    if (dcs_options$var_model == "sfarima_RSS")
+    {
+      model_order = sfarima.ord(Y, pmax = add_options$order_max$ar,
+                                qmax = add_options$order_max$ma, 
+                                crit = add_options$model_order, restr = NULL,
+                                sFUN = min, parallel = TRUE)
+    } else {
+      model_order = sarma.order(Y, method = "sep", criterion = "bic",
+                                order_max = add_options$order_max)
+    }
+    
   } else {
     model_order = add_options$model_order
   }

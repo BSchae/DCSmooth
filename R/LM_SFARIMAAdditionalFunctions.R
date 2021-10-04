@@ -153,6 +153,3 @@ macoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
   }
   return(coef.all)
 }
-
-
-
