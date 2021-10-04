@@ -65,7 +65,7 @@ test_that("model order is actually used", {
                   model_order = model_order_test))
   Y = y.norm1 + sfarima.sim(101, 101, model = list(ar = ar, ma = ma, 
                                               d = c(0.1, 0.1), sigma = 1))$Y
-  dcs_lm = dcs(Y, set.options(var_model = "sfarima_sep",
+  dcs_lm = dcs(Y, set.options(var_model = "sfarima_RSS",
                model_order = model_order_test))
   
   expect_equal(dim(dcs_iid$var_est$model$ar), NULL)

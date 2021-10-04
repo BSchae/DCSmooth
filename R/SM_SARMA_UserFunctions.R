@@ -156,6 +156,8 @@ qarma.est <- function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' @export
 sarma.sim = function(n_x, n_t, model)
 {
+  exception.check.model.sarma(model)
+  
   ar_mat = as.matrix(model$ar); ma_mat = as.matrix(model$ma)
   ar_x = dim(ar_mat)[1] - 1; ar_t = dim(ar_mat)[2] - 1
   ma_x = dim(ma_mat)[1] - 1; ma_t = dim(ma_mat)[2] - 1

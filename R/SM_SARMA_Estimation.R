@@ -241,38 +241,13 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_x = max(model_order$ar[1], model_order$ma[1])
   max_lag_t = max(model_order$ar[2], model_order$ma[2])
 
-  # # estimate coefficients
-  # arma_x = matrix(NA, nrow = n_x, ncol = model_order$ar[1] + model_order$ma[1])
-  # arma_t = matrix(NA, nrow = n_t, ncol = model_order$ar[2] + model_order$ma[2])
-  #
-  # for (j in seq_len(n_t))
-  # {
-  #   arma_t[j, ] = stats::arima(Y[, j], order = c(model_order$ar[2], 0,
-  #                              model_order$ma[2]), include.mean = FALSE)$coef
-  # }
-  # for (i in seq_len(n_x))
-  # {
-  #   arma_x[i, ] = stats::arima(Y[i, ], order = c(model_order$ar[1], 0,
-  #                              model_order$ma[1]), include.mean = FALSE)$coef
-  # }
-  #
-  # arma_x = colMeans(arma_x)
-  # arma_t = colMeans(arma_t)
-  #
-  # ar_mat = c(1, arma_x[seq_len(model_order$ar[1])]) %*%
-  #   t(c(1, -arma_t[seq_len(model_order$ar[2])]))
-  # ma_mat = c(1, arma_x[model_order$ar[1] +
-  #                             seq_len(model_order$ma[1])]) %*%
-  #   t(c(1, arma_t[model_order$ar[2] + seq_len(model_order$ma[2])]))
-
   arma_t = arima(as.vector(t(Y)),
                  order = c(model_order$ar[2], 0, model_order$ma[2]),
                  include.mean = FALSE)
-  # resid_t = matrix(arma_t$resid, nrow = n_x, ncol = n_t, byrow = TRUE)
-  arma_x = arima(as.vector(Y),#as.vector(resid_t),
+ 
+  arma_x = arima(as.vector(Y),
                  order = c(model_order$ar[1], 0, model_order$ma[1]),
                  include.mean = FALSE)
-  # innov = matrix(arma_x$resid, nrow = n_x, ncol = n_t, byrow = TRUE)
 
   # build result matrices
   ar_mat = c(1, -arma_x$coef[seq_len(model_order$ar[1])]) %*%

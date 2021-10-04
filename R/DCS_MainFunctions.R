@@ -228,6 +228,8 @@ set.options <- function(    # inside function with default values in arguments
 #'  two-valued numerical vector with bandwidths in row- and column-direction.
 #'  If the value is \code{"auto"} (the default), bandwidth selection will be 
 #'  carried out by the iterative plug-in algorithm.
+#' @param parallel A logical value indicating if parallel computing should be
+#'  used for faster computation. Default value is \code{parallel = FALSE}.
 #' @param ... Additional arguments passed to \code{dcs}. These might include
 #'  numerical vectors \code{X} and/or \code{T} containing the exogenous
 #'  covariates with respect to the rows and columns.
@@ -270,7 +272,8 @@ set.options <- function(    # inside function with default values in arguments
 #' @export
 #' 
 
-dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
+dcs <- function(Y, dcs_options = set.options(), h = "auto", 
+                parallel = FALSE, ...)
 {
   #-------Front Matter-------#
   
@@ -278,6 +281,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
   exception.check.Y(Y)
   exception.check.bndw(h, dcs_options)
   exception.check.options(dcs_options)
+  exception.check.parallel(parallel)
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   
   # process ellipsis arguments from (...)
@@ -300,11 +304,14 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto", ...)
     exception.check.XT(Y, X, T)
   }
   
+  add_options = list()
+  add_options$parallel = parallel
+  
   if (exists("add_options", dcs_options))
   {
-    add_options = dcs_options$add_options
+    add_options = append(add_options, dcs_options$add_options)
   }
-
+  
   #-------Bandwidth Selection-------#
   
   # check if given bandwidths exist
@@ -495,6 +502,7 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #'  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
 #'  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
 #'  or truncated kernels ("TR").
+#'  
 #' \code{kernel.list} prints a list of identifiers \code{kernel_id} of available
 #'  kernels in the DCSmooth package.
 #'  
@@ -516,10 +524,12 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #'  Feng, Y. and Schäfer B. (2021). Boundary Modification in Local Regression.
 #'  Working Papers CIE 144, Paderborn University.
 #' 
-#' @seealso \code{\link{kernel_list}}
+#' @seealso \code{\link{kernel.list}}
 #' 
 #' @examples
 #'  # See vignette("DCSmooth") for further examples and explanation
+#'  
+#'  kernel.list()
 #' 
 #' u = seq(from = -1, to = 0.5, length.out = 151)
 #' kern_MW220 = kernel.assign("MW_220")
@@ -551,11 +561,14 @@ kernel.list = function()
 {
   MW_kerns = dcs_list_kernels[grepl("MW_", dcs_list_kernels)]
   M_kerns = dcs_list_kernels[grepl("M_", dcs_list_kernels)]
+  T_kerns = dcs_list_kernels[grepl("T_", dcs_list_kernels)]
   
   cat("Kernels available in the DCSmooth package:\n")
   cat("------------------------------------------", "\n")
-  cat(" Müller-Wang type kernels:\n")
+  cat("Müller-Wang type kernels:\n")
   cat(MW_kerns, "\n", fill = 42)
-  cat(" Müller type kernels:\n")
+  cat("Müller type kernels:\n")
   cat(M_kerns, "\n", fill = 42)
+  cat("Truncated kernels:\n")
+  cat(T_kerns, "\n", fill = 42)
 }

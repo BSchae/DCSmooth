@@ -20,8 +20,8 @@ LP.bndw = function(Y, dcs_options, add_options)
   weight_x = weight_fcn_assign(kern_type_vec[1])
   weight_t = weight_fcn_assign(kern_type_vec[2])
                                   # weight functions for LP-regression
-  kernel_x = kernel_fcn_assign(dcs_options$kerns[1])
-  kernel_t = kernel_fcn_assign(dcs_options$kerns[2])
+  kernel_x = kernel.assign(dcs_options$kerns[1])
+  kernel_t = kernel.assign(dcs_options$kerns[2])
                                   # (equivalent) kernel function for calculation
                                   # of kernel parameters
   
@@ -40,39 +40,77 @@ LP.bndw = function(Y, dcs_options, add_options)
                                   # deflation if derivatives are estimated from
                                   # function
    
-    # constant window width only reasonable for estimation of derivatives
-    if (dcs_options$IPI_options$const_window == TRUE)
+    # parallel estimation of surfaces
+    if (add_options$parallel == TRUE)
     {
-      # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                  = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
-                                  weightFcnPtr_x = weight_x,
-                                  weightFcnPtr_t = weight_t)
-      # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
-                          c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                          c(p_order[1] + 1, drv_vec[2]), muVec = mu_vec,
-                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
-      mtt = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
-                          c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                          c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
-                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
-    } else {
-      # smoothing of Y for variance factor estimation
-      Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                  = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
-                                  weightFcnPtr_x = weight_x,
-                                  weightFcnPtr_t = weight_t)
+      par_list_Y =   list(h = h_defl,
+                          p = c(1, 1),
+                          drv = c(0, 0),
+                          mu = mu_vec,
+                          weight_x = kern_type_vec[1],
+                          weight_t = kern_type_vec[2])
+      par_list_mxx = list(h = h_infl$h_xx,
+                          p = c(2*p_order[1] - drv_vec[1] + 1, p_order[2]),
+                          drv = c(p_order[1] + 1, drv_vec[2]),
+                          mu = mu_vec,
+                          weight_x = kern_type_vec[1],
+                          weight_t = kern_type_vec[2])
+      par_list_mtt = list(h = h_infl$h_tt,
+                          p = c(p_order[1], 2*p_order[2] - drv_vec[2] + 1),
+                          drv = c(drv_vec[1], p_order[2] + 1),
+                          mu = mu_vec,
+                          weight_x = kern_type_vec[1],
+                          weight_t = kern_type_vec[2])
+      
+      par_list = list(par_Y = par_list_Y, par_mxx = par_list_mxx, 
+                      par_mtt = par_list_mtt)
+      
+      if (dcs_options$IPI_options$const_window == TRUE)
+      {
+        result_list = parallel.LP.const1(par_list, Y)
+        Y_smth = result_list[[1]]
+        mxx = result_list[[2]]
+        mtt = result_list[[3]]
+      } else {
+        result_list = parallel.LP.const0(par_list, Y)
+        Y_smth = result_list[[1]]
+        mxx = result_list[[2]]
+        mtt = result_list[[3]]
+      }
+    } else if (add_options$parallel == FALSE) {
+      if (dcs_options$IPI_options$const_window == TRUE)
+      {
+        # smoothing of Y for variance factor estimation
+        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
+                                    = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
+                                    weightFcnPtr_x = weight_x,
+                                    weightFcnPtr_t = weight_t)
+        # smoothing of derivatives m(2,0) and m(0,2)
+        mxx = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
+                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
+                            c(p_order[1] + 1, drv_vec[2]), muVec = mu_vec,
+                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+        mtt = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                            c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+                            c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
+                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+      } else {
+        # smoothing of Y for variance factor estimation
+        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
+                                    = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
+                                    weightFcnPtr_x = weight_x,
+                                    weightFcnPtr_t = weight_t)
 
-      # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
-                          c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                          c(p_order[1] + 1, drv_vec[2]),  muVec = mu_vec,
-                          weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
-      mtt = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
-                         c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                         c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
-                         weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+        # smoothing of derivatives m(2,0) and m(0,2)
+        mxx = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
+                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
+                            c(p_order[1] + 1, drv_vec[2]),  muVec = mu_vec,
+                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+        mtt = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
+                           c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
+                           c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
+                           weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+      } 
     }
       
     # shrink mxx, mtt from boundaries if delta > 0

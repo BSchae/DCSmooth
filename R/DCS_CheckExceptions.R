@@ -80,6 +80,17 @@ exception.check.bndw = function(bndw, dcs_options)
   }
 }
 
+#--------------------------Check parallel Options------------------------------#
+
+
+exception.check.parallel = function(parallel)
+{
+  if (!is.logical(parallel) || length(parallel) != 1)
+  {
+    stop("Unsupported value in argument \"parallel\".")
+  }
+}
+
 #-----------------------Check for correct Options------------------------------#
 
 # Check input for set.options()
@@ -279,5 +290,34 @@ exception.check.order_max = function(order_max)
       any(order_max$ma < 0))
   {
     stop("MA order of \"model_order\" incorrectly specified")
+  }
+}
+
+#------------------------Exceptions for SARMA/SFARIMA--------------------------#
+
+exception.check.model.sarma = function(model)
+{
+  if (any(is.na(unlist(model))))
+  {
+    stop("Missing values in subelements of list \"model\".")
+  }
+  
+  if (!is.numeric(unlist(model)))
+  {
+    stop("Only numerical values in subelements of list \"model\" allowed.")
+  }
+
+  if (as.matrix(model$ar)[1, 1] != 1)
+  {
+    warning("Entry in upper left of matrix \"$ar\" is not equal to 1.")
+  }
+  if (as.matrix(model$ma)[1, 1] != 1)
+  {
+    warning("Entry in upper left of matrix \"$ma\" is not equal to 1.")
+  }
+  
+  if (length(model$sigma) != 1)
+  {
+    stop("Argument \"sigma\" should be a scalar value.")
   }
 }

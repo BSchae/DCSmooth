@@ -5,7 +5,10 @@
 * Functions qarma.est(), qarma.sim() have been replaced by sarma.est() and sarma.sim(). They are still available and link to the new functions.
 * Added summary and print methods for classes "sarma" and "sfarima".
 * Output "var_est" of dcs() contains now the complete estimation of error terms of class "sarma" or "sfarima".
-* Arguments "model_order" and "order_max" controlling the orders of the variance models are now passed to "set.options()" as additional arguments in the functions ellipsis. 
+* Arguments "model_order" and "order_max" controlling the orders of the variance models are now passed to "set.options()" as additional arguments in the functions ellipsis.
+* Functions "kernel.assign()" and "kernel.list()" have been added.
+* New datasets "wind.nunn", "wind.yuma", "sun.nunn", "sun.yuma", "returns.alv", "returns.bmw", "returns.sie", "volumes.alv", "volumes.bmw", "volumes.sie" added.
+* Test for stationarity of SARMA models fixed.
 
 # DCSmooth 1.0.3
 * New datasets "temp.nunn" and "temp.yuma" added.

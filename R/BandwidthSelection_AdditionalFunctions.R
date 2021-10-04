@@ -19,7 +19,7 @@ h.opt.LP = function(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
   
   # relation factor gamma_21 (h_1 = gamma_21 * h_2)
   delta = (p_order - drv_vec)[1] # should be the same for both entries
-  gamma_21 = (kernel_prop_1$mu/kernel_prop_2$mu)^(1/(delta + 1)) *
+  gamma_21 = abs(kernel_prop_1$mu/kernel_prop_2$mu)^(1/(delta + 1)) * # "abs" bc. its a square root
           ( i12/i11 * (drv_vec[1] - drv_vec[2])/(2*drv_vec[2] + 1) +
           sqrt(i12^2/i11^2 * (drv_vec[1] - drv_vec[2])^2/(2*drv_vec[2] + 1)^2 +
           i22/i11 * (2*drv_vec[1] + 1)/(2*drv_vec[2] + 1)) )^(1/(delta + 1))
@@ -83,7 +83,7 @@ integral.calc.KR = function(m11, m22, n_sub)
 
 kernel.prop.LP = function(kernel_fcn, p, drv, n_int = 5000)
 {
-  u_seq  = seq(from = -1, to = 1, length.out = (2 * n_int + 1))
+  u_seq  = seq(from = 1, to = -1, length.out = (2 * n_int + 1))
   # np_matrix = np_matrix(kernel_fcn, p, n_int)
   # add_weights = m_weights(np_matrix, u_seq, drv)
   # 
@@ -92,9 +92,9 @@ kernel.prop.LP = function(kernel_fcn, p, drv, n_int = 5000)
   # val_mu = sum((add_weights * kernel_fcn_use(u_seq, q = 1, kernel_fcn)) *
   #               u_seq^(p + 1)) / (n_int * factorial(p + 1))
   
-  val_R  = sum(kernel_fcn_use(u_seq, q = 1, kernel_fcn)^2)/n_int
-  val_mu = sum(kernel_fcn_use(u_seq, q = 1, kernel_fcn) *
-                u_seq^(p + 1)) / (n_int * factorial(p + 1))
+  val_R  = sum(kernel_fcn(u_seq, q = 1)^2)/n_int
+  val_mu = sum(kernel_fcn(u_seq, q = 1) * u_seq^(p + 1)) /
+    (n_int * factorial(p + 1))
   # TODO: check if "factorial(p + 1)" is correctly
   
   return(list(R = val_R, mu = val_mu))

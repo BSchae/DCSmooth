@@ -27,7 +27,8 @@ test_that("set.options() gets \"kerns\" correctly.",{
 
 test_that("set.options() gets \"drv\" correctly.",{
   expect_equal(set.options(drv = c(0, 0))$drv, c(0, 0))
-  expect_equal(set.options(drv = c(2, 1))$drv, c(2, 1))
+  expect_equal(set.options(drv = c(2, 1), 
+                           kerns = c("MW_422", "MW_321"))$drv, c(2, 1))
 })
 
 test_that("set.options() gets \"var_model\" correctly.",{
@@ -35,7 +36,7 @@ test_that("set.options() gets \"var_model\" correctly.",{
   expect_equal(set.options(var_model = "sarma_HR")$var_model, "sarma_HR")
   expect_equal(set.options(var_model = "sarma_sep")$var_model, "sarma_sep")
   expect_equal(set.options(var_model = "sarma_RSS")$var_model, "sarma_RSS")
-  expect_equal(set.options(var_model = "sfarima_sep")$var_model, "sfarima_sep")
+  expect_equal(set.options(var_model = "sfarima_RSS")$var_model, "sfarima_RSS")
 })
 
 test_that("set.options() converts \"var_est\" correctly.",{

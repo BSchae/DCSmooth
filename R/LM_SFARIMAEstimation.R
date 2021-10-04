@@ -180,54 +180,58 @@ sfarima.residuals = function(R_mat, model)
 
 ###################### new functions ##############################
 sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
-                        lm = TRUE, restr = NULL, sFUN = min) {
-  if (lm == TRUE)
-  {
-    drange = c(0, 0.5)
-  } else {
-    drange = 0
-  }
-  
+                        restr = NULL, sFUN = min, parallel = TRUE)
+{
   if(crit == "bic") {
     crit.fun = stats::BIC
   }
   else if (crit == "aic") {
     crit.fun = stats::AIC
   }
+  
   bic_x =  matrix(0, pmax[1] + 1, qmax[1] + 1)
   bic_t =  matrix(0, pmax[2] + 1, qmax[2] + 1)
   R_x = as.vector(Rmat)
   R_t = as.vector(t(Rmat))
-  #browser()
-  n.cores = parallel::detectCores(logical = TRUE) - 1
-  #cl <- parallel::makeCluster(n.cores)
-  doParallel::registerDoParallel(n.cores)
-  `%dopar%` = foreach::`%dopar%`
-  `%:%` = foreach::`%:%`
-  
-  bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
-    foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar% {
-      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1,
-            nma = j - 1, drange = c(0, 0.5))))
-   }
-  
-  bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
-    foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar% {
-      bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1,
-            nma = j - 1, drange = c(0, 0.5))))
+
+  if (parallel == TRUE)
+  {
+    n.cores = parallel::detectCores(logical = TRUE) - 1
+    doParallel::registerDoParallel(n.cores)
+    `%dopar%` = foreach::`%dopar%`
+    `%:%` = foreach::`%:%`
+    
+    bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
+      foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar%
+      {
+        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1,
+                       nma = j - 1, drange = c(0, 0.5))))
+      }
+    
+    bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
+      foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar%
+      {
+        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1,
+                       nma = j - 1, drange = c(0, 0.5))))
+      }
+  } else {
+    for (i in 1:(pmax[1] + 1))
+    {
+      for (j in 1:(qmax[1] + 1))
+      {
+        bic_x[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x,
+                               nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
+      }
     }
-  # for (i in 1:(pmax[2] + 1)) {
-  #   for (j in 1:(qmax[2] + 1)) {
-  #     
-  #     bic_t[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1, nma = j - 1,
-  #                                                                drange = c(0, 0.5))))
-  # 
-  #     # bic_t[i, j] = mean(parallel::parApply(cl = cl, Rmat, 1, FUN = function (x)
-  #     #   crit.fun(suppressWarnings(fracdiff::fracdiff(x, nar = i - 1, nma = j - 1,
-  #     #                                                drange = c(0, 0.5))))))
-  #   }
-  # }
-  doParallel::stopImplicitCluster()
+    for (i in 1:(pmax[2] + 1))
+    {
+      for (j in 1:(qmax[2] + 1))
+      {
+        bic_t[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t,
+                               nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
+      }
+    }
+  }
   
   restr = substitute(restr)
   if(!is.null(restr)){
