@@ -24,11 +24,9 @@ cf.estimation = function(Y, dcs_options, add_options)
       model_order = sarma.order(Y, method = "sep", criterion = "bic",
                                 order_max = add_options$order_max)
     }
-    
   } else {
     model_order = add_options$model_order
   }
-  
   
   if (dcs_options$var_model == "iid")
   {

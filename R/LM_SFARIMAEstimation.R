@@ -88,7 +88,8 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   statTest = sarma.statTest(ar_mat)
   if (!statTest)
   {
-    warning("SFARIMA model not stationary, try another order for the AR-parts.")
+    warning("AR part of SFARIMA model not stationary, try another order for ",
+            "the AR-parts.")
   }
   
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,

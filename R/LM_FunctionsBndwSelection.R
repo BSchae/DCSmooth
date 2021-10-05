@@ -64,9 +64,7 @@ sfarima.cf = function(R_mat, model_order =
   cf_est = 1/(2*pi)^2 * sum(sfarima$model$ma)^2 / sum(sfarima$model$ar)^2 *
             sfarima$model$sigma^2
   
-  var_model = sfarima
-  
-  return(list(cf_est = cf_est, var_model = var_model))
+  return(list(cf_est = cf_est, var_model = sfarima))
 }
 
 #------------------------Formula for coefficient cb----------------------------#

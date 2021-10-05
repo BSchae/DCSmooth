@@ -135,7 +135,7 @@ LP.bndw = function(Y, dcs_options, add_options)
       var_est = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
                                                add_options))
       var_coef = var_est$cf_est
-      var_model = var_est$var_model
+      var_model = var_est$model_est
 
       # calculate optimal bandwidths for next step
       h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 

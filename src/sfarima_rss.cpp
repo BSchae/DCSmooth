@@ -28,27 +28,23 @@ double sfarima_rss(const arma::vec theta,
   arma::colvec phi1, psi1, phi2, psi2;
   if (nar1 > 0) {
     phi1 = theta.subvec(2, nar1 + 1);
-  }
-  else {
+  } else {
     phi1.zeros(1);
   }
   if (nar2 > 0) {
     phi2 = theta.subvec(nar1 + 2, nar12 + 1);
-  }
-  else {
+  } else {
     phi2.zeros(1);
   }
   if (nma1 > 0) {
     psi1 = theta.subvec(nar12 + 2, nar12 + nma1 + 1);
-  }
-  else {
+  } else {
     psi1.zeros(1);
   }
   
   if (nma2 > 0) {
     psi2 = theta.subvec(nar12 + nma1 + 2, nar12 + nma12 + 1);
-  }
-  else {
+  } else {
     psi2.zeros(1);
   }
   
@@ -63,8 +59,7 @@ double sfarima_rss(const arma::vec theta,
   for (int j = 0; j < n2; j++) {
     if (j < Kt) {
       xi_est.row(j) = bk2.subvec(0, j) * reverse(tR_mat.rows(0, j));
-    }
-    else {
+    } else {
       xi_est.row(j) = bk2 * reverse(tR_mat.rows((j - Kt), j));
     }
   }
@@ -73,8 +68,7 @@ double sfarima_rss(const arma::vec theta,
   for (int i = 0; i < n1; i++) {
     if (i < Kx) {
       e_est.row(i) = bk1.subvec(0, i) * reverse(txi_est.rows(0, i));
-    }
-    else {
+    } else {
       e_est.row(i) = bk1 * reverse(txi_est.rows((i - Kx), i));
     }
   }
