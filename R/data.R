@@ -112,62 +112,42 @@
 #' solar radiation in \eqn{W/m^2}.
 "sun.nunn"
 
-#' #' Returns of Allianz SE
-#' #' 
-#' #' The (log-) returns of the shares of the German insurance company Allianz SE 
-#' #' from 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data
-#' #' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "returns.alv"
-#' 
-#' #' Returns of BMW AG
-#' #' 
-#' #' The (log-) returns of shares of the German car manufacturer BMW AG from 
-#' #' 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data is 
-#' #' adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "returns.bmw"
-#' 
-#' #' Returns of Siemens AG
-#' #' 
-#' #' The (log-) returns of shares of the German technology corporation Siemens AG 
-#' #' from 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data
-#' #' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "returns.sie"
-#' 
-#' #' Volumes of Allianz SE
-#' #' 
-#' #' The trading volumes of the shares of the German insurance company Allianz SE 
-#' #' from 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data
-#' #' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "volumes.alv"
-#' 
-#' #' Volumes of BMW AG
-#' #' 
-#' #' The trading volumes of shares of the German car manufacturer BMW AG from 
-#' #' 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data is 
-#' #' adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "volumes.bmw"
-#' 
-#' #' Volumes of Siemens AG
-#' #' 
-#' #' The trading volumes of shares of the German technology corporation Siemens AG 
-#' #' from 2004-01-02 to 2014-09-30 aggregated to per-minute observations. The data
-#' #' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#' #' 
-#' #' @format A numeric matrix with 2739 rows representing the days and 510 columns
-#' #' representing the intraday time points.
-#' "volumes.sie"
+#' Returns of Allianz SE
+#'
+#' The (log-) returns of the shares of the German insurance company Allianz SE
+#' from 2007-01-02 to 2010-12-30 aggregated to 5-minute observations. The data
+#' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
+#'
+#' @format A numeric matrix with 1016 rows representing the days and 101 columns
+#' representing the intraday time points.
+"returns.alv"
+
+#' Returns of BMW AG
+#'
+#' The (log-) returns of shares of the German car manufacturer BMW AG 
+#' from 2007-01-02 to 2010-12-30 aggregated to 5-minute observations. The data
+#' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
+#'
+#' @format A numeric matrix with 1016 rows representing the days and 101 columns
+#' representing the intraday time points.
+"returns.bmw"
+
+#' Volumes of Allianz SE
+#'
+#' The trading volumes of the shares of the German insurance company Allianz SE
+#' from 2007-01-02 to 2010-09-30 aggregated to 5-minute observations. The data
+#' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
+#'
+#' @format A numeric matrix with 1016 rows representing the days and 102 columns
+#' representing the intraday time points.
+"volumes.alv"
+
+#' Volumes of BMW AG
+#'
+#' The trading volumes of shares of the German car manufacturer BMW AG from
+#' from 2007-01-02 to 2010-09-30 aggregated to 5-minute observations. The data
+#' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
+#'
+#' @format A numeric matrix with 1016 rows representing the days and 102 columns
+#' representing the intraday time points.
+"volumes.bmw"

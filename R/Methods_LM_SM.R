@@ -1,3 +1,17 @@
+################################################################################
+#                                                                              #
+#                DCSmooth Package: Methods for SARMA/SFARIMA                   #
+#                                                                              #
+################################################################################
+
+### Includes all methods for summarizing, printing and plotting classes "sarma"
+### and "sfarima"
+
+  # summary.sarma
+    # print.summary_sarma
+  # summary.sfarima
+    # print.summary_sfarima
+
 #--------------------Summary Methods for SARMA Estimation----------------------#
 
 #' Summarizing SARMA/SFARIMA Estimation or Simulation
@@ -80,7 +94,7 @@ summary.sarma = function(object, ...)
 #' @description \code{print} methods for class \code{"summary_sarma"}/
 #'  \code{"summary_sfarima"}
 #' 
-#' @param x An object of class \code{"summary_sarma"} or
+#' @param object An object of class \code{"summary_sarma"} or
 #'  \code{"summary_sfarima"}.
 #' @param ... Additional arguments passed to \code{print.summary_sarma}/
 #'  \code{print.summary_sfarima}.

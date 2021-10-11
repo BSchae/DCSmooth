@@ -47,12 +47,8 @@ test_that("exception handling works for sarma.est()", {
   model = list(ar = ar, ma = ma, sigma = 1)
   
   sarma_sim = sarma.sim(104, 104, model = model)$Y
-  Y = sarma.sim
+  Y = sarma_sim
   Y[5, 5] = NA
   
-  expect_error(sarma.est(Y))
+  expect_error(sarma.est(Y), "Y contains missing values")
 })
-
-
-
-

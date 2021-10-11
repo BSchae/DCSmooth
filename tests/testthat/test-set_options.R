@@ -49,20 +49,11 @@ test_that("set.options() converts \"var_est\" correctly.",{
 
 test_that("set.options() gets \"IPI_options\" correctly.",{
   IPI_LP = list(infl_exp = c("auto", " "), infl_par = c(1, 1), 
-                delta = c(0.05, 0.05), const_window = FALSE)
+                trim = c(0.05, 0.05), const_window = FALSE)
   IPI_KR = list(infl_exp = c(0.5, 0.5), infl_par = c(2, 1), 
-                delta = c(0.05, 0.05), const_window = FALSE)
+                trim = c(0.05, 0.05), const_window = FALSE)
   expect_equal(set.options(type = "LP")$IPI_options, IPI_LP)
   expect_equal(set.options(type = "KR")$IPI_options, IPI_KR)
-})
-
-### Test exception handling (negatives)
-context("set.options() exception handling (positives)")
-
-test_that("set.options() gives correct error messages for problems", {
-  expect_error(set.options(type = "test"), "Unsupported values in argument")
-  expect_error(set.options(type = c("KR", "LP")),
-               "Unsupported values in argument")
 })
 
 test_that("set.options() gets additional options correctly.",{
@@ -83,7 +74,33 @@ test_that("set.options() gets additional options correctly.",{
                order_list)
 })
 
+
+### Test exception handling (negatives)
 context("set.options() exception handling (negatives)")
+
+test_that("set.options() gives correct error messages for problems", {
+  expect_error(set.options(type = "test"), "Unsupported values in argument")
+  expect_error(set.options(type = c("KR", "LP")),
+               "Unsupported values in argument")
+})
+
+test_that("set.options() gets additional options correctly.",{
+  order_list = list(ar = c(1, 1), ma = c(1, 1))
+  
+  expect_message(set.options(model_order = order_list), "unused for iid.")
+  expect_message(set.options(model_order = "bic"), "unused for iid.")
+  
+  expect_error(set.options(var_model = "sarma_sep", model_order = 5),
+               "unknown model selection criterion")
+  order_list_2 = order_list
+  order_list_2$ar = "test"
+  expect_error(set.options(var_model = "sarma_sep", model_order = order_list_2),
+               "AR order of")
+  order_list_3 = order_list
+  order_list_3$ma = "test"
+  expect_error(set.options(var_model = "sarma_sep", model_order = order_list_3),
+               "MA order of")
+})
 
 test_that("errors for derivative estimation work.", {
   expect_error(set.options(drv = c(1, "a")), "Unsupported values in argument")

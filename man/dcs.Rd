@@ -4,7 +4,7 @@
 \alias{dcs}
 \title{Nonparametric Double Conditional Smoothing for 2D Surfaces}
 \usage{
-dcs(Y, dcs_options = set.options(), h = "auto", ...)
+dcs(Y, dcs_options = set.options(), h = "auto", parallel = FALSE, ...)
 }
 \arguments{
 \item{Y}{A numeric matrix that contains the observations of the random field
@@ -18,7 +18,11 @@ two-valued numerical vector with bandwidths in row- and column-direction.
 If the value is \code{"auto"} (the default), bandwidth selection will be 
 carried out by the iterative plug-in algorithm.}
 
-\item{...}{Additional arguments passed to \code{dcs}. These might include
+\item{parallel}{A logical value indicating if parallel computing should be
+used for faster computation. Default value is \code{parallel = FALSE}.
+Parallelization seems to be efficient at above 400,000 observations.}
+
+\item{...}{Additional arguments passed to \code{dcs}. Currently supported are
 numerical vectors \code{X} and/or \code{T} containing the exogenous
 covariates with respect to the rows and columns.}
 }

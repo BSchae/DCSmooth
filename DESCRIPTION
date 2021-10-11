@@ -1,7 +1,7 @@
 Package: DCSmooth
 Type: Package
 Title: Nonparametric Regression and Bandwidth Selection for Spatial Models
-Version: 1.1.0.4
+Version: 1.1.0.6
 Authors@R: c(person("Bastian", "Schaefer",
     email = "bastian.schaefer@uni-paderborn.de", role = c("aut", "cre")),
     person("Sebastian", "Letmathe", role = "ctb"),
@@ -19,7 +19,7 @@ Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb], Yuanhua Feng [ctb
 Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>
 License: GPL-3
 LazyData: true
-Imports: Rcpp, plotly, stats
+Imports: Rcpp, plotly, stats, fracdiff, doParallel, parallel, foreach
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
 Encoding: UTF-8
@@ -27,4 +27,4 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 3.1.0)
 Suggests: 
-    knitr, rmarkdown, testthat, fracdiff, doParallel, parallel, foreach
+    knitr, rmarkdown, testthat

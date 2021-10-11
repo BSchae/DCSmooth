@@ -8,6 +8,17 @@
 # ity with the requirements of the package. They stop the function and return an
 # error, if something wrong.
 
+  # exception.check.Y
+  # exception.check.XT
+  # exception.check.bndw
+  # exception.check.args_list
+  # exception.check.parallel
+  # exception.check.options.input
+  # exception.check.options
+  # exception.check.model_order
+  # exception.check.order_max
+  # exception.check.model.sarma
+
 #----------------------Check Matrix of Observations Y--------------------------#
 
 exception.check.Y = function(Y)
@@ -80,8 +91,19 @@ exception.check.bndw = function(bndw, dcs_options)
   }
 }
 
-#--------------------------Check parallel Options------------------------------#
+#-------------------------------Check args_list--------------------------------#
 
+exception.check.args_list = function(args_list)
+{
+  if (any(!(names(args_list) %in% dcs_list_args_dcs)))
+  {
+    index = which(!(names(args_list) %in% dcs_list_args_dcs))
+    warning("Additional argument(s) \"", names(args_list)[index], 
+            "\" are unsupported and will be ignored.")
+  }
+}
+
+#--------------------------Check parallel Options------------------------------#
 
 exception.check.parallel = function(parallel)
 {
@@ -132,10 +154,10 @@ exception.check.options.input = function(type, kerns, drv, var_model,
   {
     stop("Unknown values in argument \"IPI_options$infl_par\".")
   }
-  if (exists("delta", IPI_options) && (!is.numeric(IPI_options$delta) ||
-      length(IPI_options$delta) != 2))
+  if (exists("trim", IPI_options) && (!is.numeric(IPI_options$trim) ||
+      length(IPI_options$trim) != 2))
   {
-    stop("Unknown values in argument \"IPI_options$delta\".")
+    stop("Unknown values in argument \"IPI_options$trim\".")
   }
   if (exists("const_window", IPI_options) && 
       (!is.logical(IPI_options$const_window) ||
@@ -193,19 +215,19 @@ exception.check.options = function(dcs_opt)
     stop("Derivative order must be at least 0.")
   }
   
-  # check delta orders
-  if (!is.numeric(dcs_opt$IPI_options$delta))
+  # check trim orders
+  if (!is.numeric(dcs_opt$IPI_options$trim))
   {
-    stop("Shrink factor \"delta\" must be numeric.")
+    stop("Shrink factor \"trim\" must be numeric.")
   }
-  if (length(dcs_opt$IPI_options$delta) != 2)
+  if (length(dcs_opt$IPI_options$trim) != 2)
   {
-    stop("Shrink factor \"delta\" must be a numeric vector of length 2.")
+    stop("Shrink factor \"trim\" must be a numeric vector of length 2.")
   }
-  if (any(dcs_opt$IPI_options$delta < 0) ||
-      any(dcs_opt$IPI_options$delta > 0.5))
+  if (any(dcs_opt$IPI_options$trim < 0) ||
+      any(dcs_opt$IPI_options$trim > 0.5))
   {
-    stop("Shrink factor \"delta\" must be between 0 and 0.5.")
+    stop("Shrink factor \"trim\" must be between 0 and 0.5.")
   }
   
   # Options for derivative estimation
@@ -250,7 +272,13 @@ exception.check.model_order = function(model_order, var_model)
   if (!is.list(model_order) && (length(model_order) == 1 &&
       model_order %in% c("aic", "bic", "gpac")))
   {
-    return(NULL)
+    # No GPAC estimation for SFARIMA possible
+    if (model_order == "gpac" && var_model == "sfarima_RSS")
+    {
+      stop("Order selection of type \"gpac\" not supported for SFARIMA models.")
+    } else {
+      return(NULL)
+    }
   }
   
   if (!is.list(model_order) && (length(model_order) != 1 ||

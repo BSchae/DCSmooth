@@ -2,12 +2,9 @@
 % Please edit documentation in R/DCS_MainFunctions.R
 \name{kernel.assign}
 \alias{kernel.assign}
-\alias{kernel.list}
 \title{Assign a Kernel Function}
 \usage{
 kernel.assign(kernel_id)
-
-kernel.list()
 }
 \arguments{
 \item{kernel_id}{a string specifying the kernel identifier as given in the
@@ -29,15 +26,10 @@ Assign a Kernel Function
  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
  or truncated kernels ("TR").
- 
-\code{kernel.list} prints a list of identifiers \code{kernel_id} of available
- kernels in the DCSmooth package.
 }
 
 \examples{
  # See vignette("DCSmooth") for further examples and explanation
- 
- kernel.list()
 
 u = seq(from = -1, to = 0.5, length.out = 151)
 kern_MW220 = kernel.assign("MW_220")

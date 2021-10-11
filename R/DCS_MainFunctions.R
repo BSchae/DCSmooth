@@ -4,17 +4,13 @@
 #                                                                              #
 ################################################################################
 
-# Includes the main functions for the DCS package
+### Includes the main functions for the DCS package
 
-# set.options (exported)
-
-# dcs (exported)
-
-# surface.dcs (exported)
-
-# kernel.assign (exported)
-
-# kernel.list (exported)
+  # set.options (exported)
+  # dcs (exported)
+  # surface.dcs (exported)
+  # kernel.assign (exported)
+  # kernel.list (exported)
 
 
 #------------------------Set Options via Function------------------------------#
@@ -115,9 +111,9 @@ set.options <- function(    # inside function with default values in arguments
   } else {
     IPI_options = list()
     # get IPI_options from higher-ranking list "args_list"
-    if (exists("delta", args_list))
+    if (exists("trim", args_list))
     {
-      IPI_options$delta = args_list$delta
+      IPI_options$trim = args_list$trim
     }
     if (exists("infl_par", args_list))
     {
@@ -168,7 +164,7 @@ set.options <- function(    # inside function with default values in arguments
       IPI_options$infl_exp <- c("auto", " ")
     }
     if (!exists("infl_par", IPI_options)) { IPI_options$infl_par <- c(1, 1) }
-    if (!exists("delta", IPI_options)) { IPI_options$delta <- c(0.05, 0.05) }
+    if (!exists("trim", IPI_options)) { IPI_options$trim <- c(0.05, 0.05) }
     if (!exists("const_window", IPI_options))
     {
       IPI_options$const_window <- FALSE
@@ -180,7 +176,7 @@ set.options <- function(    # inside function with default values in arguments
       IPI_options$infl_exp <- c(0.5, 0.5)
     }
     if (!exists("infl_par", IPI_options)) { IPI_options$infl_par <- c(2, 1) }
-    if (!exists("delta", IPI_options)) { IPI_options$delta <- c(0.05, 0.05) }
+    if (!exists("trim", IPI_options)) { IPI_options$trim <- c(0.05, 0.05) }
     if (!exists("const_window", IPI_options))
     {
       IPI_options$const_window <- FALSE
@@ -231,7 +227,7 @@ set.options <- function(    # inside function with default values in arguments
 #' @param parallel A logical value indicating if parallel computing should be
 #'  used for faster computation. Default value is \code{parallel = FALSE}.
 #'  Parallelization seems to be efficient at above 400,000 observations.
-#' @param ... Additional arguments passed to \code{dcs}. These might include
+#' @param ... Additional arguments passed to \code{dcs}. Currently supported are
 #'  numerical vectors \code{X} and/or \code{T} containing the exogenous
 #'  covariates with respect to the rows and columns.
 #' 
@@ -290,6 +286,8 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     # set up vectors for X and T if neccessary
     args_list <- list(...)
     
+    exception.check.args_list(args_list)
+    
     if (!exists("X", where = args_list))
     {
       X <- 0:(n_x - 1)/(n_x - 1)
@@ -325,14 +323,36 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     # bandwidth selection process
     if (dcs_options$type == "KR")
     {
-      ### kernel regression
-      # TODO: allow for derivatives in kernel regression
-      h_select_obj <- KR.bndw(Y, dcs_options, add_options)
-      h_opt <- pmin(h_select_obj$h_opt, c(0.45, 0.45)) 
-                                          # KR cannot handle larger bandwidths
+      if (any(dcs_options$drv > 0))
+      {
+        dcs_options_0 = dcs_options
+        dcs_options_0$drv = c(0, 0)
+        dcs_options_0$kerns = c("MW_220", "MW_220") # TODO: Change later to correct orders
+        h_aux_obj <- KR.bndw(Y, dcs_options_0, add_options, cf_est = TRUE)
+        cf_est = list(var_coef = h_aux_obj$var_coef,
+                      var_model = h_aux_obj$var_model)
+      } else {
+        cf_est = TRUE
+      }
+      
+      h_select_obj <- KR.bndw(Y, dcs_options, add_options, cf_est = cf_est)
+      h_opt <- pmin(h_select_obj$h_opt, c(0.45, 0.45)) # max bndw for KR
+    
     } else if (dcs_options$type == "LP") {
-      ### local polynomial regression
-      h_select_obj <- LP.bndw(Y, dcs_options, add_options)
+      if (any(dcs_options$drv > 0))
+      {
+        dcs_options_0 = dcs_options
+        dcs_options_0$drv = c(0, 0)
+        dcs_options_0$p_order = c(1, 1)
+        dcs_options_0$kerns = c("MW_220", "MW_220") # TODO: Change later to correct orders
+        h_aux_obj <- LP.bndw(Y, dcs_options_0, add_options, cf_est = TRUE)
+        cf_est = list(var_coef = h_aux_obj$var_coef,
+                      var_model = h_aux_obj$var_model)
+      } else {
+        cf_est = TRUE
+      }
+      
+      h_select_obj <- LP.bndw(Y, dcs_options, add_options, cf_est = cf_est)
       h_opt <- h_select_obj$h_opt
     }
     
@@ -437,6 +457,9 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
 #'  (2) and residuals (3).
 #' @param Y an object of class \code{"dcs"} or a numeric matrix that contains the
 #'   values to be plotted.
+#' @param trim a numeric vector with two values specifying the percentage of
+#'  trimming applied to the boundaries of the surface to plot. Useful for
+#'  derivative estimation.
 #' @param plot_choice override the prompt to specify a plot, can be 
 #'  \code{c(1, 2, 3)}.
 #' @param ... optional arguments passed to the plot function.
@@ -449,13 +472,21 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
 #' # See vignette("DCSmooth") for examples and explanation
 #' 
 #' smth =  dcs(y.norm1 + rnorm(101^2))
-#' surface.dcs(smth, plot_choice = 2)
+#' surface.dcs(smth, trim = c(0.05, 0.05), plot_choice = 2)
 #' 
 #' @export
 #' 
 
-surface.dcs <- function(Y, plot_choice = "choice", ...)
+surface.dcs <- function(Y, trim = c(0, 0), plot_choice = "choice", ...)
 {
+  # check exceptions for argument "trim"
+  if ((length(trim) != 2) || !is.numeric(trim) || any(trim < 0) ||
+      any(trim >= 0.5))
+  {
+    stop("Only values [0, 0.5) allowed for argument \"trim\".")
+  }
+  
+  # procedure if "dcs"-object is passed
   if (class(Y)[1] == "dcs")
   {
     fcn_arg <- list(...)
@@ -476,20 +507,29 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
       stop("Invalid value in argument \"plot_choice\". Use c(1, 2, 3).")
     }
     
+    index_x = ceiling(trim[1] * dim(Y$Y)[1]):
+                (dim(Y$Y)[1] - floor(trim[1] * dim(Y$Y)[1]))
+    index_t = ceiling(trim[2] * dim(Y$Y)[2]):
+                (dim(Y$Y)[2] - floor(trim[2] * dim(Y$Y)[2]))
+    
     if (plot_choice == 1) {
-      Y_mat <- Y$Y
+      Y_mat <- Y$Y[index_x, index_t]
     } else if (plot_choice == 2) {
-      Y_mat <- Y$M
+      Y_mat <- Y$M[index_x, index_t]
     } else if (plot_choice == 3) {
-      Y_mat <- Y$R
+      Y_mat <- Y$R[index_x, index_t]
     } else {
       stop(plot_choice, " is not a valid plot-type.")
     }
     
-    .plotly.3d(Y = Y_mat, X = Y$X, T = Y$T, 
-              color = c("#444C5C", "#78A5A3", "#E1B16A", "#CE5A57"), ...)
+    .plotly.3d(Y = Y_mat, X = Y$X[index_x], T = Y$T[index_t], ...)
   } else {
-    .plotly.3d(Y = Y, ...)
+    index_x = ceiling(trim[1] * dim(Y)[1]):
+               (dim(Y)[1] - floor(trim[1] * dim(Y)[1]))
+    index_t = ceiling(trim[2] * dim(Y)[2]):
+               (dim(Y)[2] - floor(trim[2] * dim(Y)[2]))
+    
+    .plotly.3d(Y = Y[index_x, index_t], ...)
   }
 }
 
@@ -503,9 +543,6 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #'  \eqn{K(u,q)}, where \eqn{u \in [-1, q]}{u = [-1, q]} and \eqn{q \in [0, 1]}
 #'  {q = [0, 1]}. Kernels are of the Müller-Wang type ("MW"), Müller type ("M")
 #'  or truncated kernels ("TR").
-#'  
-#' \code{kernel.list} prints a list of identifiers \code{kernel_id} of available
-#'  kernels in the DCSmooth package.
 #'  
 #' @param kernel_id a string specifying the kernel identifier as given in the
 #'  details.
@@ -529,8 +566,6 @@ surface.dcs <- function(Y, plot_choice = "choice", ...)
 #' 
 #' @examples
 #'  # See vignette("DCSmooth") for further examples and explanation
-#'  
-#'  kernel.list()
 #' 
 #' u = seq(from = -1, to = 0.5, length.out = 151)
 #' kern_MW220 = kernel.assign("MW_220")
@@ -545,7 +580,7 @@ kernel.assign = function(kernel_id)
   # check for correct input
   if (!(kernel_id %in% dcs_list_kernels))
   {
-    stop("unknown kernel identifier.  See available kernels with ",
+    stop("unknown kernel identifier. See available kernels with ",
          "\"kernel.list()\".")
   } else {
     kernel_fcn_id = paste0("kern_fcn_", gsub("_", "", kernel_id))
@@ -555,21 +590,63 @@ kernel.assign = function(kernel_id)
   return(kern_out)
 }
 
-#' @rdname kernel.assign
+#' Print a list of available kernels in the DCSmooth package
+#' 
+#' @section Details:
+#' \code{kernel.list} is used to get a list of available kernels in the DCSmooth
+#'  package. 
+#'  
+#' \code{kernel.list} prints a list of identifiers \code{kernel_id} of available
+#'  kernels in the DCSmooth package. The available kernel types are "T": 
+#'  truncated, "MW": Müller-Wang boundary correction, "M": Müller boundary
+#'  correction.
+#'  
+#' @param print Logical value. Should the list be printed to the console? If
+#'  \code{TRUE} (the default), the list is printed to the console, if
+#'  \code{FALSE} the list of identifiers is returned from the function as
+#'  (surprise!) a list.
+#'  
+#' @return If \code{print = FALSE}, a list is returned containing the kernel
+#'  identifiers
+#'  
+#' @references
+#'  Müller, H.-G. and Wang, J.-L. (1994). Hazard rate estimation under random
+#'  censoring with varying kernels and bandwidths. Biometrics, 50:61-76.
+#'  
+#'  Müller, H.-G. (1991). Smooth optimum kernel estimators near endpoints.
+#'  Biometrika, 78:521-530.
+#'  
+#'  Feng, Y. and Schäfer B. (2021). Boundary Modification in Local Regression.
+#'  Working Papers CIE 144, Paderborn University.
+#' 
+#' @seealso \code{\link{kernel.assign}}
+#' 
+#' @examples
+#'  # See vignette("DCSmooth") for further examples and explanation
+#'  
+#'  kernel.list()
+#' 
 #' @export
 
-kernel.list = function()
+kernel.list = function(print = TRUE)
 {
   MW_kerns = dcs_list_kernels[grepl("MW_", dcs_list_kernels)]
   M_kerns = dcs_list_kernels[grepl("M_", dcs_list_kernels)]
   T_kerns = dcs_list_kernels[grepl("T_", dcs_list_kernels)]
   
-  cat("Kernels available in the DCSmooth package:\n")
-  cat("------------------------------------------", "\n")
-  cat("Müller-Wang type kernels:\n")
-  cat(MW_kerns, "\n", fill = 42)
-  cat("Müller type kernels:\n")
-  cat(M_kerns, "\n", fill = 42)
-  cat("Truncated kernels:\n")
-  cat(T_kerns, "\n", fill = 42)
+  if (isTRUE(print))
+  {
+    cat("Kernels available in the DCSmooth package:\n")
+    cat("------------------------------------------", "\n")
+    cat("M\u00FCller-Wang type kernels:\n")
+    cat(MW_kerns, "\n", fill = 42)
+    cat("M\u00FCller type kernels:\n")
+    cat(M_kerns, "\n", fill = 42)
+    cat("Truncated kernels:\n")
+    cat(T_kerns, "\n", fill = 42)
+  } else if (isFALSE(print)) {
+    kernel_list = list(MW_kerns = MW_kerns, M_kerns = M_kerns,
+                       T_kerns = T_kerns)
+    return(kernel_list)
+  }
 }

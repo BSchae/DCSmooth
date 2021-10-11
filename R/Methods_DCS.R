@@ -4,11 +4,18 @@
 #                                                                              #
 ################################################################################
 
-# Includes all methods for summarizing, printing and plotting classes "dcs" and
-# "dcs_options".
+### Includes all methods for summarizing, printing and plotting classes "dcs" and
+### "dcs_options".
 
-# summary.dcs
-  # print.summary_dcs
+  # summary.dcs
+    # print.summary_dcs
+  # print.dcs
+  # summary.dcs_options
+  # print.dcs_options
+  # residuals.dcs
+  # plot.dcs
+  # .order.to.string
+  # .onUnload
 
 #------------------------------Summary Methods---------------------------------#
 
@@ -197,26 +204,25 @@ print.dcs = function(x, ...)
   if (attr(x, "h_select_auto") == TRUE)
   {
     cat(class(x), "\n")
-    cat("--------------------------------------", "\n")
-    cat("DCS with automatic bandwidth selection\n")
-    cat("--------------------------------------", "\n")
+    cat("------------------------------------------", "\n")
+    cat("DCS with automatic bandwidth selection:\n")
+    cat("------------------------------------------", "\n")
     cat(" Selected Bandwidths:\n")
     cat("\t\th_x:", signif(x$h[1], digits = 5), "\n")
     cat("\t\th_t:", signif(x$h[2], digits = 5), "\n")
     cat(" Variance Factor:\n")
     cat("\t\tc_f:", signif(x$c_f, digits = 5), "\n")
-    cat("--------------------------------------", "\n")
-    
+    cat("------------------------------------------", "\n")
   # when given bandwidths are used.
   } else if (attr(x, "h_select_auto") == FALSE) {
     cat(class(x), "\n")
-    cat("---------------------------", "\n")
-    cat("DCS with given bandwidths\n")
-    cat("---------------------------", "\n")
+    cat("------------------------------", "\n")
+    cat("DCS with given bandwidths:\n")
+    cat("------------------------------", "\n")
     cat("Used Bandwidths:\n")
     cat("\th_x:", x$h[1], "\n")
     cat("\th_t:", x$h[2], "\n")
-    cat("---------------------------")
+    cat("------------------------------")
   }
 }
 
@@ -288,7 +294,7 @@ summary.dcs_options = function(object, ...)
       sep = "")
   cat("inflation exponents \t", ipi$infl_exp[1], "\t", ipi$infl_exp[2], "\n",
       sep = "")
-  cat("delta \t \t \t", ipi$delta[1], "\t", ipi$delta[2], "\n", sep = "")
+  cat("trim \t \t \t", ipi$trim[1], "\t", ipi$trim[2], "\n", sep = "")
   cat("constant window width \t", ipi$const_window, "\n", sep = "")
   cat("---------------------------------------", "\n")
 }

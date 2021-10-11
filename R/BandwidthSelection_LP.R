@@ -4,7 +4,11 @@
 #                                                                              #
 ################################################################################
 
-LP.bndw = function(Y, dcs_options, add_options)
+### Bandwidth selection function for local polynomial regression
+
+  # LP.bndw
+
+LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n = n_x * n_t                   # total number of observations
@@ -36,29 +40,21 @@ LP.bndw = function(Y, dcs_options, add_options)
     h_opt_temp = h_opt[1:2]       # store old bandwidths for breaking condition
     h_infl = inflation.LP(h_opt_temp, dcs_options, n_x, n_t)  
                                   # inflation of bandwidths for drv estimation
-    h_defl = deflation.LP(h_opt_temp, dcs_options, n_x, n_t)
-                                  # deflation if derivatives are estimated from
-                                  # function
    
     # parallel estimation of surfaces
     if (add_options$parallel == TRUE)
     {
-      par_list_Y =   list(h = h_defl,
-                          p = c(1, 1),
-                          drv = c(0, 0),
-                          mu = mu_vec,
-                          weight_x = kern_type_vec[1],
+      par_list_Y =   list(h = h_opt, p = c(1, 1), drv = c(0, 0), mu = mu_vec,
+                          weight_x = kern_type_vec[1], 
                           weight_t = kern_type_vec[2])
-      par_list_mxx = list(h = h_infl$h_xx,
+      par_list_mxx = list(h = h_infl$h_xx, 
                           p = c(2*p_order[1] - drv_vec[1] + 1, p_order[2]),
-                          drv = c(p_order[1] + 1, drv_vec[2]),
-                          mu = mu_vec,
+                          drv = c(p_order[1] + 1, drv_vec[2]), mu = mu_vec,
                           weight_x = kern_type_vec[1],
                           weight_t = kern_type_vec[2])
       par_list_mtt = list(h = h_infl$h_tt,
                           p = c(p_order[1], 2*p_order[2] - drv_vec[2] + 1),
-                          drv = c(drv_vec[1], p_order[2] + 1),
-                          mu = mu_vec,
+                          drv = c(drv_vec[1], p_order[2] + 1), mu = mu_vec,
                           weight_x = kern_type_vec[1],
                           weight_t = kern_type_vec[2])
       
@@ -81,46 +77,50 @@ LP.bndw = function(Y, dcs_options, add_options)
       if (dcs_options$IPI_options$const_window == TRUE)
       {
         # smoothing of Y for variance factor estimation
-        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                    = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
+        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt, polyOrderVec =
+                                    c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
                                     weightFcnPtr_x = weight_x,
                                     weightFcnPtr_t = weight_t)
         # smoothing of derivatives m(2,0) and m(0,2)
         mxx = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
-                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                            c(p_order[1] + 1, drv_vec[2]), muVec = mu_vec,
-                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), 
+                            drvVec = c(p_order[1] + 1, drv_vec[2]), 
+                            muVec = mu_vec, weightFcnPtr_x = weight_x,
+                            weightFcnPtr_t = weight_t)
         mtt = LP_dcs_const1_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
-                            c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                            c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
-                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+                            c(p_order[1], 2*p_order[2] - drv_vec[2] + 1),
+                            drvVec = c(drv_vec[1], p_order[2] + 1),
+                            muVec = mu_vec, weightFcnPtr_x = weight_x,
+                            weightFcnPtr_t = weight_t)
       } else {
         # smoothing of Y for variance factor estimation
-        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_defl, polyOrderVec
-                                    = c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
+        Y_smth = LP_dcs_const0_BMod(yMat = Y, hVec = h_opt, polyOrderVec =
+                                    c(1, 1), drvVec = c(0, 0), muVec = mu_vec,
                                     weightFcnPtr_x = weight_x,
                                     weightFcnPtr_t = weight_t)
 
         # smoothing of derivatives m(2,0) and m(0,2)
         mxx = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_xx, polyOrderVec =
-                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]), drvVec =
-                            c(p_order[1] + 1, drv_vec[2]),  muVec = mu_vec,
-                            weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+                            c(2*p_order[1] - drv_vec[1] + 1, p_order[2]),
+                            drvVec = c(p_order[1] + 1, drv_vec[2]),
+                            muVec = mu_vec, weightFcnPtr_x = weight_x,
+                            weightFcnPtr_t = weight_t)
         mtt = LP_dcs_const0_BMod(yMat = Y, hVec = h_infl$h_tt, polyOrderVec =
-                           c(p_order[1], 2*p_order[2] - drv_vec[2] + 1), drvVec =
-                           c(drv_vec[1], p_order[2] + 1), muVec = mu_vec,
-                           weightFcnPtr_x = weight_x, weightFcnPtr_t = weight_t)
+                           c(p_order[1], 2*p_order[2] - drv_vec[2] + 1),
+                           drvVec = c(drv_vec[1], p_order[2] + 1),
+                           muVec = mu_vec, weightFcnPtr_x = weight_x,
+                           weightFcnPtr_t = weight_t)
       } 
     }
       
-    # shrink mxx, mtt from boundaries if delta > 0
-    if (dcs_options$IPI_options$delta[1] != 0 ||
-        dcs_options$IPI_options$delta[2] != 0)
+    # shrink mxx, mtt from boundaries if trim > 0
+    if (dcs_options$IPI_options$trim[1] != 0 ||
+        dcs_options$IPI_options$trim[2] != 0)
     {
-      shrink_x = ceiling(dcs_options$IPI_options$delta[1] * n_x):
-                         (n_x - floor(dcs_options$IPI_options$delta[1] * n_x))
-      shrink_t = ceiling(dcs_options$IPI_options$delta[2] * n_t):
-                         (n_t - floor(dcs_options$IPI_options$delta[2] * n_t))
+      shrink_x = ceiling(dcs_options$IPI_options$trim[1] * n_x):
+                         (n_x - floor(dcs_options$IPI_options$trim[1] * n_x))
+      shrink_t = ceiling(dcs_options$IPI_options$trim[2] * n_t):
+                         (n_t - floor(dcs_options$IPI_options$trim[2] * n_t))
       
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
@@ -129,25 +129,24 @@ LP.bndw = function(Y, dcs_options, add_options)
       n_sub = n                           # all observations are used
     }
     
-    if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
+    ### Estimation of Variance Factor and Model ###
+    if (isTRUE(cf_est))
     {
-      # calculate variance factor
-      var_est = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
-                                               add_options))
+      var_est = suppressWarnings(cf.estimation(Y - Y_smth, 
+                                               dcs_options, add_options))
       var_coef = var_est$cf_est
       var_model = var_est$model_est
+    } else {
+      var_coef = cf_est$var_coef
+      var_model = cf_est$var_model
+    }
 
-      # calculate optimal bandwidths for next step
+    # calculate optimal bandwidths for next step
+    if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
+    {
       h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 
                        n_x, n_t)
     } else {                         ### Short-memory or iid. estimation
-      # calculate variance factor
-      var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
-                                                 add_options))
-      var_coef  = var_est$cf_est
-      var_model = var_est$model_est
-      
-      # calculate optimal bandwidths for next step
       h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
                        kernel_t)
     }

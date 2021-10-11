@@ -4,6 +4,8 @@
 #                                                                              #
 ################################################################################
 
+### Nonparametric estimation of variance factor (experimental)
+
 #-------------------Estimation of Autocovariance Function----------------------#
 
 acfMatrix = function(Y)

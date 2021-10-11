@@ -1,8 +1,13 @@
 ################################################################################
 #                                                                              #
-#                DCSmooth Package: additional Functions for SFARIMA              #
+#                DCSmooth Package: Additional Functions for SFARIMA            #
 #                                                                              #
 ################################################################################
+
+### Functions related to SFARIMA but not directly linked to estimation
+
+  # sfarima.sim
+  # macoef (UNUSED?)
 
 #----------------------------Simulation Function-------------------------------#
 
@@ -72,7 +77,6 @@ sfarima.sim <- function(n_x, n_t, model)
     stop("Long memory parameter \"d\" incorrectly specified.")
   }
   
-
   # meta options
   nstart = max(floor(1.5 * c(n_x, n_t)), 150)
   k_x = min(50, n_x); k_t = min(50, n_t)
@@ -118,38 +122,38 @@ sfarima.sim <- function(n_x, n_t, model)
   return(coef_out)
 }
 
-#----------------------------------------------------------------#
-
-macoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
-  p = length(ar[ar != 0])
-  q = length(ma[ma != 0])
-  if (p == 0) {
-    ar = 0
-  }
-  if (q == 0) {
-    ma = 0
-  }
-  ma.coef = c(1, ma, rep(0, k - q))
-  arma.coef = (1:(k + 1)) * 0
-  arma.coef[1] = 1
-  
-  if (p > 0 | q > 0) {
-    for (i in 2:(k + 1)) {
-      if ((i - p) < 1) {
-        arma.coef[i] = sum(ar[1:(p - abs(i - p) - 1)] * arma.coef[(i - 1):1]) - ma.coef[i]
-      } else {
-        arma.coef[i] = sum(ar[1:p] * arma.coef[(i - 1):(i - p)]) - ma.coef[i]
-      }
-    }
-  } else {
-    arma.coef + 1
-  }
-  
-  d.coef = choose(-d, 0:k) * ((-1)^(0:k))
-  
-  coef.all = (1:(k + 1)) * 0
-  for (j in 1:(k + 1)) {
-    coef.all[j] = sum(d.coef[1:j] * arma.coef[j:1])
-  }
-  return(coef.all)
-}
+# #----------------------------------------------------------------#
+# 
+# macoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
+#   p = length(ar[ar != 0])
+#   q = length(ma[ma != 0])
+#   if (p == 0) {
+#     ar = 0
+#   }
+#   if (q == 0) {
+#     ma = 0
+#   }
+#   ma.coef = c(1, ma, rep(0, k - q))
+#   arma.coef = (1:(k + 1)) * 0
+#   arma.coef[1] = 1
+#   
+#   if (p > 0 | q > 0) {
+#     for (i in 2:(k + 1)) {
+#       if ((i - p) < 1) {
+#         arma.coef[i] = sum(ar[1:(p - abs(i - p) - 1)] * arma.coef[(i - 1):1]) - ma.coef[i]
+#       } else {
+#         arma.coef[i] = sum(ar[1:p] * arma.coef[(i - 1):(i - p)]) - ma.coef[i]
+#       }
+#     }
+#   } else {
+#     arma.coef + 1
+#   }
+#   
+#   d.coef = choose(-d, 0:k) * ((-1)^(0:k))
+#   
+#   coef.all = (1:(k + 1)) * 0
+#   for (j in 1:(k + 1)) {
+#     coef.all[j] = sum(d.coef[1:j] * arma.coef[j:1])
+#   }
+#   return(coef.all)
+# }

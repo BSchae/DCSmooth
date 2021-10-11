@@ -10,11 +10,11 @@
 \method{print}{summary_sfarima}(object, ...)
 }
 \arguments{
+\item{object}{An object of class \code{"summary_sarma"} or
+\code{"summary_sfarima"}.}
+
 \item{...}{Additional arguments passed to \code{print.summary_sarma}/
 \code{print.summary_sfarima}.}
-
-\item{x}{An object of class \code{"summary_sarma"} or
-\code{"summary_sfarima"}.}
 }
 \value{
 No return value.

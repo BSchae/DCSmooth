@@ -1,3 +1,7 @@
+# DCSmooth 1.1.2
+* Parallelization for DCS procedure added.
+* Bandwidth selection of derivative estimation improved.
+
 # DCSmooth 1.1.1
 * Estimation of variance model revised.
 * set.options takes argument var_model = c("iid", "sarma_HR", "sarma_sep", "sarma_RSS", "sfarima_RSS") instead of var_est. However, var_est is still available for downstream compatibility, with the old identifiers.

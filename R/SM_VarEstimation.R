@@ -19,10 +19,12 @@ cf.estimation = function(Y, dcs_options, add_options)
       model_order = sfarima.ord(Y, pmax = add_options$order_max$ar,
                                 qmax = add_options$order_max$ma, 
                                 crit = add_options$model_order, restr = NULL,
-                                sFUN = min, parallel = TRUE)
+                                sFUN = min, parallel = add_options$parallel)
     } else {
-      model_order = sarma.order(Y, method = "sep", criterion = "bic",
-                                order_max = add_options$order_max)
+      model_order = sarma.order(Y, method = "sep",
+                                criterion = add_options$model_order,
+                                order_max = add_options$order_max,
+                                parallel = add_options$parallel)
     }
   } else {
     model_order = add_options$model_order

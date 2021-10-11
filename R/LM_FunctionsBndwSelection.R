@@ -4,6 +4,14 @@
 #                                                                              #
 ################################################################################
 
+### Contains functions needed in the bandwidth selection under long memory
+### spatial errors.
+
+  # h.opt.LM
+  # sfarima.cf
+  # h.coef.cb
+  # kernel.prop.LM
+
 #----------------------Formula for optimal bandwidths--------------------------#
 
 h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, dcs_options, n_x, n_t)
@@ -16,7 +24,7 @@ h.opt.LM = function(mxx, mtt, var_coef, var_model, n_sub, dcs_options, n_x, n_t)
   }
   
   drv_vec = dcs_options$drv
-  shrink_par = dcs_options$IPI_options$delta
+  shrink_par = dcs_options$IPI_options$trim
   k_vec = as.numeric(substr(dcs_options$kern, nchar(dcs_options$kern) - 2,
                              nchar(dcs_options$kern) - 2))
   mu_vec = as.numeric(substr(dcs_options$kern, nchar(dcs_options$kern) - 1,
@@ -90,11 +98,6 @@ kernel.prop.LM = function(k, p, drv, d, mu)
 {
   n_int = 20000
   u_seq  = seq(from = -1, to = 1, length.out = 2*n_int + 1)
-
-  if (drv > 0)
-  {
-    stop("Bandwidth selection under long-memory errors not implemented yet.")
-  }
     
   if (p == 1)
   {

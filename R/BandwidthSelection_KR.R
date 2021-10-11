@@ -4,9 +4,13 @@
 #                                                                             #
 ###############################################################################
 
+### Bandwidth selection function for kernel regression
+
+  # KR.bndw
+
 #------------------Function for the optimal bandwidth via IPI-----------------#
 
-KR.bndw = function(Y, dcs_options, add_options)
+KR.bndw = function(Y, dcs_options, add_options, cf_est)
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   n  = n_x * n_t                            # total number of observations
@@ -41,38 +45,68 @@ KR.bndw = function(Y, dcs_options, add_options)
     h_infl  = inflation.KR(h_opt_temp, c(n_x, n_t), dcs_options)
                           # inflation of bndws for estimation of derivatives
     
-    # constant bandwidth only reasonable for estimation of derivatives
-    if (dcs_options$IPI_options$const_window == TRUE)
-    {
-      # pre-smoothing of the surface function m(0,0) for estimation of variance
-      Y_smth = KR_dcs_const0(yMat = Y, hVec = h_opt_temp, 
-                             drvVec = c(0, 0), kernFcnPtrX = kern_fcn_0,
-                             kernFcnPtrT = kern_fcn_0)
-      # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = KR_dcs_const1(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
-                        kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
-      mtt = KR_dcs_const1(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
-                    kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
-    } else if (dcs_options$IPI_options$const_window == FALSE) {
-      # pre-smoothing of the surface function m(0,0) for estimation of variance
-      Y_smth = KR_dcs_const0(yMat = Y, hVec = h_opt_temp, drvVec = c(0, 0),
-                             kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_0)
-      # smoothing of derivatives m(2,0) and m(0,2)
-      mxx = KR_dcs_const0(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
-                          kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
+    # parallel estimation of surfaces
+    if (add_options$parallel == TRUE) {
+      par_list_Y = list(h = h_defl, drv = c(0, 0), mu = mu_vec,
+                        kernel_x = dcs_options$kerns[1], 
+                        weight_t = dcs_options$kerns[2])
+      par_list_mxx = list(h = h_infl$h_xx, drv = c(2, 0),
+                          kernel_x = dcs_options$kerns[1],
+                          kernel_t = dcs_options$kerns[2])
+      par_list_mtt = list(h = h_infl$h_tt,
+                          drv = c(0, 2),
+                          kernel_x = dcs_options$kerns[1],
+                          kernel_t = dcs_options$kerns[2])
       
-      mtt = KR_dcs_const0(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
-                          kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
+      par_list = list(par_Y = par_list_Y, par_mxx = par_list_mxx, 
+                      par_mtt = par_list_mtt)
+      
+      if (dcs_options$IPI_options$const_window == TRUE)
+      {
+        result_list = parallel.KR.const1(par_list, Y)
+        Y_smth = result_list[[1]]
+        mxx = result_list[[2]]
+        mtt = result_list[[3]]
+      } else {
+        result_list = parallel.KR.const0(par_list, Y)
+        Y_smth = result_list[[1]]
+        mxx = result_list[[2]]
+        mtt = result_list[[3]]
+      }
+    } else if (add_options$parallel == FALSE) {
+    # constant bandwidth only reasonable for estimation of derivatives
+      if (dcs_options$IPI_options$const_window == TRUE)
+      {
+        # pre-smoothing of the surface function m(0,0) for estimation of variance
+        Y_smth = KR_dcs_const0(yMat = Y, hVec = h_opt_temp, 
+                               drvVec = c(0, 0), kernFcnPtrX = kern_fcn_0,
+                               kernFcnPtrT = kern_fcn_0)
+        # smoothing of derivatives m(2,0) and m(0,2)
+        mxx = KR_dcs_const1(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
+                            kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
+        mtt = KR_dcs_const1(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
+                            kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
+      } else if (dcs_options$IPI_options$const_window == FALSE) {
+        # pre-smoothing of the surface function m(0,0) for estimation of variance
+        Y_smth = KR_dcs_const0(yMat = Y, hVec = h_opt_temp, drvVec = c(0, 0),
+                               kernFcnPtrX = kern_fcn_0,
+                               kernFcnPtrT = kern_fcn_0)
+        # smoothing of derivatives m(2,0) and m(0,2)
+        mxx = KR_dcs_const0(yMat = Y, hVec = h_infl$h_xx, drvVec = c(2, 0),
+                            kernFcnPtrX = kern_fcn_2, kernFcnPtrT = kern_fcn_0)
+        mtt = KR_dcs_const0(yMat = Y, hVec = h_infl$h_tt, drvVec = c(0, 2),
+                            kernFcnPtrX = kern_fcn_0, kernFcnPtrT = kern_fcn_2)
+      }
     }
 
-    # shrink mxx, mtt from boundaries if delta > 0
-    if (dcs_options$IPI_options$delta[1] != 0 ||
-        dcs_options$IPI_options$delta[2] != 0)
+    # shrink mxx, mtt from boundaries if trim > 0
+    if (dcs_options$IPI_options$trim[1] != 0 ||
+        dcs_options$IPI_options$trim[2] != 0)
     {
-      shrink_x = ceiling(dcs_options$IPI_options$delta[1] * n_x):
-                      (n_x - floor(dcs_options$IPI_options$delta[1] * n_x))
-      shrink_t = ceiling(dcs_options$IPI_options$delta[2] * n_t):
-                      (n_t - floor(dcs_options$IPI_options$delta[2] * n_t))
+      shrink_x = ceiling(dcs_options$IPI_options$trim[1] * n_x):
+                      (n_x - floor(dcs_options$IPI_options$trim[1] * n_x))
+      shrink_t = ceiling(dcs_options$IPI_options$trim[2] * n_t):
+                      (n_t - floor(dcs_options$IPI_options$trim[2] * n_t))
 
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
@@ -82,28 +116,26 @@ KR.bndw = function(Y, dcs_options, add_options)
     }
     
     ### Estimation of Variance Factor and Model ###
+    if (isTRUE(cf_est))
+    {
+      var_est = suppressWarnings(cf.estimation(Y - Y_smth, 
+                                               dcs_options, add_options))
+      var_coef = var_est$cf_est
+      var_model = var_est$model_est
+    } else {
+      var_coef = cf_est$var_coef
+      var_model = cf_est$var_model
+    }
+      
+    # calculate optimal bandwidths for next step
     if (dcs_options$var_model == "sfarima_RSS") ### Long-memory estimation
     {
-      # calculate variance factor
-      var_est = suppressWarnings(sfarima.cf(Y - Y_smth,
-                                            add_options$model_order))
-      var_coef = var_est$cf_est
-      var_model = var_est$var_model
-      
-      # calculate optimal bandwidths for next step
-      h_opt = h.opt.LM(mxx, mtt, var_coef, var_model, n_sub, dcs_options, 
+      h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 
                        n_x, n_t)
     } else {                         ### Short-memory or iid. estimation
-      # calculate variance factor
-      var_est   = suppressWarnings(cf.estimation(Y - Y_smth, dcs_options,
-                                                 add_options))
-      var_coef  = var_est$cf_est
-      var_model = var_est$model_est
-      
-      # calculate optimal bandwidths for next step
       h_opt = h.opt.KR(mxx, mtt, var_coef, n, n_sub, kernel_prop_x,
                        kernel_prop_t)
-    }
+    } 
     
     # break condition
     if( ((h_opt[1]/h_opt_temp[1] - 1 < 0.001) && (h_opt[2]/h_opt_temp[2] - 1 

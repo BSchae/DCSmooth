@@ -1,8 +1,19 @@
 ################################################################################
 #                                                                              #
-#       DCSmooth Package: Auxiliary Funcions for Bandwidth Selection           #
+#       DCSmooth Package: Auxiliary Functions for Bandwidth Selection          #
 #                                                                              #
 ################################################################################
+
+### Contains functions needed in the bandwidth selection (if not long memory
+### estimation is used).
+
+  # h.opt.LP
+  # h.opt.KR
+  # integral.calc.KR
+  # kernel.prop.LP
+  # kernel.prop.KR
+  # inflation.LP
+  # inflation.KR
 
 #----------------------Formula for optimal bandwidths--------------------------#
 
@@ -133,20 +144,6 @@ inflation.LP = function(h, dcs_options, n_x, n_t)
   h_tt = pmax(h_infl_tt, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
   
   return(list(h_xx = h_xx, h_tt = h_tt))
-}
-
-deflation.LP = function(h, dcs_options, n_x, n_t)
-{
-  defl_exp = (dcs_options$p_order[1] + dcs_options$drv[2] + 2)/
-              (dcs_options$p_order[1] - dcs_options$drv[1] + 2)
-  
-  h_defl = c(h[1]^defl_exp, h[2]^defl_exp)
-  
-  # minimum values for LPR
-  h_defl = pmax(h_defl, c((dcs_options$p_order[1] + 1)/(n_x - 1), 
-                      (dcs_options$p_order[2] + 1)/(n_t - 1)))
-  
-  return(h_defl)
 }
 
 inflation.KR = function(h, n, dcs_options)

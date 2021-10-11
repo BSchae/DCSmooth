@@ -4,11 +4,12 @@
 #                                                                              #
 ################################################################################
 
-# This file includes all functions related to the estimation of SARMA-processes
+### This file includes all functions related to the estimation of 
+### SARMA-processes
 
-# sarma.HR.est
-# sarma.sep.est
-# sarma.RSS.est
+  # sarma.HR.est
+  # sarma.sep.est
+  # sarma.RSS.est
 
 #-----------------SARMA Estimation using Hannan-Rissanen Algorithm-------------#
 
@@ -250,15 +251,20 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
                  include.mean = FALSE)
 
   # build result matrices
-  ar_mat = c(1, -arma_x$coef[seq_len(model_order$ar[1])]) %*%
-    t(c(1, -arma_t$coef[seq_len(model_order$ar[2])]))
-  ma_mat = c(1, arma_x$coef[model_order$ar[1] +
+  ar_mat = as.matrix(c(1, -arma_x$coef[seq_len(model_order$ar[1])]) %*%
+    t(c(1, -arma_t$coef[seq_len(model_order$ar[2])])))
+  ma_mat = as.matrix(c(1, arma_x$coef[model_order$ar[1] +
                               seq_len(model_order$ma[1])]) %*%
-    t(c(1, arma_t$coef[model_order$ar[2] + seq_len(model_order$ma[2])]))
+    t(c(1, arma_t$coef[model_order$ar[2] + seq_len(model_order$ma[2])])))
 
   innov = sarma.residuals(Y, list(ar = ar_mat, ma = ma_mat, sigma = NA))
   stdev = sd(innov)
   stat_test = sarma.statTest(ar_mat)
+  
+  colnames(ar_mat) = paste0("lag ", 0:model_order$ar[2])
+  rownames(ar_mat) = paste0("lag ", 0:model_order$ar[1])
+  colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
+  rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
 
   # prepare output
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
@@ -289,14 +295,19 @@ sarma.RSS.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
                               seq_len(model_order$ma[2])])
   
   # prepare results for output
-  ar_mat = ar_x %*% t(ar_t)
-  ma_mat = ma_x %*% t(ma_t)
+  ar_mat = as.matrix(ar_x %*% t(ar_t))
+  ma_mat = as.matrix(ma_x %*% t(ma_t))
   stdev = sqrt(theta_opt$value/(n_x * n_t))
   model = list(ar = ar_mat, ma = ma_mat, sigma = stdev)
   innov = sarma.residuals(R_mat = Y, model = model)
   
   # check stationarity
   statTest = sarma.statTest(ar_mat)
+  
+  colnames(ar_mat) = paste0("lag ", 0:model_order$ar[2])
+  rownames(ar_mat) = paste0("lag ", 0:model_order$ar[1])
+  colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
+  rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
 
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
                   sigma = stdev), stnry = statTest)
@@ -316,10 +327,14 @@ sarma.residuals = function(R_mat, model)
   E_itm = R_mat * 0   # intermediate results
   E_fnl = R_mat * 0   # final results
   
-  ar_inf_x = c(1, astsa::ARMAtoAR(ar = -model$ar[-1, 1], ma = model$ma[-1, 1],
-                                  lag.max = k_x))
-  ar_inf_t = t(c(1, astsa::ARMAtoAR(ar = -model$ar[1, -1], ma = model$ma[1, -1],
-                                    lag.max = k_t)))
+  ar_x = ifelse(length(model$ar[-1, 1]) > 0, -model$ar[-1, 1], 0)
+  ma_x = ifelse(length(model$ma[-1, 1]) > 0, model$ma[-1, 1], 0)
+  ar_t = ifelse(length(model$ar[1, -1]) > 0, -model$ar[1, -1], 0)
+  ma_t = ifelse(length(model$ma[1, -1]) > 0, model$ma[1, -1], 0)
+  
+  ar_inf_x = ar_coef(ar = ar_x, ma = ma_x, d = 0, k = k_x)
+  ar_inf_t = ar_coef(ar = ar_t, ma = ma_t, d = 0, k = k_t)
+  
   for (j in 1:n_t)
   {
     E_itm[, j] = R_mat[, j:max(1, j - k_t + 1), drop = FALSE] %*%
@@ -334,6 +349,3 @@ sarma.residuals = function(R_mat, model)
   
   return(E_fnl)
 }
-
-#----------------------Fast separable SARMA Estimation-------------------------#
-

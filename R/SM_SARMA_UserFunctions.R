@@ -211,10 +211,18 @@ qarma.sim <- function(n_x, n_t, model)
 #----------------------------SARMA Order Selection-----------------------------#
 
 sarma.order = function(Y, method = "sep", criterion = "bic",
-                       order_max = list(ar = c(1, 1), ma = c(1, 1)))
+                       order_max = list(ar = c(1, 1), ma = c(1, 1)),
+                       parallel = FALSE)
 {
-  order_opt =  sarma.aic.bic(Y, pmax = order_max$ar, qmax = order_max$ma, 
-                             crit = criterion, restr = NULL, sFUN = min)
+  if (criterion %in% c("aic", "bic"))
+  {
+    order_opt = sarma.order.aic.bic(Y, pmax = order_max$ar,
+                                    qmax = order_max$ma,
+                                    crit = criterion, restr = NULL, sFUN = min,
+                                    parallel = parallel)
+  } else if (criterion == "gpac") {
+    order_opt = sarma.order.gpac(Y, order_max = order_max)
+  }
   
   return(order_opt)
 }
