@@ -122,38 +122,77 @@ sfarima.sim <- function(n_x, n_t, model)
   return(coef_out)
 }
 
-# #----------------------------------------------------------------#
-# 
-# macoef <- function(ar = 0, ma = 0, d = 0, k = 50) {
-#   p = length(ar[ar != 0])
-#   q = length(ma[ma != 0])
-#   if (p == 0) {
-#     ar = 0
-#   }
-#   if (q == 0) {
-#     ma = 0
-#   }
-#   ma.coef = c(1, ma, rep(0, k - q))
-#   arma.coef = (1:(k + 1)) * 0
-#   arma.coef[1] = 1
-#   
-#   if (p > 0 | q > 0) {
-#     for (i in 2:(k + 1)) {
-#       if ((i - p) < 1) {
-#         arma.coef[i] = sum(ar[1:(p - abs(i - p) - 1)] * arma.coef[(i - 1):1]) - ma.coef[i]
-#       } else {
-#         arma.coef[i] = sum(ar[1:p] * arma.coef[(i - 1):(i - p)]) - ma.coef[i]
-#       }
-#     }
-#   } else {
-#     arma.coef + 1
-#   }
-#   
-#   d.coef = choose(-d, 0:k) * ((-1)^(0:k))
-#   
-#   coef.all = (1:(k + 1)) * 0
-#   for (j in 1:(k + 1)) {
-#     coef.all[j] = sum(d.coef[1:j] * arma.coef[j:1])
-#   }
-#   return(coef.all)
-# }
+#--------------------BIC/AIC ORDER SELECTION FOR SFARIMA-----------------------#
+
+sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
+                        restr = NULL, sFUN = min, parallel = TRUE)
+{
+  if(crit == "bic") {
+    crit.fun = stats::BIC
+  }
+  else if (crit == "aic") {
+    crit.fun = stats::AIC
+  }
+  
+  bic_x =  matrix(0, pmax[1] + 1, qmax[1] + 1)
+  bic_t =  matrix(0, pmax[2] + 1, qmax[2] + 1)
+  R_x = as.vector(Rmat)
+  R_t = as.vector(t(Rmat))
+  
+  if (parallel == TRUE)
+  {
+    n.cores = parallel::detectCores(logical = TRUE) - 1
+    doParallel::registerDoParallel(n.cores)
+    `%dopar%` = foreach::`%dopar%`
+    `%:%` = foreach::`%:%`
+    
+    bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
+      foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar%
+      {
+        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1,
+                                                           nma = j - 1, drange = c(0, 0.5))))
+      }
+    
+    bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
+      foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar%
+      {
+        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1,
+                                                           nma = j - 1, drange = c(0, 0.5))))
+      }
+    
+    doParallel::stopImplicitCluster()
+  } else {
+    for (i in 1:(pmax[1] + 1))
+    {
+      for (j in 1:(qmax[1] + 1))
+      {
+        bic_x[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x,
+                                                                   nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
+      }
+    }
+    for (i in 1:(pmax[2] + 1))
+    {
+      for (j in 1:(qmax[2] + 1))
+      {
+        bic_t[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t,
+                                                                   nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
+      }
+    }
+  }
+  
+  restr = substitute(restr)
+  if(!is.null(restr)){
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x[eval(restr)]), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t[eval(restr)]), arr.ind = TRUE) - 1)
+  } else {
+    ord.opt_x <- c(which(bic_x == sFUN(bic_x), arr.ind = TRUE) - 1)
+    ord.opt_t <- c(which(bic_t == sFUN(bic_t), arr.ind = TRUE) - 1)
+  }
+  
+  # put model_orders into list
+  ar = c(ord.opt_x[1], ord.opt_t[1])
+  ma = c(ord.opt_x[2], ord.opt_t[2])
+  model_order = list(ar = ar, ma = ma)
+  
+  return(model_order)   
+}

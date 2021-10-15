@@ -1,7 +1,7 @@
 Package: DCSmooth
 Type: Package
 Title: Nonparametric Regression and Bandwidth Selection for Spatial Models
-Version: 1.1.0.6
+Version: 1.1.0.7
 Authors@R: c(person("Bastian", "Schaefer",
     email = "bastian.schaefer@uni-paderborn.de", role = c("aut", "cre")),
     person("Sebastian", "Letmathe", role = "ctb"),
@@ -15,7 +15,8 @@ Description: Nonparametric smoothing techniques for
     Methods used in this paper are described in
     Feng/Schaefer (2021) <https://ideas.repec.org/p/pdn/ciepap/144.html>, 
     Schaefer/Feng (2021) <https://ideas.repec.org/p/pdn/ciepap/143.html>.
-Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb], Yuanhua Feng [ctb]
+Author: Bastian Schaefer [aut, cre], Sebastian Letmathe [ctb],
+    Yuanhua Feng [ths]
 Maintainer: Bastian Schaefer <bastian.schaefer@uni-paderborn.de>
 License: GPL-3
 LazyData: true

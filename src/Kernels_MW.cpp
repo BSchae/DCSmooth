@@ -231,3 +231,79 @@ arma::vec kern_fcn_MW422(arma::vec& uVec, double q = 1)
   }
   return uOut;
 }
+
+// [[Rcpp::export]]
+arma::vec kern_fcn_MW533(arma::vec& uVec, double q = 1)
+{
+  arma::uword n_size{ uVec.size() };
+  arma::vec uOut(n_size);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q_denom{ pow(1 + q, 14) };
+  double out{ };
+  double u{ };
+  double u2{ };
+  double u3{ };
+  double u4{ };
+  
+  for (int i{ 0 }; i < n_size; ++i)
+  {
+    u   = uVec(i);
+    u2  = u * u;
+    u3  = u2 * u;
+    u4 = u3 * u;
+    
+    out = -720720 * (q - u) * (q - u) * (1 + u) * (1 + u) * (1 + u) / q_denom *(
+      (- 16*q5 + 105*q4 - 210*q3 +  175*q2 -   60*q +   6) +
+                (157*q4 - 672*q3 +  903*q2 -  478*q +  78) * u +
+                       (- 510*q3 + 1407*q2 - 1200*q + 315) * u2 +
+                                  ( 671*q2 - 1122*q + 495) * u3 +
+                                          (-  308*q + 264) * u4);
+    
+    uOut(i) = out;
+  }
+  return uOut;
+}
+
+// [[Rcpp::export]]
+arma::vec kern_fcn_MW644(arma::vec& uVec, double q = 1)
+{
+  arma::uword n_size{ uVec.size() };
+  arma::vec uOut(n_size);
+  
+  double q2{ q * q };
+  double q3{ q2 * q };
+  double q4{ q3 * q };
+  double q5{ q4 * q };
+  double q6{ q5 * q };
+  double q_denom{ pow(1 + q, 18) };
+  double out{ };
+  double u{ };
+  double u2{ };
+  double u3{ };
+  double u4{ };
+  double u5{ };
+  
+  for (int i{ 0 }; i < n_size; ++i)
+  {
+    u  = uVec(i);
+    u2 = u * u;
+    u3 = u2 * u;
+    u4 = u3 * u;
+    u5 = u4 * u;
+    
+    out = 147026880 * pow(q - u, 3) * pow(1 + u, 4) / q_denom * (
+      (25*q6 - 216*q5 +  612*q4 -  768*q3 +  459*q2 -  120*q +   10) + 
+            (- 321*q5 + 1944*q4 - 3912*q3 + 3420*q2 - 1293*q +  160) * u +
+                       (1482*q4 - 6240*q3 + 8658*q2 - 4836*q +  884) * u2 +
+                               (- 3146*q3 + 8892*q2 - 7878*q + 2184) * u3 +
+                                           (3120*q2 - 5460*q + 2470) * u4 +
+                                                   (- 1170*q + 1040) * u5);
+ 
+    uOut(i) = out;
+  }
+  return uOut;
+}

@@ -80,6 +80,16 @@ set.options <- function(    # inside function with default values in arguments
   # get ellipsis
   args_list <- list(...)
   
+  args_names = names(args_list)
+  if (any(!(args_names %in% c("IPI_options", "model_order", "order_max",
+                              "var_est"))))
+  {
+    arg_unknown = args_names[which(!(args_names %in% 
+                         c("IPI_options", "model_order", "order_max",
+                           "var_est")))]
+    stop("Unsupported argument(s) \"",arg_unknown, "\" in set.options().")
+  }
+  
   ### include old var_est options
   if (exists("var_est", args_list))
   {

@@ -5,12 +5,12 @@
 \alias{print.summary_sfarima}
 \title{Print the Summary of a "sarma"/"sfarima" object}
 \usage{
-\method{print}{summary_sarma}(object, ...)
+\method{print}{summary_sarma}(x, ...)
 
-\method{print}{summary_sfarima}(object, ...)
+\method{print}{summary_sfarima}(x, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"summary_sarma"} or
+\item{x}{An object of class \code{"summary_sarma"} or
 \code{"summary_sfarima"}.}
 
 \item{...}{Additional arguments passed to \code{print.summary_sarma}/

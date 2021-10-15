@@ -23,6 +23,10 @@ Rcpp::XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_MW421)));
   else if (fstr == "MW_422")
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_MW422)));
+  else if (fstr == "MW_533")
+    return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_MW533)));
+  else if (fstr == "MW_644")
+    return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_MW644)));
   
   else if (fstr == "M_200")
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_M200)));
@@ -38,6 +42,10 @@ Rcpp::XPtr<funcPtr> kernel_fcn_assign(std::string fstr) {
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_M421)));
   else if (fstr == "M_422")
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_M422)));
+  else if (fstr == "M_533")
+    return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_M533)));
+  else if (fstr == "M_644")
+    return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_M644)));
   
   else if (fstr == "T_220")
     return(Rcpp::XPtr<funcPtr>(new funcPtr(&kern_fcn_T220)));

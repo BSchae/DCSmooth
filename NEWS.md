@@ -1,6 +1,9 @@
 # DCSmooth 1.1.2
 * Parallelization for DCS procedure added.
 * Bandwidth selection of derivative estimation improved.
+* Additional argument "trim" in surface.dcs for trimming the boundaries of the plot.
+* Data sets "returns.alv", "returns.bmw", "volumes.alv", "volumes.bmw" added.
+* Bugs in estimation of derivatives ("KR" and "LP") corrected.
 
 # DCSmooth 1.1.1
 * Estimation of variance model revised.

@@ -94,7 +94,7 @@ summary.sarma = function(object, ...)
 #' @description \code{print} methods for class \code{"summary_sarma"}/
 #'  \code{"summary_sfarima"}
 #' 
-#' @param object An object of class \code{"summary_sarma"} or
+#' @param x An object of class \code{"summary_sarma"} or
 #'  \code{"summary_sfarima"}.
 #' @param ... Additional arguments passed to \code{print.summary_sarma}/
 #'  \code{print.summary_sfarima}.
@@ -104,7 +104,7 @@ summary.sarma = function(object, ...)
 #' @seealso \code{\link{summary.sarma}} \code{\link{summary.sfarima}}
 #' 
 #' @export
-print.summary_sarma = function(object, ...)
+print.summary_sarma = function(x, ...)
 {
   args_list = list(...)
   if (!exists("digits", args_list))
@@ -112,24 +112,24 @@ print.summary_sarma = function(object, ...)
     digits = max(3, getOption("digits") - 3)
   }
   
-  # cat(class(object), "\n")
+  # cat(class(x), "\n")
   cat("------------------------------------------", "\n")
-  if (object$subclass == "est")
+  if (x$subclass == "est")
   {
-    cat("Estimation of SARMA", .order.to.string(object$model_order), 
+    cat("Estimation of SARMA", .order.to.string(x$model_order), 
         "\n", sep = "")
-  } else if (object$subclass == "sim")
+  } else if (x$subclass == "sim")
   {
-    cat("Simulation of SARMA", .order.to.string(object$model_order), 
+    cat("Simulation of SARMA", .order.to.string(x$model_order), 
         "\n", sep = "")
   }
   cat("------------------------------------------", "\n")
-  cat("sigma:\t", signif(object$sigma, digits = digits), "\n")
-  cat("stationary:\t", object$stnry, "\n")
+  cat("sigma:\t", signif(x$sigma, digits = digits), "\n")
+  cat("stationary:\t", x$stnry, "\n")
   cat("ar:\n")
-  print(signif(object$ar, digits = digits))
+  print(signif(x$ar, digits = digits))
   cat("\nma:\n")
-  print(signif(object$ma, digits = digits))
+  print(signif(x$ma, digits = digits))
 }
 
 #-------------------Summary Methods for SFARIMA Estimation---------------------#
@@ -154,7 +154,7 @@ summary.sfarima = function(object, ...)
 
 #' @rdname print.summary_sarma
 #' @export
-print.summary_sfarima = function(object, ...)
+print.summary_sfarima = function(x, ...)
 {
   args_list = list(...)
   if (!exists("digits", args_list))
@@ -162,23 +162,23 @@ print.summary_sfarima = function(object, ...)
     digits = max(3, getOption("digits") - 3)
   }
   
-  # cat(class(object), "\n")
+  # cat(class(x), "\n")
   cat("------------------------------------------", "\n")
-  if (object$subclass == "est")
+  if (x$subclass == "est")
   {
-    cat("Estimation of SFARIMA", .order.to.string(object$model_order), 
+    cat("Estimation of SFARIMA", .order.to.string(x$model_order), 
         "\n", sep = "")
-  } else if (object$subclass == "sim")
+  } else if (x$subclass == "sim")
   {
-    cat("Simulation of SFARIMA", .order.to.string(object$model_order), 
+    cat("Simulation of SFARIMA", .order.to.string(x$model_order), 
         "\n", sep = "")
   }
   cat("------------------------------------------", "\n")
-  cat("d:\t\t", signif(object$d, digits = digits), "\n")
-  cat("SD (sigma):\t", signif(object$sigma, digits = digits), "\n")
-  cat("stationary:\t", object$stnry, "\n")
+  cat("d:\t\t", signif(x$d, digits = digits), "\n")
+  cat("SD (sigma):\t", signif(x$sigma, digits = digits), "\n")
+  cat("stationary:\t", x$stnry, "\n")
   cat("ar:\n")
-  print(signif(object$ar, digits = digits))
+  print(signif(x$ar, digits = digits))
   cat("\nma:\n")
-  print(signif(object$ma, digits = digits))
+  print(signif(x$ma, digits = digits))
 }

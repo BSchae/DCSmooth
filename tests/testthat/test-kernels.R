@@ -18,6 +18,8 @@ test_that("0 moments are correct.", {
   MW420 = kernel.assign("MW_420")
   MW421 = kernel.assign("MW_421")
   MW422 = kernel.assign("MW_422")
+  MW533 = kernel.assign("MW_533")
+  MW644 = kernel.assign("MW_644")
   
   expect_equal(sum(MW200(u, 1))/n_test, 1, tolerance = 1e-04)
   expect_equal(sum(MW210(u, 1))/n_test, 1, tolerance = 1e-04)
@@ -26,6 +28,8 @@ test_that("0 moments are correct.", {
   expect_equal(sum(MW420(u, 1))/n_test, 1, tolerance = 1e-04)
   expect_equal(sum(MW421(u, 1))/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(MW422(u, 1))/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW533(u, 1))/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW644(u, 1))/n_test, 0, tolerance = 1e-04)
 })
 
 test_that("1st moments are correct.", {
@@ -38,6 +42,8 @@ test_that("1st moments are correct.", {
   MW420 = kernel.assign("MW_420")
   MW421 = kernel.assign("MW_421")
   MW422 = kernel.assign("MW_422")
+  MW533 = kernel.assign("MW_533")
+  MW644 = kernel.assign("MW_644")
   
   expect_equal(sum(MW200(u, 1) * u)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(MW210(u, 1) * u)/n_test, 0, tolerance = 1e-04)
@@ -46,6 +52,8 @@ test_that("1st moments are correct.", {
   expect_equal(sum(MW420(u, 1) * u)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(MW421(u, 1) * u)/n_test, -1, tolerance = 1e-04)
   expect_equal(sum(MW422(u, 1) * u)/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW533(u, 1) * u)/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW644(u, 1) * u)/n_test, 0, tolerance = 1e-04)
 })
 
 test_that("2nd moments are correct.", {
@@ -58,6 +66,8 @@ test_that("2nd moments are correct.", {
   MW420 = kernel.assign("MW_420")
   MW421 = kernel.assign("MW_421")
   MW422 = kernel.assign("MW_422")
+  MW533 = kernel.assign("MW_533")
+  MW644 = kernel.assign("MW_644")
   
   expect_equal(sum(MW200(u, 1) * u^2)/n_test, 1/3, tolerance = 1e-04)
   expect_equal(sum(MW210(u, 1) * u^2)/n_test, 1/5, tolerance = 1e-04)
@@ -66,6 +76,16 @@ test_that("2nd moments are correct.", {
   expect_equal(sum(MW420(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(MW421(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(MW422(u, 1) * u^2)/n_test, 2, tolerance = 1e-04)
+  expect_equal(sum(MW533(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW644(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
+})
+
+test_that("3rd moments are correct.", {
+  n_test = 250000.5
+  u = seq(from = -1, to = 1, length.out = 2*n_test)
+  MW533 = kernel.assign("MW_533")
+  
+  expect_equal(sum(MW533(u, 1) * u^3)/n_test, -6, tolerance = 1e-04)
 })
 
 test_that("4th moments are correct.", {
@@ -74,12 +94,15 @@ test_that("4th moments are correct.", {
   MW420 = kernel.assign("MW_420")
   MW421 = kernel.assign("MW_421")
   MW422 = kernel.assign("MW_422")
+  MW533 = kernel.assign("MW_533")
+  MW644 = kernel.assign("MW_644")
   
   expect_equal(sum(MW420(u, 1) * u^4)/n_test, -1/33, tolerance = 1e-04)
   expect_equal(sum(MW421(u, 1) * u^4)/n_test, 4/33, tolerance = 1e-04)
   expect_equal(sum(MW422(u, 1) * u^4)/n_test, 12/11, tolerance = 1e-04)
+  expect_equal(sum(MW533(u, 1) * u^4)/n_test, 0, tolerance = 1e-04)
+  expect_equal(sum(MW644(u, 1) * u^4)/n_test, 24, tolerance = 1e-04)
 })
-
 
 ### Müller Kernels
 context("test M kernels")
@@ -142,6 +165,14 @@ test_that("2nd moments are correct.", {
   expect_equal(sum(M420(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(M421(u, 1) * u^2)/n_test, 0, tolerance = 1e-04)
   expect_equal(sum(M422(u, 1) * u^2)/n_test, 2, tolerance = 1e-04)
+})
+
+test_that("3rd moments are correct.", {
+  n_test = 250000.5
+  u = seq(from = -1, to = 1, length.out = 2*n_test)
+  MW533 = kernel.assign("M_533")
+  
+  expect_equal(sum(MW533(u, 1) * u^3)/n_test, -6, tolerance = 1e-04)
 })
 
 test_that("4th moments are correct.", {

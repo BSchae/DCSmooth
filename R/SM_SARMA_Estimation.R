@@ -61,16 +61,22 @@ sarma.HR.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
     # fill ar and ma matrices
     # updated to lag-order (phi_00/psi_00 in upper left corner)
     # ar_mat is lhs of QARMA-equation (phi_00 = 1)
-    ar_mat = matrix(c(1, -arma_reg$coef[1:total_lag_ar]), byrow = TRUE,
-                    nrow = (model_order$ar[1] + 1), 
-                    ncol = (model_order$ar[2] + 1))
-    ma_mat = matrix(c(1, arma_reg$coef[(total_lag_ar + 1):
-                    (total_lag_ar + total_lag_ma)]), byrow = TRUE,
-                    nrow = (model_order$ma[1] + 1),
-                    ncol = (model_order$ma[2] + 1))
-    if (total_lag_ar == 0)
+    if (total_lag_ar > 0)
     {
-      ar_mat[1, 1] = 1
+      ar_mat = matrix(c(1, -arma_reg$coef[1:total_lag_ar]), byrow = TRUE,
+                      nrow = (model_order$ar[1] + 1), 
+                      ncol = (model_order$ar[2] + 1))
+    } else if (total_lag_ar == 0) {
+      ar_mat = as.matrix(1)
+    }
+    if (total_lag_ma > 0)
+    {
+      ma_mat = matrix(c(1, arma_reg$coef[(total_lag_ar + 1):
+                      (total_lag_ar + total_lag_ma)]), byrow = TRUE,
+                      nrow = (model_order$ma[1] + 1),
+                      ncol = (model_order$ma[2] + 1))
+    } else if (total_lag_ar == 0) {
+      ma_mat = as.matrix(1)
     }
   } else {
     arma_reg = list(ar_aux = as.vector(ar_aux)[-1])
@@ -86,23 +92,23 @@ sarma.HR.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   
   innov = arma_reg$residuals #residuals_mat
   
-  improve = FALSE
-  if (improve == TRUE)
-  {
-    stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
-                                 (nT - max_lag_t - model_order$ar[2])))
-    
-    arma_reg$coef = qarma.est_3rdstep(Y, ar_mat, ma_mat, model_order) +
-      arma_reg$coef
-    
-    ar_mat = matrix(c(1, -arma_reg$coef[1:total_lag_ar]), byrow = TRUE,
-                    nrow = (model_order$ar[1] + 1), 
-                    ncol = (model_order$ar[2] + 1))
-    ma_mat = matrix(c(1, arma_reg$coef[(total_lag_ar + 1):
-                    (total_lag_ar + total_lag_ma)]), byrow = TRUE,
-                    nrow = (model_order$ma[1] + 1),
-                    ncol = (model_order$ma[2] + 1))
-  }
+  # improve = FALSE
+  # if (improve == TRUE)
+  # {
+  #   stdev = sqrt(sum(innov^2)/((nX - max_lag_x - model_order$ar[1]) * 
+  #                                (nT - max_lag_t - model_order$ar[2])))
+  #   
+  #   arma_reg$coef = qarma.est_3rdstep(Y, ar_mat, ma_mat, model_order) +
+  #     arma_reg$coef
+  #   
+  #   ar_mat = matrix(c(1, -arma_reg$coef[1:total_lag_ar]), byrow = TRUE,
+  #                   nrow = (model_order$ar[1] + 1), 
+  #                   ncol = (model_order$ar[2] + 1))
+  #   ma_mat = matrix(c(1, arma_reg$coef[(total_lag_ar + 1):
+  #                   (total_lag_ar + total_lag_ma)]), byrow = TRUE,
+  #                   nrow = (model_order$ma[1] + 1),
+  #                   ncol = (model_order$ma[2] + 1))
+  # }
   
   # check stationarity
   statTest = sarma.statTest(ar_mat)
@@ -113,7 +119,7 @@ sarma.HR.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
   colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
   
-  stdev = sd(innov)
+  stdev = stats::sd(innov)
   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
                   sigma = stdev), stnry = statTest)
   class(coef_out) = "sarma"
@@ -226,7 +232,7 @@ sarma.HR.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #   rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
 #   colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
 #   
-#   stdev = sd(innov)
+#   stdev = stats::sd(innov)
 #   coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
 #                                                      sigma = stdev), stnry = statTest)
 #   class(coef_out) = "sarma"
@@ -242,11 +248,11 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   max_lag_x = max(model_order$ar[1], model_order$ma[1])
   max_lag_t = max(model_order$ar[2], model_order$ma[2])
 
-  arma_t = arima(as.vector(t(Y)),
+  arma_t = stats::arima(as.vector(t(Y)),
                  order = c(model_order$ar[2], 0, model_order$ma[2]),
                  include.mean = FALSE)
  
-  arma_x = arima(as.vector(Y),
+  arma_x = stats::arima(as.vector(Y),
                  order = c(model_order$ar[1], 0, model_order$ma[1]),
                  include.mean = FALSE)
 
@@ -258,7 +264,7 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
     t(c(1, arma_t$coef[model_order$ar[2] + seq_len(model_order$ma[2])])))
 
   innov = sarma.residuals(Y, list(ar = ar_mat, ma = ma_mat, sigma = NA))
-  stdev = sd(innov)
+  stdev = stats::sd(innov)
   stat_test = sarma.statTest(ar_mat)
   
   colnames(ar_mat) = paste0("lag ", 0:model_order$ar[2])
@@ -278,14 +284,11 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 
 sarma.RSS.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
-  # model_init = suppressWarnings(sarma.sep.est(Y,
-                                # model_order = model_order)$model)
-  # theta_init = c(-model_init$ar[-1, 1], -model_init$ar[1, -1],
-                 # model_init$ma[-1, 1], model_init$ma[1, -1])
   theta_init = rep(0, times = sum(unlist(model_order)))
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  theta_opt  = stats::optim(theta_init, sarma_rss, R_mat = Y,
-                            model_order = model_order, method = "Nelder-Mead")
+  theta_opt  = stats::optim(theta_init, sarma_rss, R_mat = Y, 
+                            model_order = model_order,
+                            method = "BFGS")
   
   # put coefficients into matrices
   ar_x = c(1, -theta_opt$par[seq_len(model_order$ar[1])])
@@ -346,6 +349,6 @@ sarma.residuals = function(R_mat, model)
     E_fnl[i, ] = ar_inf_x[1:min(i, k_x), drop = FALSE] %*%
       E_itm[i:max(1, i - k_x + 1), , drop = FALSE]
   }
-  
+
   return(E_fnl)
 }

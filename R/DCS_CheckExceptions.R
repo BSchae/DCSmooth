@@ -173,13 +173,13 @@ exception.check.options.input = function(type, kerns, drv, var_model,
 exception.check.options = function(dcs_opt)
 {
   sys.call(-1)
-  # check class
+# check class
   if(!(class(dcs_opt) == "dcs_options"))
   {
     stop("Incorrect options specified, please use \"set.options()\".")
   }
   
-  # check for unknown or missing options
+# check for unknown or missing options
   unknown_name = names(dcs_opt)[which(!(names(dcs_opt) %in% dcs_list_options))]
   if (length(unknown_name) > 0)
   {
@@ -192,20 +192,20 @@ exception.check.options = function(dcs_opt)
     stop("Option \"", unspec_name, "\" not specified.")
   }
   
-  # check kernels
+# check kernels
   if (!(dcs_opt$kerns[1] %in% dcs_list_kernels) || 
       !(dcs_opt$kerns[2] %in% dcs_list_kernels))
   {
     stop("Unsupported kernels specified.")
   }
   
-  # check regression type
+# check regression type
   if (!(dcs_opt$type %in% c("LP", "KR")))
   {
     stop("Unsupported regression type. Choose \"KR\" or \"LP\"")
   }
   
-  # check derivative orders
+# check derivative orders
   if (!is.numeric(dcs_opt$drv))
   {
     stop("Derivative order must be numeric.")
@@ -215,7 +215,7 @@ exception.check.options = function(dcs_opt)
     stop("Derivative order must be at least 0.")
   }
   
-  # check trim orders
+# check trim orders
   if (!is.numeric(dcs_opt$IPI_options$trim))
   {
     stop("Shrink factor \"trim\" must be numeric.")
@@ -230,7 +230,7 @@ exception.check.options = function(dcs_opt)
     stop("Shrink factor \"trim\" must be between 0 and 0.5.")
   }
   
-  # Options for derivative estimation
+# Options for derivative estimation
   if (!is.numeric(dcs_opt$drv))
   {
     stop("Derivative order must be numeric.")
@@ -240,11 +240,26 @@ exception.check.options = function(dcs_opt)
   {
     stop("Kernel orders not matching derivative orders.")
   }
-  
-  ### Options for variance estimation method
+  if (any(dcs_opt$drv > 2))
+  {
+    stop("Estimation of derivatives > 2 currently not supported.")
+  }
+  if (dcs_opt$type == "KR" && any(dcs_opt$drv > 0) &&
+      any(dcs_opt$drv[which(substr(dcs_opt$kerns, 1, 1) == "T")] > 0))
+  {
+    stop("Estimation of derivatives > 0 currently not supported for ",
+         "truncated kernels.")
+  }
+
+### Options for variance estimation method
   if (!(dcs_opt$var_model %in% dcs_list_var_model))
   {
     stop("unsupported method in \"var_model\".")
+  }
+  if (dcs_opt$var_model == "np")
+  {
+    warning("Nonparametric estimation of variance factor c_f currently in ",
+            "experimental state (probably slow).")
   }
   
   ### Model selection options
@@ -257,7 +272,6 @@ exception.check.options = function(dcs_opt)
   {
     exception.check.order_max(dcs_opt$add_options$order_max)
   }
-  
 }
 
 #---------------------------Check additional Options---------------------------#

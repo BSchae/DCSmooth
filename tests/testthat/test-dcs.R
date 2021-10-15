@@ -395,6 +395,7 @@ test_that("derivatives are correctly for different errors", {
 context("given bandwidths")
 
 test_that("given bandwidths are used", {
+  set.seed(123)
   Y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
   
   dcs_KR = dcs(Y, set.options(type = "KR"), h = c(0.1, 0.15))
@@ -419,6 +420,7 @@ test_that("given bandwidths are used", {
 })
 
 test_that("(too) small bandwidths are handled correctly", {
+  set.seed(123)
   Y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
   dcs_KR_small = dcs(Y, h = c(0.001, 0.001), 
                      dcs_options = set.options(type = "KR"))
@@ -431,6 +433,7 @@ test_that("(too) small bandwidths are handled correctly", {
 })
 
 test_that("(too) large bandwidths are handled correctly", {
+  set.seed(123)
   Y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
   dcs_LP_large = dcs(Y, h = c(0.6, 0.6), 
                      dcs_options = set.options(type = "LP"))

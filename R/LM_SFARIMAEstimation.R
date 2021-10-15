@@ -69,21 +69,23 @@
 sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  theta_init = rep(0, times = sum(unlist(model_order)) + 2)
-  theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y, 
+  theta_init = c(0.1, 0.1, rep(0, times = sum(unlist(model_order))))
+  theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y,
                             model_order = model_order,
-                            lower = c(0, 0, rep(-Inf, sum(unlist(model_order)))),
-                            upper = c(0.495, 0.495, rep(Inf, sum(unlist(model_order)))),
+                            lower = c(0.001, 0.001, 
+                                      rep(-Inf, sum(unlist(model_order)))),
+                            upper = c(0.499, 0.499,
+                                      rep(Inf, sum(unlist(model_order)))),
                             method = "L-BFGS-B")
-  
+    
   # put coefficients into matrices
   d_vec = theta_opt$par[1:2]
   ar_x = c(1, -theta_opt$par[2 + seq_len(model_order$ar[1])])
-  ar_t = c(1, -theta_opt$par[2 + model_order$ar[1] + 
+  ar_t = c(1, -theta_opt$par[2 + model_order$ar[1] +
                              seq_len(model_order$ar[2])])
   ma_x = c(1, theta_opt$par[2 + sum(model_order$ar) +
                             seq_len(model_order$ma[1])])
-  ma_t = c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] + 
+  ma_t = c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] +
                             seq_len(model_order$ma[2])])
   
   # prepare results for output
@@ -197,77 +199,4 @@ sfarima.residuals = function(R_mat, model)
   }
   
   return(E_fnl)
-}
-
-#--------------------BIC/AIC ORDER SELECTION FOR SFARIMA-----------------------#
-
-sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
-                        restr = NULL, sFUN = min, parallel = TRUE)
-{
-  if(crit == "bic") {
-    crit.fun = stats::BIC
-  }
-  else if (crit == "aic") {
-    crit.fun = stats::AIC
-  }
-  
-  bic_x =  matrix(0, pmax[1] + 1, qmax[1] + 1)
-  bic_t =  matrix(0, pmax[2] + 1, qmax[2] + 1)
-  R_x = as.vector(Rmat)
-  R_t = as.vector(t(Rmat))
-
-  if (parallel == TRUE)
-  {
-    n.cores = parallel::detectCores(logical = TRUE) - 1
-    doParallel::registerDoParallel(n.cores)
-    `%dopar%` = foreach::`%dopar%`
-    `%:%` = foreach::`%:%`
-    
-    bic_x = foreach::foreach(i = 1:(pmax[1] + 1), .combine = "rbind") %:%
-      foreach::foreach(j = 1:(qmax[1] + 1), .combine = "c") %dopar%
-      {
-        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x, nar = i - 1,
-                       nma = j - 1, drange = c(0, 0.5))))
-      }
-    
-    bic_t = foreach::foreach(i = 1:(pmax[2] + 1), .combine = "rbind") %:%
-      foreach::foreach(j = 1:(qmax[2] + 1), .combine = "c") %dopar%
-      {
-        bic = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t, nar = i - 1,
-                       nma = j - 1, drange = c(0, 0.5))))
-      }
-  } else {
-    for (i in 1:(pmax[1] + 1))
-    {
-      for (j in 1:(qmax[1] + 1))
-      {
-        bic_x[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_x,
-                               nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
-      }
-    }
-    for (i in 1:(pmax[2] + 1))
-    {
-      for (j in 1:(qmax[2] + 1))
-      {
-        bic_t[i, j] = crit.fun(suppressWarnings(fracdiff::fracdiff(R_t,
-                               nar = i - 1, nma = j - 1, drange = c(0, 0.5))))
-      }
-    }
-  }
-  
-  restr = substitute(restr)
-  if(!is.null(restr)){
-    ord.opt_x <- c(which(bic_x == sFUN(bic_x[eval(restr)]), arr.ind = TRUE) - 1)
-    ord.opt_t <- c(which(bic_t == sFUN(bic_t[eval(restr)]), arr.ind = TRUE) - 1)
-  } else {
-    ord.opt_x <- c(which(bic_x == sFUN(bic_x), arr.ind = TRUE) - 1)
-    ord.opt_t <- c(which(bic_t == sFUN(bic_t), arr.ind = TRUE) - 1)
-  }
-  
-  # put model_orders into list
-  ar = c(ord.opt_x[1], ord.opt_t[1])
-  ma = c(ord.opt_x[2], ord.opt_t[2])
-  model_order = list(ar = ar, ma = ma)
-  
-  return(model_order)   
 }

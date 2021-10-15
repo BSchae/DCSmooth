@@ -147,7 +147,7 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
       h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 
                        n_x, n_t)
     } else {                         ### Short-memory or iid. estimation
-      h_opt = h.opt.LP(mxx, mtt, var_coef, n_sub, p_order, drv_vec, kernel_x,
+      h_opt = h.opt.LP(mxx, mtt, var_coef, n, n_sub, p_order, drv_vec, kernel_x,
                        kernel_t)
     }
 

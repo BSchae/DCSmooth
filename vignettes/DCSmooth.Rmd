@@ -127,7 +127,6 @@ Default options for local polynomial regression (`type = "LP"`) are
 summary(set.options(type = "LP"))
 ```
 
-
 ### `dcs()` {-}
 The `dcs()`-function is the main function of the package and includes IPI-bandwidth selection and non-parametric smoothing of the observations `Y` using the selected bandwidths. This function creates an object of class `dcs`, which includes the results of the DCS procedure.
 
@@ -159,6 +158,7 @@ This function is a convenient wrapper for the `plotly::plot_ly()` function of th
 Arguments of `surface.dcs()` are
 
 * **Y** Either an object of class `"dcs"`, inheriting from a call to `dcs()` or a numeric matrix, which is then directly passed to `plotly::plot_ly()`.
+* **trim** A two-value vector which gives the percentage (between 0 and 0.5) of boundaries to leave out in the plot. Useful, if estimation at boundaries is unstable and has too high values compared to the inner, e.g. useful when estimation of derivatives is considered.
 * **plot_choice** Only used, if `Y` is an object of class `"dcs"`. Specifies the surface to be plotted, `1` for the original observations, `2` for the smoothed surface and `3` for the residual surface. If `plot_choice` is omitted and `Y` is an `"dcs"`-object, a choice dialogue will be prompted to the console, which asks to state one of the available options.
 * **...** Further arguments to be passed to the `plotly::plot_ly()` function.
 
