@@ -165,6 +165,16 @@ set.options <- function(    # inside function with default values in arguments
   ### check inputs
   exception.check.options.input(type, kerns, drv, var_model, IPI_options)
   
+  # change IPI_options for long memory estimation
+  if (!exists("infl_exp", IPI_options) && var_model == "sfarima_RSS")
+  {
+    IPI_options$infl_exp <- c(0.5, 0.5)
+  }
+  if (!exists("infl_par", IPI_options) && var_model == "sfarima_RSS")
+  {
+    IPI_options$infl_par <- c(3, 1)
+  }
+  
   # Select options according to type ("LP", "KR")
   if (type == "LP")
   {
@@ -193,16 +203,6 @@ set.options <- function(    # inside function with default values in arguments
     }
   } else {
     stop("Unknown type \"", type, "\"")
-  }
-  
-  # change IPI_options for long memory estimation
-  if (!exists("infl_exp", IPI_options) && var_model == "sfarima_RSS")
-  {
-    IPI_options$infl_exp <- c(0.5, 0.5)
-  }
-  if (!exists("infl_par", IPI_options) && var_model == "sfarima_RSS")
-  {
-    IPI_options$infl_par <- c(3, 1)
   }
   
   options_list <- list(type = type, kerns = kerns, p_order = p_order,

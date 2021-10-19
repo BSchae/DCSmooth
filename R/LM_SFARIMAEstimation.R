@@ -122,51 +122,6 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   return(coef_out)
 }
 
-# sfarima.rss = function(theta, R_mat,
-#                        model_order = list(ar = c(1, 1), ma = c(1, 1)))
-# {
-#   n_x = dim(R_mat)[1]; n_t = dim(R_mat)[2]
-#   k_x = min(50, n_x); k_t = min(100, n_t)
-#   
-#   # get coefficients from theta
-#   # theta = (d1, d2, ar_x, ar_t, ma_x, ma_t)
-#   d_vec = theta[1:2]
-#   ar_x = theta[2 + seq_len(model_order$ar[1])]
-#   ar_t = theta[2 + model_order$ar[1] + seq_len(model_order$ar[2])]
-#   ma_x = theta[2 + sum(model_order$ar) + seq_len(model_order$ma[1])]
-#   ma_t = theta[2 + sum(model_order$ar) + model_order$ma[1] + 
-#                  seq_len(model_order$ma[1])]
-#   
-#   # result matrices
-#   E_itm = R_mat * 0   # intermediate results
-#   E_fnl = R_mat * 0   # final results
-#   
-#   # calculate AR(inf) coefficients with long-memory
-#   ar_inf_x = c(1, astsa::ARMAtoAR(ar = ar_x, ma = ma_x, lag.max = k_x))
-#   d_x = choose(d_vec[1], 0:k_x) * ((-1)^(0:k_x))
-#   coef_x = cumsum_part_reverse(d_x, ar_inf_x)
-#   
-#   ar_inf_t = t(c(1, astsa::ARMAtoAR(ar = ar_t, ma = ma_t, lag.max = k_t)))
-#   d_t = choose(d_vec[2], 0:k_t) * ((-1)^(0:k_t))
-#   coef_t = cumsum_part_reverse(d_t, ar_inf_t)
-#   
-#   for (j in 1:n_t)
-#   {
-#     E_itm[, j] = R_mat[, j:max(1, j - k_t + 1), drop = FALSE] %*%
-#       coef_t[1:min(j, k_t), drop = FALSE]
-#   }
-#   
-#   for (i in 1:n_x)
-#   {
-#     E_fnl[i, ] = coef_x[1:min(i, k_x), drop = FALSE] %*%
-#       E_itm[i:max(1, i - k_x + 1), , drop = FALSE]
-#   }
-#   
-#   RSS = sum(E_fnl^2)
-#   
-#   return(RSS)
-# }
-
 #-----------------------CALCULATION OF SFARIMA RESIDUALS-----------------------#
 
 sfarima.residuals = function(R_mat, model)

@@ -143,6 +143,7 @@ sfarima.ord <- function(Rmat, pmax = c(0, 0), qmax = c(0, 0), crit = "bic",
   {
     n.cores = parallel::detectCores(logical = TRUE) - 1
     doParallel::registerDoParallel(n.cores)
+    
     `%dopar%` = foreach::`%dopar%`
     `%:%` = foreach::`%:%`
     

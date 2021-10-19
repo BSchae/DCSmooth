@@ -153,10 +153,6 @@ ar_coef <- function(ar, ma, d, k) {
     .Call('_DCSmooth_ar_coef', PACKAGE = 'DCSmooth', ar, ma, d, k)
 }
 
-dcoef_test <- function(d, k) {
-    .Call('_DCSmooth_dcoef_test', PACKAGE = 'DCSmooth', d, k)
-}
-
 ARMA_to_AR <- function(phi, psi, K) {
     .Call('_DCSmooth_ARMA_to_AR', PACKAGE = 'DCSmooth', phi, psi, K)
 }

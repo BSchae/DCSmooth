@@ -44,6 +44,9 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
     # parallel estimation of surfaces
     if (add_options$parallel == TRUE)
     {
+      n_core = parallel::detectCores() - 1
+      doParallel::registerDoParallel(n_core)
+      
       par_list_Y =   list(h = h_opt, p = c(1, 1), drv = c(0, 0), mu = mu_vec,
                           weight_x = kern_type_vec[1], 
                           weight_t = kern_type_vec[2])
@@ -57,6 +60,8 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
                           drv = c(drv_vec[1], p_order[2] + 1), mu = mu_vec,
                           weight_x = kern_type_vec[1],
                           weight_t = kern_type_vec[2])
+      
+      doParallel::stopImplicitCluster
       
       par_list = list(par_Y = par_list_Y, par_mxx = par_list_mxx, 
                       par_mtt = par_list_mtt)
@@ -132,7 +137,7 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
     ### Estimation of Variance Factor and Model ###
     if (isTRUE(cf_est))
     {
-      var_est = suppressWarnings(cf.estimation(Y - Y_smth, 
+      var_est = suppressWarnings(cf.estimation(Y - Y_smth,
                                                dcs_options, add_options))
       var_coef = var_est$cf_est
       var_model = var_est$model_est
@@ -147,8 +152,8 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
       h_opt = h.opt.LM(mxx, mtt, var_coef, var_model$model, n_sub, dcs_options, 
                        n_x, n_t)
     } else {                         ### Short-memory or iid. estimation
-      h_opt = h.opt.LP(mxx, mtt, var_coef, n, n_sub, p_order, drv_vec, kernel_x,
-                       kernel_t)
+      h_opt = h.opt.LP(mxx, mtt, var_coef, n_x * n_t, n_sub, p_order, drv_vec,
+                       kernel_x, kernel_t)
     }
 
     # break condition
@@ -160,6 +165,7 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
       iterate = FALSE
     }
   }
+  
   return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
               var_model = var_model))
 }

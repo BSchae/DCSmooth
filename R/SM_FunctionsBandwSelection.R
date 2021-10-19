@@ -49,10 +49,7 @@ h.opt.LP = function(mxx, mtt, var_coef, n, n_sub, p_order, drv_vec, kernel_x,
            i12 * gamma_delta
   ht_opt = (2*drv_vec[2] + 1)/(2*(delta + 1)) * (kernel_prop_1$R *
            kernel_prop_2$R * var_coef) /
-           (n * gamma^(2*drv_vec[2] + 1) * C2) 
-  
-  if(hx_opt < 0) { hx_opt = -hx_opt } # ensure positive bandwidth
-  if(ht_opt < 0) { ht_opt = -ht_opt }
+           (n * gamma^(2*drv_vec[2] + 1) * C2)
   
   hx_opt = hx_opt^(1/(2*(delta + sum(drv_vec) + 2)))
   ht_opt = ht_opt^(1/(2*(delta + sum(drv_vec) + 2)))
@@ -66,13 +63,6 @@ h.opt.KR = function(mxx, mtt, var_coef, n, n_sub, k_vec, drv, kernel_prop_x,
 {
   # calculation of integrals
   i11 = sum(mxx^2)/n_sub; i22 = sum(mtt^2)/n_sub; i12 = sum(mxx * mtt)/n_sub
-  
-  factor_xt = (kernel_prop_x$R^2 * var_coef) /(n * kernel_prop_x$mu^2)
-  denom_Ix = (i11/i22)^0.75 * (sqrt(i11*i22) + i12)
-  denom_It = (i22/i11)^0.75 * (sqrt(i11*i22) + i12)
-
-  hx = (factor_xt / denom_Ix)^(1/6)
-  ht = (factor_xt / denom_It)^(1/6)
   
   # delta = k - \nu = 2 fixed.
   delta = 2

@@ -425,6 +425,7 @@ sarma.order.aic.bic <- function(Rmat, pmax = c(1, 1), qmax = c(1, 1),
   {
     n.cores = parallel::detectCores(logical = TRUE) - 1
     doParallel::registerDoParallel(n.cores)
+    
     `%dopar%` = foreach::`%dopar%`
     `%:%` = foreach::`%:%`
     

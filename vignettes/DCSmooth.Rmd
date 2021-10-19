@@ -8,7 +8,7 @@ vignette: >
   %\VignetteIndexEntry{DCSmooth}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-date: 09.10.2021
+date: 18.10.2021
 bibliography: literature.bib
 csl: journal-of-the-royal-statistical-society.csl
 ---
@@ -62,8 +62,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `y.norm3`          |  A surface with two gaussian ridges.                    |
 | `temp.nunn`        |  Temperatures in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `temp.yuma`        |  Temperatures in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
-| `wind.nunn`        |  Windspeed in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
-| `wind.yuma`        |  Windspeed in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
+| `wind.nunn`        |  Wind speed in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
+| `wind.yuma`        |  Wind speed in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `sun.nunn`        |  Solar radiation in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `sun.yuma`        |  Solar radiation in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `returns.bmw`        |  5 minute returns of BMW AG from 2007 to 2010 |
@@ -201,7 +201,7 @@ Simulation of a (separable) spatial fractional ARIMA (SFARIMA) process. This fun
 Arguments of `sfarima.sim()` are
 
 * **n_x**, **n_t** The dimension of the resulting matrix of observations, where `n_x` specifies the number of rows and `n_t` the number of columns. Initially, a matrix `Y'` of size $2 n_x \times 2 n_t$ is simulated, for which simulation points with $i \leq n_x$ or $j \leq n_t$ are discarded (burn-in period).
-* **model** A list containing the model parameters to be used in the simulation of the form `list(ar, ma, d, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and containing the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The long-memory parameters $d_x, d_t$ are stored in `d`, a numeical vector of length 2, with $0 < d_x, d_t < 0.5$. The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.3 and the notation of the short memory SARMA part in Section 4.4.
+* **model** A list containing the model parameters to be used in the simulation of the form `list(ar, ma, d, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and containing the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The long-memory parameters $d_x, d_t$ are stored in `d`, a numerical vector of length 2, with $0 < d_x, d_t < 0.5$. The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.3 and the notation of the short memory SARMA part in Section 4.4.
 
 `sfarima.sim()` returns an object of class `"sfarima"` with attribute `"subclass" = "sim"` including the following values:
 
@@ -230,7 +230,7 @@ This function sets an external pointer to a specified boundary kernel available 
 
 Arguments of `kernel.assign()` are
 
-* **kernel_id** The identifier for the kernel to be assigned. It is a character string of the form `"X_abc"`, where `X` is specifies the type (`MW`, `M`, `T`), `a` i the kernel order $k$, `b` is the degree of smootheness $\mu$ and `c` is the order of derivative $\nu$. A list of currently useable kernel identifiers can be accessed with the function `kernel.list()`.
+* **kernel_id** The identifier for the kernel to be assigned. It is a character string of the form `"X_abc"`, where `X` is specifies the type (`MW`, `M`, `T`), `a` i the kernel order $k$, `b` is the degree of smoothness $\mu$ and `c` is the order of derivative $\nu$. A list of currently useable kernel identifiers can be accessed with the function `kernel.list()`.
 
 `kernel.assign()` returns an object of class `"function"`, which points to a precompiled kernel function.
 
@@ -282,23 +282,19 @@ Each of the three simulated example data sets is a matrix of size $101 \times 10
 # surface.dcs(y.norm3)
 ```
 
-The environmental application data sets feature the temperature, wind speed and solar radiation surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`, `sun.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`, `sun.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius*, wind speed in *m/s* and solar radiation in *W/m^2*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et. al. (2013), [doi:10.1175/BAMS-D-12-00170.1](https://journals.ametsoc.org/view/journals/bams/94/4/bams-d-12-00170.1.xml).
+The environmental application data sets feature the temperature, wind speed and solar radiation surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`, `sun.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`, `sun.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius*, wind speed in *m/s* and solar radiation in *W/m^2*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
 
 ```{r}
 # surface.dcs(temp.nunn)
 # surface.dcs(temp.yuma)
 # surface.dcs(wind.nunn)
 # surface.dcs(wind.yuma)
-# surface.dcs(sun.nunn)
-# surface.dcs(sun.yuma)
 ```
 
-For examples of financial applications, the return and volume data of German car manufacturer BMW AG and German insurance company Allianz SE is available in the package. The data is aggregated to the 5-minute level over the years 2007-2010, hence, the financial crisis 2008 is covered. The matrices consist of 1016 rows representing the days and 101 (returns) respective 102 (volumes) columns for the intraday 5-minute intervals.
+For examples of financial applications, the return and volume data of German insurance company Allianz SE is available in the package. The data is aggregated to the 5-minute level over the years 2007-2010, hence, the financial crisis 2008 is covered. The matrices consist of 1016 rows representing the days and 101 (returns) respective 102 (volumes) columns for the intraday 5-minute intervals.
 
 ```{r}
-# surface.dcs(returns.bmw)
 # surface.dcs(returns.alv)
-# surface.dcs(volumes.bmw)
 # surface.dcs(volumes.alv)
 ```
 
@@ -423,7 +419,7 @@ dcs_sarma_4 = dcs(y_sarma, opt_sarma_4)
 summary(dcs_sarma_4$var_est)
 ```
 
-## 3.3 Modelling errors with long memory
+## 3.3 Modeling errors with long memory
 This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow an SFARIMA$((p_x, p_t), (q_x, q_t))$ process with long memory. Order selection for SFARIMA models works exactly as in the SARMA case. We use the same SARMA model as in 3.2 with long-memory parameters $d = (0.3, 0.1)$:
 
 ```{r}
@@ -592,7 +588,7 @@ These procedure can be directly used for SFARIMA models, if the long memory para
 ### The Hannan-Rissanen Algorithm
 The previously defined estimation methods require numeric optimization of some quantities and hence take more time for calculation on a computer. The Hannan-Rissanen algorithm (@HannanRissanen1982) provides a much faster estimation procedure. An extension to SARMA models is straightforward:
 
-The main idea Hannan-Rissanen algorithm is to use a high-order SAR auxiliary model for initial estimation of the unobservable innovations sequence. Then, a linear regression model is applied, which yields the SARMA-parameters from the observations and estimated innovations.
+The main idea Hannan-Rissanen algorithm is to use a high-order SAR auxiliary model for initial estimation of the non observable innovations sequence. Then, a linear regression model is applied, which yields the SARMA-parameters from the observations and estimated innovations.
 
 Let $\{\varepsilon\}_{i,j}$ be the the ordered observations of the $SARMA((p_x, p_t), (q_x, q_t))$ process $\varepsilon(x, t)$ with $i = 1, \dots, n_x, j = 1, \dots, n_t$. The SARMA parameters $\mathbf{\phi, \mathbf{\psi}$ are then estimated by the modified Hannan-Rissanen algorithm:
 1. Obtain the auxiliary residuals $\widetilde{\eta}_{i,j}$ by fitting a high-order autoregressive model with $(\widetilde{p}_x, \widetilde{p}_t) \geq (p_x, p_t)$ to the observations:

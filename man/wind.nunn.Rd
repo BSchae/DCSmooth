@@ -14,9 +14,8 @@ wind.nunn
 \description{
 This dataset contains the 5-minute observations of the 2020 wind speed in
 Nunn, CO. The data is from the U.S. Climate Reference Network database at 
-\url{https://www.ncdc.noaa.gov/crn/qcdatasets.html}. (see Diamond et. al.
-(2013), \href{https://journals.ametsoc.org/view/journals/bams/94/4/bams-d-12-00170.1.xml}{doi:10.1175/BAMS-D-12-00170.1}).
-The observations were adjusted to matrix form for direct use with the 
-\code{DCSmooth}-functions.
+\href{https://www.ncdc.noaa.gov/crn/qcdatasets.html}{www.ncdc.noaa.gov}. 
+(see Diamond et al., 2013). The observations were adjusted matrix form for 
+direct use with the \code{DCSmooth}-functions.
 }
 \keyword{datasets}

@@ -3,16 +3,7 @@
 \docType{data}
 \name{volumes.alv}
 \alias{volumes.alv}
-\title{#' Returns of BMW AG
-#'
-#' The (log-) returns of shares of the German car manufacturer BMW AG 
-#' from 2007-01-02 to 2010-12-30 aggregated to 5-minute observations. The data
-#' is adjusted to matrix form for direct use with the \code{DCSmooth}-functions.
-#'
-#' @format A numeric matrix with 1016 rows representing the days and 101 columns
-#' representing the intraday time points.
-"returns.bmw"
-Volumes of Allianz SE}
+\title{Volumes of Allianz SE}
 \format{
 A numeric matrix with 1016 rows representing the days and 102 columns
 representing the intraday time points.

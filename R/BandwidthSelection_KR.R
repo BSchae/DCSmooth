@@ -55,6 +55,9 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
     # parallel estimation of surfaces
     if (add_options$parallel == TRUE)
     {
+      n_core = parallel::detectCores() - 1
+      doParallel::registerDoParallel(n_core)
+      
       par_list_Y = list(h = h_opt_temp, drv = dcs_options$drv,
                         kernel_x = dcs_options$kerns[1], 
                         kernel_t = dcs_options$kerns[2])
@@ -66,6 +69,8 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
                           drv = c(dcs_options$drv[1], k_vec[2]),
                           kernel_x = dcs_options$kerns[1],
                           kernel_t = kernel_kt_id)
+      
+      doParallel::stopImplicitCluster
       
       par_list = list(par_Y = par_list_Y, par_mxx = par_list_mxx, 
                       par_mtt = par_list_mtt)
@@ -157,6 +162,7 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
       iterate = FALSE
     }
   }
+  
   return(list(h_opt = h_opt, iterations = iteration_count, var_coef = var_coef,
               var_model = var_model))
 }

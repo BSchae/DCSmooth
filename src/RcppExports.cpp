@@ -496,18 +496,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dcoef_test
-arma::vec dcoef_test(const double d, const int k);
-RcppExport SEXP _DCSmooth_dcoef_test(SEXP dSEXP, SEXP kSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double >::type d(dSEXP);
-    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
-    rcpp_result_gen = Rcpp::wrap(dcoef_test(d, k));
-    return rcpp_result_gen;
-END_RCPP
-}
 // ARMA_to_AR
 NumericVector ARMA_to_AR(const arma::vec phi, const arma::vec psi, const int K);
 RcppExport SEXP _DCSmooth_ARMA_to_AR(SEXP phiSEXP, SEXP psiSEXP, SEXP KSEXP) {
@@ -587,7 +575,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_LPSmooth_matrix_BMod", (DL_FUNC) &_DCSmooth_LPSmooth_matrix_BMod, 6},
     {"_DCSmooth_LP_dcs_const1_BMod", (DL_FUNC) &_DCSmooth_LP_dcs_const1_BMod, 7},
     {"_DCSmooth_ar_coef", (DL_FUNC) &_DCSmooth_ar_coef, 4},
-    {"_DCSmooth_dcoef_test", (DL_FUNC) &_DCSmooth_dcoef_test, 2},
     {"_DCSmooth_ARMA_to_AR", (DL_FUNC) &_DCSmooth_ARMA_to_AR, 3},
     {"_DCSmooth_sarma_rss", (DL_FUNC) &_DCSmooth_sarma_rss, 3},
     {"_DCSmooth_sfarima_rss", (DL_FUNC) &_DCSmooth_sfarima_rss, 3},

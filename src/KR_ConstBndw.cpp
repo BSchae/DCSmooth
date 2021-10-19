@@ -5,13 +5,6 @@
 
 using namespace Rcpp;
 
-// arma::vec kernFkt_MW200(arma::vec&, double);
-// arma::vec kernFkt_MW210(arma::vec&, double);
-// arma::vec kernFkt_MW220(arma::vec&, double);
-// arma::vec kernFkt_MW320(arma::vec&, double);
-// arma::vec kernFkt_MW420(arma::vec&, double);
-// arma::vec kernFkt_MW422(arma::vec&, double);
-
 //---------------------------------------------------------------------------//
 //                    Kernel Regression Functions                            //
 //---------------------------------------------------------------------------//
