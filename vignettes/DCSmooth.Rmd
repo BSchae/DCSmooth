@@ -226,7 +226,7 @@ This function sets an external pointer to a specified boundary kernel available 
 
 Arguments of `kernel.assign()` are
 
-* **kernel_id** The identifier for the kernel to be assigned. It is a character string of the form `"X_abc"`, where `X` is specifies the type (`MW`, `M`, `T`), `a` i the kernel order $k$, `b` is the degree of smoothness $\mu$ and `c` is the order of derivative $\nu$. A list of currently useable kernel identifiers can be accessed with the function `kernel.list()`.
+* **kernel_id** The identifier for the kernel to be assigned. It is a character string of the form `"X_abc"`, where `X` is specifies the type (`MW`, `M`, `T`), `a` i the kernel order $k$, `b` is the degree of smoothness $\mu$ and `c` is the order of derivative $\nu$. A list of currently usable kernel identifiers can be accessed with the function `kernel.list()`.
 
 `kernel.assign()` returns an object of class `"function"`, which points to a precompiled kernel function.
 
@@ -278,7 +278,7 @@ Each of the three simulated example data sets is a matrix of size $101 \times 10
 # surface.dcs(y.norm3)
 ```
 
-The environmental application data sets feature the temperature and wind speed surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius* and wind speed si given in *m/s*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
+The environmental application data sets feature the temperature and wind speed surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius* and wind speed is given in *m/s*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
 
 ```{r}
 # surface.dcs(temp.nunn)
@@ -502,7 +502,7 @@ dcs_drv_2
 # 4 Mathematical Background
 
 ## 4.1 Double Conditional Smoothing
-The double conditional smoothing (DCS, see @Feng2013) is a spatial smoothing technique which effectively reduces the twodimensional estimation to two one-dimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
+The double conditional smoothing (DCS, see @Feng2013) is a spatial smoothing technique which effectively reduces the two-dimensional estimation to two one-dimensional estimation procedures. The DCS is defined for kernel regression as well as for local polynomial regression.
 
 Classical bivariate (and multivariate) regression has been considered e.g. by @Herrmann1995 (kernel regression) and @RuppertWand1994 (local polynomial regression). The DCS provides now a faster and, especially for equidistant data, more efficient smoothing scheme, which leads to reduced computation time. For the DCS procedure implemented in this package, consider a $(n_x \times n_t)$-matrix $\mathbf{Y}$ of non-empty observations $u_{i,j}$ and equidistant covariates $X$, $T$ on $[0,1]$, where $X$ has length $n_x$ and $T$ has length $n_t$. The model is then
 $$
