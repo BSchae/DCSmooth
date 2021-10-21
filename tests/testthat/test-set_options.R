@@ -48,7 +48,7 @@ test_that("set.options() converts \"var_est\" correctly.",{
 })
 
 test_that("set.options() gets \"IPI_options\" correctly.",{
-  IPI_LP = list(infl_exp = c("auto", " "), infl_par = c(1, 1), 
+  IPI_LP = list(infl_exp = c("auto", " "), infl_par = c(2, 1), 
                 trim = c(0.05, 0.05), const_window = FALSE)
   IPI_KR = list(infl_exp = c(0.5, 0.5), infl_par = c(2, 1), 
                 trim = c(0.05, 0.05), const_window = FALSE)
