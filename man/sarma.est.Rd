@@ -51,11 +51,11 @@ by the specified method. The lag-orders of the \eqn{SARMA(p, q)} are given by
 # See vignette("DCSmooth") for examples and explanation
 
 ## simulation of SARMA process
-ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-sigma = 0.5
-sarma_model = list(ar = ar, ma = ma, sigma = sigma)
-sarma_simulated = sarma.sim(100, 100, model = sarma_model)
+ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+sigma <- 0.5
+sarma_model <- list(ar = ar, ma = ma, sigma = sigma)
+sarma_simulated <- sarma.sim(100, 100, model = sarma_model)
 sarma_simulated$model
 
 ## estimation of SARMA process

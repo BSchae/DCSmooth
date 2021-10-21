@@ -52,12 +52,12 @@
 #' # See vignette("DCSmooth") for examples and explanation
 #' 
 #' ## simulation of SFARIMA process
-#' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-#' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-#' d = c(0.1, 0.1)
-#' sigma = 0.5
-#' sfarima_model = list(ar = ar, ma = ma, d = d, sigma = sigma)
-#' sfarima_sim = sfarima.sim(50, 50, model = sfarima_model)
+#' ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+#' ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+#' d <- c(0.1, 0.1)
+#' sigma <- 0.5
+#' sfarima_model <- list(ar = ar, ma = ma, d = d, sigma = sigma)
+#' sfarima_sim <- sfarima.sim(50, 50, model = sfarima_model)
 #' 
 #' ## estimation of SFARIMA process
 #' sfarima.est(sfarima_sim$Y)$model
@@ -66,11 +66,11 @@
 #' 
 #' @export
 
-sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
+sfarima.est <- function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  theta_init = c(rep(0, times = sum(unlist(model_order)) + 2))
-  theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y,
+  theta_init <- c(rep(0, times = sum(unlist(model_order)) + 2))
+  theta_opt  <- stats::optim(theta_init, sfarima_rss, R_mat = Y,
                             model_order = model_order,
                             lower = c(0, 0, 
                                       rep(-Inf, sum(unlist(model_order)))),
@@ -79,24 +79,24 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
                             method = "L-BFGS-B")
     
   # put coefficients into matrices
-  d_vec = theta_opt$par[1:2]
-  ar_x = c(1, -theta_opt$par[2 + seq_len(model_order$ar[1])])
-  ar_t = c(1, -theta_opt$par[2 + model_order$ar[1] +
+  d_vec <- theta_opt$par[1:2]
+  ar_x <- c(1, -theta_opt$par[2 + seq_len(model_order$ar[1])])
+  ar_t <- c(1, -theta_opt$par[2 + model_order$ar[1] +
                              seq_len(model_order$ar[2])])
-  ma_x = c(1, theta_opt$par[2 + sum(model_order$ar) +
+  ma_x <- c(1, theta_opt$par[2 + sum(model_order$ar) +
                             seq_len(model_order$ma[1])])
-  ma_t = c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] +
+  ma_t <- c(1, theta_opt$par[2 + sum(model_order$ar) + model_order$ma[1] +
                             seq_len(model_order$ma[2])])
   
   # prepare results for output
-  ar_mat = ar_x %*% t(ar_t)
-  ma_mat = ma_x %*% t(ma_t)
-  stdev = sqrt(theta_opt$value/(n_x * n_t))
-  model = list(ar = ar_mat, ma = ma_mat, d = d_vec, sigma = stdev)
-  innov = sfarima.residuals(R_mat = Y, model = model)
+  ar_mat <- ar_x %*% t(ar_t)
+  ma_mat <- ma_x %*% t(ma_t)
+  stdev <- sqrt(theta_opt$value/(n_x * n_t))
+  model <- list(ar = ar_mat, ma = ma_mat, d = d_vec, sigma = stdev)
+  innov <- sfarima.residuals(R_mat = Y, model = model)
   
   # check stationarity
-  statTest = sarma.statTest(ar_mat)
+  statTest <- sarma.statTest(ar_mat)
   if (!statTest)
   {
     warning("AR part of SFARIMA model not stationary, try another order for ",
@@ -110,15 +110,15 @@ sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
             "Try to use an SARMA model.")
   }
   
-  colnames(ar_mat) = paste0("lag ", 0:model_order$ar[2])
-  rownames(ar_mat) = paste0("lag ", 0:model_order$ar[1])
-  colnames(ma_mat) = paste0("lag ", 0:model_order$ma[2])
-  rownames(ma_mat) = paste0("lag ", 0:model_order$ma[1])
+  colnames(ar_mat) <- paste0("lag ", 0:model_order$ar[2])
+  rownames(ar_mat) <- paste0("lag ", 0:model_order$ar[1])
+  colnames(ma_mat) <- paste0("lag ", 0:model_order$ma[2])
+  rownames(ma_mat) <- paste0("lag ", 0:model_order$ma[1])
   
-  coef_out = list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
+  coef_out <- list(Y = Y, innov = innov, model = list(ar = ar_mat, ma = ma_mat,
                                   d = d_vec, sigma = stdev), stnry = statTest)
-  class(coef_out) = "sfarima"
-  attr(coef_out, "subclass") = "est"
+  class(coef_out) <- "sfarima"
+  attr(coef_out, "subclass") <- "est"
   return(coef_out)
 }
 

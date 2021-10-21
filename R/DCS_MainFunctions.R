@@ -137,27 +137,27 @@ set.options <- function(    # inside function with default values in arguments
     }
     if (exists("infl_par", args_list))
     {
-      IPI_options$infl_par = args_list$infl_par
+      IPI_options$infl_par <- args_list$infl_par
     }
     if (exists("infl_exp", args_list))
     {
-      IPI_options$infl_exp = args_list$infl_exp
+      IPI_options$infl_exp <- args_list$infl_exp
     }
     if (exists("const_window", args_list))
     {
-      IPI_options$const_window = args_list$const_window
+      IPI_options$const_window <- args_list$const_window
     }
   }
   
   ### set model orders
-  add_options = list()
+  add_options <- list()
   
   if (exists("model_order", where = args_list))
   {
     exception.check.model_order(args_list$model_order, var_model)
-    add_options$model_order = args_list$model_order
+    add_options$model_order <- args_list$model_order
   } else if (var_model %in% dcs_list_var_model && var_model != "iid") {
-    add_options$model_order = list(ar = c(1, 1), ma = c(1, 1))
+    add_options$model_order <- list(ar = c(1, 1), ma = c(1, 1))
   }
   if (exists("order_max", where = args_list) && 
       length(add_options$model_order) == 1 &&
@@ -197,7 +197,7 @@ set.options <- function(    # inside function with default values in arguments
     {
       IPI_options$infl_exp <- c("auto", " ")
     }
-    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par <- c(1, 1) }
+    if (!exists("infl_par", IPI_options)) { IPI_options$infl_par <- c(2, 1) }
     if (!exists("trim", IPI_options)) { IPI_options$trim <- c(0.05, 0.05) }
     if (!exists("const_window", IPI_options))
     {
@@ -327,12 +327,12 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     exception.check.XT(Y, X, T)
   }
   
-  add_options = list()
-  add_options$parallel = parallel
+  add_options <- list()
+  add_options$parallel <- parallel
   
   if (exists("add_options", dcs_options))
   {
-    add_options = append(add_options, dcs_options$add_options)
+    add_options <- append(add_options, dcs_options$add_options)
   }
   
   #-------Bandwidth Selection-------#
@@ -349,13 +349,13 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     {
       if (any(dcs_options$drv > 0))
       {
-        dcs_options_0 = dcs_options
+        dcs_options_0 <- dcs_options
         dcs_options_0$drv <- c(0, 0)
-        kernel_0_id = paste0(sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns),
+        kernel_0_id <- paste0(sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns),
                              "_220")
         dcs_options_0$kerns <- kernel_0_id# TODO: Change later to correct orders
         h_aux_obj <- KR.bndw(Y, dcs_options_0, add_options, cf_est = TRUE)
-        cf_est = list(var_coef = h_aux_obj$var_coef,
+        cf_est <- list(var_coef = h_aux_obj$var_coef,
                       var_model = h_aux_obj$var_model)
       } else {
         cf_est <- TRUE
@@ -367,9 +367,9 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     } else if (dcs_options$type == "LP") {
       if (any(dcs_options$drv > 0))
       {
-        dcs_options_0 = dcs_options
-        dcs_options_0$drv = c(0, 0)
-        dcs_options_0$p_order = c(1, 1)
+        dcs_options_0 <- dcs_options
+        dcs_options_0$drv <- c(0, 0)
+        dcs_options_0$p_order <- c(1, 1)
         kernel_0_id <- paste0(sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns),
                              "_220")
         dcs_options_0$kerns <- kernel_0_id# TODO: Change later to correct orders
@@ -377,7 +377,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
         cf_est <- list(var_coef = h_aux_obj$var_coef,
                       var_model = h_aux_obj$var_model)
       } else {
-        cf_est = TRUE
+        cf_est <- TRUE
       }
       
       h_select_obj <- LP.bndw(Y, dcs_options, add_options, cf_est = cf_est)
@@ -476,7 +476,6 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     dcs_out <- list(Y = Y, X = X, T = T, M = Y_smth_out, R = R, h = h_opt,
                    c_f = h_select_obj$var_coef, 
                    var_est = var_model_est$model_est,
-                   #var_model = var_model,
                    dcs_options = dcs_options,
                    iterations = h_select_obj$iterations,
                    time_used = difftime(time_end, time_start, units = "secs"))
@@ -484,7 +483,6 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
   } else if (h_select_auto == FALSE) {
     dcs_out <- list(X = X, T = T, Y = Y, M = Y_smth_out, R = R, h = h_opt,
                    c_f = NA, var_est = var_model_est$model_est,
-                   #var_model = var_model,
                    dcs_options = dcs_options,
                    iterations = NA, time_used = NA)
     attr(dcs_out, "h_select_auto") <- h_select_auto
@@ -521,7 +519,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
 #' @examples
 #' # See vignette("DCSmooth") for examples and explanation
 #' 
-#' smth =  dcs(y.norm1 + rnorm(101^2))
+#' smth <-  dcs(y.norm1 + rnorm(101^2))
 #' surface.dcs(smth, trim = c(0.05, 0.05), plot_choice = 2)
 #' 
 #' @export
@@ -574,9 +572,9 @@ surface.dcs <- function(Y, trim = c(0, 0), plot_choice = "choice", ...)
     
     .plotly.3d(Y = Y_mat, X = Y$X[index_x], T = Y$T[index_t], ...)
   } else {
-    index_x = ceiling(trim[1] * dim(Y)[1]):
+    index_x <- ceiling(trim[1] * dim(Y)[1]):
                (dim(Y)[1] - floor(trim[1] * dim(Y)[1]))
-    index_t = ceiling(trim[2] * dim(Y)[2]):
+    index_t <- ceiling(trim[2] * dim(Y)[2]):
                (dim(Y)[2] - floor(trim[2] * dim(Y)[2]))
     
     .plotly.3d(Y = Y[index_x, index_t], ...)
@@ -617,9 +615,9 @@ surface.dcs <- function(Y, trim = c(0, 0), plot_choice = "choice", ...)
 #' @examples
 #'  # See vignette("DCSmooth") for further examples and explanation
 #' 
-#' u = seq(from = -1, to = 0.5, length.out = 151)
-#' kern_MW220 = kernel.assign("MW_220")
-#' k = kern_MW220(u, 0.5)
+#' u <- seq(from = -1, to = 0.5, length.out = 151)
+#' kern_MW220 <- kernel.assign("MW_220")
+#' k <- kern_MW220(u, 0.5)
 #' plot(u, k, type = "l") 
 #' 
 #' @export
@@ -633,8 +631,8 @@ kernel.assign = function(kernel_id)
     stop("unknown kernel identifier. See available kernels with ",
          "\"kernel.list()\".")
   } else {
-    kernel_fcn_id = paste0("kern_fcn_", gsub("_", "", kernel_id))
-    kern_out = get(kernel_fcn_id)
+    kernel_fcn_id <- paste0("kern_fcn_", gsub("_", "", kernel_id))
+    kern_out <- get(kernel_fcn_id)
   }
   
   return(kern_out)
@@ -680,9 +678,9 @@ kernel.assign = function(kernel_id)
 
 kernel.list = function(print = TRUE)
 {
-  MW_kerns = dcs_list_kernels[grepl("MW_", dcs_list_kernels)]
-  M_kerns = dcs_list_kernels[grepl("M_", dcs_list_kernels)]
-  T_kerns = dcs_list_kernels[grepl("T_", dcs_list_kernels)]
+  MW_kerns <- dcs_list_kernels[grepl("MW_", dcs_list_kernels)]
+  M_kerns <- dcs_list_kernels[grepl("M_", dcs_list_kernels)]
+  T_kerns <- dcs_list_kernels[grepl("T_", dcs_list_kernels)]
   
   if (isTRUE(print))
   {
@@ -695,7 +693,7 @@ kernel.list = function(print = TRUE)
     cat("Truncated kernels:\n")
     cat(T_kerns, "\n", fill = 42)
   } else if (isFALSE(print)) {
-    kernel_list = list(MW_kerns = MW_kerns, M_kerns = M_kerns,
+    kernel_list <- list(MW_kerns = MW_kerns, M_kerns = M_kerns,
                        T_kerns = T_kerns)
     return(kernel_list)
   }

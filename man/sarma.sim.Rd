@@ -49,12 +49,12 @@ are created from a normal distribution with specified variance
 \examples{
 # See vignette("DCSmooth") for examples and explanation
  
-ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-sigma = 0.5
-sarma_model = list(ar = ar, ma = ma, sigma = sigma)
+ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+sigma <- 0.5
+sarma_model <- list(ar = ar, ma = ma, sigma = sigma)
 
-sarma_sim = sarma.sim(100, 100, model = sarma_model)
+sarma_sim <- sarma.sim(100, 100, model = sarma_model)
 summary(sarma_sim)
 
 }

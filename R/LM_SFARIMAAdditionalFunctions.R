@@ -49,22 +49,22 @@
 #' @examples
 #' # See vignette("DCSmooth") for examples and explanation
 #'  
-#' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-#' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-#' d = c(0.1, 0.1)
-#' sigma = 0.5
-#' sfarima_model = list(ar = ar, ma = ma, d = d, sigma = sigma)
+#' ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+#' ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+#' d <- c(0.1, 0.1)
+#' sigma <- 0.5
+#' sfarima_model <- list(ar = ar, ma = ma, d = d, sigma = sigma)
 #' 
-#' sfarima_sim = sfarima.sim(100, 100, model = sfarima_model)
+#' sfarima_sim <- sfarima.sim(100, 100, model = sfarima_model)
 #' surface.dcs(sfarima_sim$Y)
 #' 
 #' @export
 
 sfarima.sim <- function(n_x, n_t, model)
 {
-  ar_mat = as.matrix(model$ar); ma_mat = as.matrix(model$ma)
-  ar_x = -ar_mat[-1, 1]; ar_t = -ar_mat[1, -1]
-  ma_x = ma_mat[-1, 1]; ma_t = ma_mat[1, -1]
+  ar_mat <- as.matrix(model$ar); ma_mat = as.matrix(model$ma)
+  ar_x <- -ar_mat[-1, 1]; ar_t = -ar_mat[1, -1]
+  ma_x <- ma_mat[-1, 1]; ma_t = ma_mat[1, -1]
   
   # check if provided model is correctly specified
   if (isFALSE(all.equal(as.matrix(ar_mat[-1, -1]), ar_x %*% t(ar_t)))  ||
@@ -78,46 +78,46 @@ sfarima.sim <- function(n_x, n_t, model)
   }
   
   # meta options
-  nstart = max(floor(1.5 * c(n_x, n_t)), 150)
-  k_x = min(50, n_x); k_t = min(50, n_t)
+  nstart <- max(floor(1.5 * c(n_x, n_t)), 150)
+  k_x <- min(50, n_x); k_t = min(50, n_t)
   
-  n_x = n_x + nstart
-  n_t = n_t + nstart
-  eps_mat = matrix(stats::rnorm(n_x * n_t), n_x, n_t) * model$sigma
+  n_x <- n_x + nstart
+  n_t <- n_t + nstart
+  eps_mat <- matrix(stats::rnorm(n_x * n_t), n_x, n_t) * model$sigma
   
-  ma_inf_x = c(1, stats::ARMAtoMA(ar = ar_x, ma = ma_x, lag.max = k_x))
-  d_x = choose(-model$d[1], 0:k_x) * ((-1)^(0:k_x))
-  coef_x = cumsum_part_reverse(d_x, ma_inf_x)
+  ma_inf_x <- c(1, stats::ARMAtoMA(ar = ar_x, ma = ma_x, lag.max = k_x))
+  d_x <- choose(-model$d[1], 0:k_x) * ((-1)^(0:k_x))
+  coef_x <- cumsum_part_reverse(d_x, ma_inf_x)
   
-  ma_inf_t = t(c(1, stats::ARMAtoMA(ar = ar_t, ma = ma_t, lag.max = k_t)))
-  d_t = choose(-model$d[2], 0:k_t) * ((-1)^(0:k_t))
-  coef_t = cumsum_part_reverse(d_t, ma_inf_t)
+  ma_inf_t <- t(c(1, stats::ARMAtoMA(ar = ar_t, ma = ma_t, lag.max = k_t)))
+  d_t <- choose(-model$d[2], 0:k_t) * ((-1)^(0:k_t))
+  coef_t <- cumsum_part_reverse(d_t, ma_inf_t)
   
-  X1.sim = X2.sim = matrix(0, n_x, n_t)
+  X1.sim <- X2.sim <- matrix(0, n_x, n_t)
 
   for(j in 1:n_t) {
     if (j <= k_t) {
-      X2.sim[, j] = eps_mat[, j:1, drop = FALSE] %*% coef_t[1:j, drop = FALSE] 
+      X2.sim[, j] <- eps_mat[, j:1, drop = FALSE] %*% coef_t[1:j, drop = FALSE] 
     }
     else {
-      X2.sim[, j] = eps_mat[, j:(j - k_t)] %*% coef_t
+      X2.sim[, j] <- eps_mat[, j:(j - k_t)] %*% coef_t
     }
   }
   for(i in 1:n_x) {
     if (i <= k_x) {
-      X1.sim[i, ] = coef_x[1:i, drop = FALSE] %*% X2.sim[i:1, , drop = FALSE]
+      X1.sim[i, ] <- coef_x[1:i, drop = FALSE] %*% X2.sim[i:1, , drop = FALSE]
     }
     else {
-      X1.sim[i, ] = t(coef_x) %*% X2.sim[i:(i - k_x), ]
+      X1.sim[i, ] <- t(coef_x) %*% X2.sim[i:(i - k_x), ]
     }
   }
     
-  sfarima_out = X1.sim[(nstart + 1):n_x, (nstart + 1):n_t]
-  error_out = eps_mat[(nstart + 1):n_x, (nstart + 1):n_t]
-  coef_out = list(Y = sfarima_out, innov = error_out, model = model,
+  sfarima_out <- X1.sim[(nstart + 1):n_x, (nstart + 1):n_t]
+  error_out <- eps_mat[(nstart + 1):n_x, (nstart + 1):n_t]
+  coef_out <- list(Y = sfarima_out, innov = error_out, model = model,
                   stnry = TRUE)
-  class(coef_out) = "sfarima"
-  attr(coef_out, "subclass") = "sim"
+  class(coef_out) <- "sfarima"
+  attr(coef_out, "subclass") <- "sim"
     
   return(coef_out)
 }

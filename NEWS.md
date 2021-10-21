@@ -4,6 +4,7 @@
 * Additional argument "trim" in surface.dcs for trimming the boundaries of the plot.
 * Data sets "returns.alv", "returns.bmw", "volumes.alv", "volumes.bmw" added.
 * Bugs in estimation of derivatives ("KR" and "LP") corrected and corresponding error model are fixed.
+* Default value in IPI_options$infl_par set to (2,1) for local polynomial regression.
 
 # DCSmooth 1.1.0
 * Estimation of variance model revised.

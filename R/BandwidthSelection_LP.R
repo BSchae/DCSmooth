@@ -134,7 +134,8 @@ LP.bndw = function(Y, dcs_options, add_options, cf_est = TRUE)
     ### Estimation of Variance Factor and Model ###
     if (isTRUE(cf_est))
     {
-      var_est = suppressWarnings(cf.estimation(R, dcs_options, add_options))
+      var_est = suppressWarnings(suppressMessages(cf.estimation(R, dcs_options,
+                                                                add_options)))
       var_coef = var_est$cf_est
       var_model = var_est$model_est
     } else {

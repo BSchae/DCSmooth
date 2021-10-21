@@ -36,7 +36,7 @@ derivative estimation.}
 \examples{
 # See vignette("DCSmooth") for examples and explanation
 
-smth =  dcs(y.norm1 + rnorm(101^2))
+smth <-  dcs(y.norm1 + rnorm(101^2))
 surface.dcs(smth, trim = c(0.05, 0.05), plot_choice = 2)
 
 }

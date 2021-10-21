@@ -31,9 +31,9 @@ Assign a Kernel Function
 \examples{
  # See vignette("DCSmooth") for further examples and explanation
 
-u = seq(from = -1, to = 0.5, length.out = 151)
-kern_MW220 = kernel.assign("MW_220")
-k = kern_MW220(u, 0.5)
+u <- seq(from = -1, to = 0.5, length.out = 151)
+kern_MW220 <- kernel.assign("MW_220")
+k <- kern_MW220(u, 0.5)
 plot(u, k, type = "l") 
 
 }

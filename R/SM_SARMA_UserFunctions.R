@@ -55,11 +55,11 @@
 #' # See vignette("DCSmooth") for examples and explanation
 #' 
 #' ## simulation of SARMA process
-#' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-#' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-#' sigma = 0.5
-#' sarma_model = list(ar = ar, ma = ma, sigma = sigma)
-#' sarma_simulated = sarma.sim(100, 100, model = sarma_model)
+#' ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+#' ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+#' sigma <- 0.5
+#' sarma_model <- list(ar = ar, ma = ma, sigma = sigma)
+#' sarma_simulated <- sarma.sim(100, 100, model = sarma_model)
 #' sarma_simulated$model
 #' 
 #' ## estimation of SARMA process
@@ -68,7 +68,7 @@
 #'            model_order = list(ar = c(1, 1), ma = c(1, 1)))$model
 #' 
 #' @export
-sarma.est = function(Y, method = "HR",
+sarma.est <- function(Y, method = "HR",
                      model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   exception.check.Y(Y)
@@ -145,52 +145,55 @@ qarma.est <- function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 #' @examples
 #' # See vignette("DCSmooth") for examples and explanation
 #'  
-#' ma = matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
-#' ar = matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
-#' sigma = 0.5
-#' sarma_model = list(ar = ar, ma = ma, sigma = sigma)
+#' ma <- matrix(c(1, 0.2, 0.4, 0.1), nrow = 2, ncol = 2)
+#' ar <- matrix(c(1, 0.5, -0.1, 0.1), nrow = 2, ncol = 2)
+#' sigma <- 0.5
+#' sarma_model <- list(ar = ar, ma = ma, sigma = sigma)
 #' 
-#' sarma_sim = sarma.sim(100, 100, model = sarma_model)
+#' sarma_sim <- sarma.sim(100, 100, model = sarma_model)
 #' summary(sarma_sim)
 #' 
 #' @export
-sarma.sim = function(n_x, n_t, model)
+sarma.sim <- function(n_x, n_t, model)
 {
   exception.check.model.sarma(model)
   
-  ar_mat = as.matrix(model$ar); ma_mat = as.matrix(model$ma)
-  ar_x = dim(ar_mat)[1] - 1; ar_t = dim(ar_mat)[2] - 1
-  ma_x = dim(ma_mat)[1] - 1; ma_t = dim(ma_mat)[2] - 1
-  x_init = max(ar_x, ma_x) + 1
-  t_init = max(ar_t, ma_t) + 1
+  ar_mat <- as.matrix(model$ar); ma_mat = as.matrix(model$ma)
+  ar_x <- dim(ar_mat)[1] - 1; ar_t = dim(ar_mat)[2] - 1
+  ma_x <- dim(ma_mat)[1] - 1; ma_t = dim(ma_mat)[2] - 1
+  x_init <- max(ar_x, ma_x) + 1
+  t_init <- max(ar_t, ma_t) + 1
   
   # set coefficients for zero-lags
-  ma_mat[1, 1] = 1 # MA-coefficients
-  ar_mat[1, 1] = 0 # AR-coefficients
+  if (ar_mat[1, 1] != 1)
+  {
+    warning("AR(0,0) coefficient in upper left of parameter matrix is not 1.")
+  }
+  ar_mat[1, 1] <- 0 # AR-coefficients
   
-  n_mat = floor(1.25 * c(n_x, n_t))
-  error_mat = matrix(stats::rnorm(prod(n_mat)), nrow = n_mat[1], 
+  n_mat <- floor(1.25 * c(n_x, n_t))
+  error_mat <- matrix(stats::rnorm(prod(n_mat)), nrow = n_mat[1], 
                      ncol = n_mat[2]) * model$sigma
-  arma_mat = error_mat
+  arma_mat <- error_mat
   
   for (i in x_init:n_mat[1])
   {
     for (j in t_init:n_mat[2])
     {
-      arma_mat[i, j] = sum(-ar_mat * arma_mat[i:(i - ar_x), j:(j - ar_t)]) +
+      arma_mat[i, j] <- sum(-ar_mat * arma_mat[i:(i - ar_x), j:(j - ar_t)]) +
         sum(ma_mat * error_mat[i:(i - ma_x), j:(j - ma_t)])
     }
   }
   
-  arma_out = arma_mat[(n_mat[1] - n_x + 1):
+  arma_out <- arma_mat[(n_mat[1] - n_x + 1):
                         n_mat[1], (n_mat[2] - n_t + 1):n_mat[2]]
-  error_out = error_mat[(n_mat[1] - n_x + 1):
+  error_out <- error_mat[(n_mat[1] - n_x + 1):
                           n_mat[1], (n_mat[2] - n_t + 1):n_mat[2]]
   
-  coef_out = list(Y = arma_out, innov = error_out, model = model,
+  coef_out <- list(Y = arma_out, innov = error_out, model = model,
                   stnry = TRUE)
-  class(coef_out) = "sarma"
-  attr(coef_out, "subclass") = "sim"
+  class(coef_out) <- "sarma"
+  attr(coef_out, "subclass") <- "sim"
   
   return(coef_out)
 }
@@ -210,18 +213,18 @@ qarma.sim <- function(n_x, n_t, model)
 
 #----------------------------SARMA Order Selection-----------------------------#
 
-sarma.order = function(Y, method = "sep", criterion = "bic",
+sarma.order <- function(Y, method = "sep", criterion = "bic",
                        order_max = list(ar = c(1, 1), ma = c(1, 1)),
                        parallel = FALSE)
 {
   if (criterion %in% c("aic", "bic"))
   {
-    order_opt = sarma.order.aic.bic(Y, pmax = order_max$ar,
+    order_opt <- sarma.order.aic.bic(Y, pmax = order_max$ar,
                                     qmax = order_max$ma,
                                     crit = criterion, restr = NULL, sFUN = min,
                                     parallel = parallel)
   } else if (criterion == "gpac") {
-    order_opt = sarma.order.gpac(Y, order_max = order_max)
+    order_opt <- sarma.order.gpac(Y, order_max = order_max)
   }
   
   return(order_opt)
