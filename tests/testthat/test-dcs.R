@@ -364,7 +364,7 @@ test_that("derivatives are correctly for different errors", {
   opt_1 = set.options(type = "LP", drv = c(2, 0),
                       kerns = c("MW_422", "MW_220"), var_model = "sarma_sep")
   opt_2 = set.options(type = "LP", drv = c(2, 0),
-                      kerns = c("MW_422", "MW_220"), var_model = "sfarima_RSS")
+                      kerns = c("MW_422", "MW_220"), var_model = "sfarima_RSS")#, infl_par = c(1, 1), infl_exp = c(0.5, 0.5))
   
   dcs_1 = suppressWarnings(dcs(Y, opt_1))
   dcs_2 = dcs(Y, opt_2)

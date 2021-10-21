@@ -56,6 +56,14 @@ test_that("set.options() gets \"IPI_options\" correctly.",{
   expect_equal(set.options(type = "KR")$IPI_options, IPI_KR)
 })
 
+test_that("set.options() gets \"IPI_options\" correctly without list", {
+  expect_equal(set.options(trim = c(0.1, 0.1))$IPI_options$trim, c(0.1, 0.1))
+  expect_equal(set.options(infl_par = c(3, 2))$IPI_options$infl_par, c(3, 2))
+  expect_equal(set.options(infl_exp = c(0.8, 0.8))$IPI_options$infl_exp,
+               c(0.8, 0.8))
+  expect_true(set.options(const_window = TRUE)$IPI_options$const_window)
+})
+
 test_that("set.options() gets additional options correctly.",{
   order_list = list(ar = c(1, 1), ma = c(1, 1))
   

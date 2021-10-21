@@ -19,8 +19,8 @@ utils::globalVariables('list_index_parallel')
 
 parallel.LP.const0 = function(opts_list, Y)
 {
-  # n_core = parallel::detectCores() - 1
-  # doParallel::registerDoParallel(n_core)
+  n_core = parallel::detectCores() - 1
+  doParallel::registerDoParallel(n_core)
   `%dopar%` = foreach::`%dopar%`
   
   output = foreach::foreach(list_index_parallel = 1:3,
@@ -32,7 +32,7 @@ parallel.LP.const0 = function(opts_list, Y)
     return(result)
   }
   
-  # doParallel::stopImplicitCluster()
+  doParallel::stopImplicitCluster()
   
   return(output)
 }
@@ -50,8 +50,8 @@ LP.const0.list = function(opts_list, Y)
 
 parallel.LP.const1 = function(opts_list, Y, n_core)
 {
-  # n_core = parallel::detectCores() - 1
-  # doParallel::registerDoParallel(n_core)
+  n_core = parallel::detectCores() - 1
+  doParallel::registerDoParallel(n_core)
   `%dopar%` = foreach::`%dopar%`
   
   output = foreach::foreach(list_index_parallel = 1:3,
@@ -63,7 +63,7 @@ parallel.LP.const1 = function(opts_list, Y, n_core)
     return(result)
   }
   
-  # doParallel::stopImplicitCluster()
+  doParallel::stopImplicitCluster()
   
   return(output)
 }
@@ -83,8 +83,8 @@ LP.const1.list = function(opts_list, Y)
 
 parallel.KR.const0 = function(opts_list, Y)
 {
-  # n_core = parallel::detectCores() - 1
-  # doParallel::registerDoParallel(n_core)
+  n_core = parallel::detectCores() - 1
+  doParallel::registerDoParallel(n_core)
   `%dopar%` = foreach::`%dopar%`
   
   output = foreach::foreach(list_index_parallel = 1:3,
@@ -96,7 +96,7 @@ parallel.KR.const0 = function(opts_list, Y)
     return(result)
   }
   
-  # doParallel::stopImplicitCluster()
+  doParallel::stopImplicitCluster()
   
   return(output)
 }
@@ -112,8 +112,8 @@ KR.const0.list = function(opts_list, Y)
 
 parallel.KR.const1 = function(opts_list, Y, n_core)
 {
-  # n_core = parallel::detectCores() - 1
-  # doParallel::registerDoParallel(n_core)
+  n_core = parallel::detectCores() - 1
+  doParallel::registerDoParallel(n_core)
   `%dopar%` = foreach::`%dopar%`
   
   output = foreach::foreach(list_index_parallel = 1:3,
@@ -125,7 +125,7 @@ parallel.KR.const1 = function(opts_list, Y, n_core)
     return(result)
   }
   
-  # doParallel::stopImplicitCluster()
+  doParallel::stopImplicitCluster()
   
   return(output)
 }

@@ -14,8 +14,6 @@ There were no ERRORs or WARNINGs.
 There was 1 NOTE on R-hub: solaris-x86-patched-ods (r-release)
 * Files ‘README.md’ or ‘NEWS.md’ cannot be checked without ‘pandoc’ being installed.
 
-
-
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
 

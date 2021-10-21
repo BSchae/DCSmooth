@@ -69,12 +69,12 @@
 sfarima.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
 {
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
-  theta_init = c(0.1, 0.1, rep(0, times = sum(unlist(model_order))))
+  theta_init = c(rep(0, times = sum(unlist(model_order)) + 2))
   theta_opt  = stats::optim(theta_init, sfarima_rss, R_mat = Y,
                             model_order = model_order,
-                            lower = c(0.001, 0.001, 
+                            lower = c(0, 0, 
                                       rep(-Inf, sum(unlist(model_order)))),
-                            upper = c(0.499, 0.499,
+                            upper = c(0.495, 0.495,
                                       rep(Inf, sum(unlist(model_order)))),
                             method = "L-BFGS-B")
     

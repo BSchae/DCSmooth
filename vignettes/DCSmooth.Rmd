@@ -64,12 +64,8 @@ The *DCSmooth* contains the following functions, methods and data sets:
 | `temp.yuma`        |  Temperatures in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `wind.nunn`        |  Wind speed in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
 | `wind.yuma`        |  Wind speed in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
-| `sun.nunn`        |  Solar radiation in Nunn, CO observed in 2020 in 5 minute intervals. (Source: NOAA) |
-| `sun.yuma`        |  Solar radiation in Yuma, AZ observed in 2020 in 5 minute intervals. (Source: NOAA) |
-| `returns.bmw`        |  5 minute returns of BMW AG from 2007 to 2010 |
 | `returns.alv`        |  5 minute returns of Allianz SE from 2007 to 2010 |
-| `volumes.bmw`        |  5 minute volumes of BMW AG from 2007 to 2010 |
-| `volumes.bmw`        |  5 minute volumes of Allianz SE from 2007 to 2010 |
+| `volumes.alv`        |  5 minute volumes of Allianz SE from 2007 to 2010 |
 
 
 # 2 Details of Functions, Methods and Data
@@ -98,7 +94,7 @@ The models and estimation methods are described in more detail in Section 4.4.
 > The option **var_est** with values `c("iid", "qarma", "sarma", "lm")` has been replaced by **var_model**. For compatibility reasons, the option can still be used in `set.options` but will be converted to **var_model**
 
 * **...** Additional arguments passed to `set.options`. The default values of these options typically depend on other options and thus are put in an ellipsis. Accepted arguments are
-  + **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and trimming parameters for stabilized estimation of the necessary derivatives (`trim`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the logical flag `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type and error model selected and are given below.
+  + **IPI_options** Advanced options for tuning the parameters of the iterative plug-in algorithm of the bandwidth selection. These options include 2-element vectors for the inflation parameters (`infl_par`), the inflation exponents (`infl_exp`) and trimming parameters for stabilized estimation of the necessary derivatives (`trim`). Another option to further stabilize estimation of derivatives at the boundaries is the use of a constant estimation window at the boundaries setting the logical flag `const_window` to `TRUE`. The default values for the IPI-options depend partly on the regression type and error model selected and are given below. For convenience, the contents of `IPI_options` can be passed directly into the ellipsis `...` of `set.options()`.
   + **model_order** controls the order of the parametric error term model if an SARMA or SFARIMA model is used. This can be either a list of the form `list(ar = c(1, 1), ma = c(1, 1))` (the default for SARMA and SFARIMA) specifying the model order, or any of `c("aic", "bic", "gpac")` specifying an order selection criterion. Note that `gpac` does not work under SFARIMA errors.
   + **order_max** Controls the maximum order if an order selection process is chosen in `model_order`. Is a list of the form `list(ar = c(1, 1), ma = c(1, 1))` (the default).
 
@@ -170,7 +166,7 @@ Simulation of a spatial ARMA process (SARMA). This function returns an object of
 Arguments of `sarma.sim()` are
 
 * **n_x**, **n_t** The dimension of the resulting matrix of observations, where `n_x` specifies the number of rows and `n_t` the number of columns. Initially, a matrix `Y'` of size $2 n_x \times 2 n_t$ is simulated, for which simulation points with $i \leq n_x$ or $j \leq n_t$ are discarded (burn-in period).
-* **model** A list containing the model parameters to be used in the simulation. The argument should be a list of the form `list(ar, ma, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and contain the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.2 and the notation of SARMA models in Section 4.4.
+* **model** A list containing the model parameters to be used in the simulation. The argument should be a list of the form `list(ar, ma, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and contain the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.3 and the notation of SARMA models in Section 4.4.
 
 `sarma.sim()` returns an object of class `"sarma"` with attribute `"subclass" = "sim"` including the following values:
 
@@ -201,7 +197,7 @@ Simulation of a (separable) spatial fractional ARIMA (SFARIMA) process. This fun
 Arguments of `sfarima.sim()` are
 
 * **n_x**, **n_t** The dimension of the resulting matrix of observations, where `n_x` specifies the number of rows and `n_t` the number of columns. Initially, a matrix `Y'` of size $2 n_x \times 2 n_t$ is simulated, for which simulation points with $i \leq n_x$ or $j \leq n_t$ are discarded (burn-in period).
-* **model** A list containing the model parameters to be used in the simulation of the form `list(ar, ma, d, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and containing the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The long-memory parameters $d_x, d_t$ are stored in `d`, a numerical vector of length 2, with $0 < d_x, d_t < 0.5$. The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.3 and the notation of the short memory SARMA part in Section 4.4.
+* **model** A list containing the model parameters to be used in the simulation of the form `list(ar, ma, d, sigma)`. The values `ar` and `ma` are matrices of size $(p_x + 1) \times (p_t + 1)$ respective $(q_x + 1) \times (q_t + 1)$ and containing the coefficients in ascending lag order, so that the upper left entry is equal to 1 (for lag 0 in both dimensions). The long-memory parameters $d_x, d_t$ are stored in `d`, a numerical vector of length 2, with $0 < d_x, d_t < 0.5$. The standard deviation of the iid. innovations with zero mean is `sigma`, which should be a single positive number. See the examples in the application part 3.4 and the notation of the short memory SARMA part in Section 4.4.
 
 `sfarima.sim()` returns an object of class `"sfarima"` with attribute `"subclass" = "sim"` including the following values:
 
@@ -282,7 +278,7 @@ Each of the three simulated example data sets is a matrix of size $101 \times 10
 # surface.dcs(y.norm3)
 ```
 
-The environmental application data sets feature the temperature, wind speed and solar radiation surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`, `sun.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`, `sun.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius*, wind speed in *m/s* and solar radiation in *W/m^2*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
+The environmental application data sets feature the temperature and wind speed surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius* and wind speed si given in *m/s*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
 
 ```{r}
 # surface.dcs(temp.nunn)
@@ -299,11 +295,46 @@ For examples of financial applications, the return and volume data of German ins
 ```
 
 # 3 Application
-The application of the package is demonstrated at the example of the simulated function `y.norm1` which represent a gaussian peak on $[0,1]^2$ with $n_x = n_t = 101$ evaluation points. Different models are simulated and estimation using `dcs` is demonstrated. Whenever default options are used, they are not explicitly used as function arguments, instead only when deviating from the defaults, the options are changed.
+The application of the package is demonstrated at the example of the simulated function `y.norm1`, which represents a gaussian peak on $[0,1]^2$ with $n_x = n_t = 101$ evaluation points. Different models are simulated and estimation using `dcs` is demonstrated. Whenever default options are used, they are not explicitly used as function arguments, instead only when deviating from the defaults, the options are changed.
 
 > In order to keep the file size manageable, the `surface.dcs` commands in this vignette are commented out. Run the complete code used in section 3 of this vignette by `demo("DCS_demo", package = "DCSmooth")`, but note that it might take some time.
 
-## 3.1 Application of the DCS with iid. errors
+## 3.1 Defining the Options
+
+In order to set specific options use the `set.options()` function to create an object of class `"dcs_options"`.
+
+```{r}
+opt1 = set.options(type = "KR", kerns = c("M_220", "M_422"), drv = c(0, 2),
+                   var_model = "sarma_RSS",
+                   IPI_options = list(trim = c(0.1, 0.1), infl_par = c(1, 1),
+                                      infl_exp = c(0.7, 0.7), 
+                                      const_window = TRUE),
+                   model_order = list(ar = c(1, 1), ma = c(0, 0)))
+summary(opt1)
+class(opt1)
+```
+
+The contents of the advanced option `IPI_options` can be set directly as argument in `set.options()`. Changing these options might lead to non convergent bandwidths.
+
+```{r}
+opt2 = set.options(type = "KR", kerns = c("M_220", "M_422"), drv = c(0, 2),
+                   var_model = "sarma_RSS", trim = c(0.1, 0.1),
+                   infl_par = c(1, 1), infl_exp = c(0.7, 0.7), 
+                   const_window = TRUE,
+                   model_order = list(ar = c(1, 1), ma = c(0, 0)))
+summary(opt2)
+class(opt2)
+```
+
+When using a model selection procedure, the additional option `order_max` is available:
+
+```{r}
+opt3 = set.options(var_model = "sarma_sep", model_order = "bic",
+                   order_max = list(ar = c(0, 1), ma = c(2, 2)))
+summary(opt3)
+```
+
+## 3.2 Application of the DCS with iid. errors
 
 The example data set is simulated by using iid. errors:
 
@@ -350,7 +381,7 @@ summary(dcs_LP_iid)
 ```
 
 
-## 3.2 Application of the DCS with SARMA errors
+## 3.3 Application of the DCS with SARMA errors
 A matrix containing innovations following a SARMA$((p_x, p_t), (q_x, q_t))$ process can be obtained by using the `sarma.sim()` function. We use the following SARMA$((1, 1), (1, 1))$-process as example:
 $$
 AR = \begin{pmatrix} 1 & 0.4 \\ -0.3 & -0.12 \end{pmatrix},
@@ -419,8 +450,8 @@ dcs_sarma_4 = dcs(y_sarma, opt_sarma_4)
 summary(dcs_sarma_4$var_est)
 ```
 
-## 3.3 Modeling errors with long memory
-This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow an SFARIMA$((p_x, p_t), (q_x, q_t))$ process with long memory. Order selection for SFARIMA models works exactly as in the SARMA case. We use the same SARMA model as in 3.2 with long-memory parameters $d = (0.3, 0.1)$:
+## 3.4 Modeling errors with long memory
+This package includes a bandwidth selection algorithm when the errors $\varepsilon(x, t)$ follow an SFARIMA$((p_x, p_t), (q_x, q_t))$ process with long memory. Order selection for SFARIMA models works exactly as in the SARMA case. We use the same SARMA model as in 3.3 with long-memory parameters $d = (0.3, 0.1)$:
 
 ```{r}
 ar_mat = matrix(c(1, -0.3, 0.4, 0.12), nrow = 2, ncol = 2)
@@ -443,8 +474,8 @@ summary(dcs_sfarima$var_est)
 ```
 
 
-## 3.4 Estimation of derivatives
-Local polynomial estimation is suitable for estimation of derivatives of a function or a surface. While estimation of derivatives works as well under dependent errors, the example uses the iid. model from 3.1. Derivatives can be computed for any derivative vector `drv`, if the values are non-negative and an appropriate kernel function is chosen (such that the derivative order of the kernel matches the derivative order in `drv`). Note that the order of the polynomials for the $\nu$th derivative is chosen to be $p_i = \nu_i + 1, i = x, t$. As bandwidths increase with the order of the derivatives, the bandwidth might be large for higher derivative orders.
+## 3.5 Estimation of derivatives
+Local polynomial estimation is suitable for estimation of derivatives of a function or a surface. While estimation of derivatives works as well under dependent errors, the example uses the iid. model from 3.2. Derivatives can be computed for any derivative vector `drv`, if the values are non-negative and an appropriate kernel function is chosen (such that the derivative order of the kernel matches the derivative order in `drv`). Note that the order of the polynomials for the $\nu$th derivative is chosen to be $p_i = \nu_i + 1, i = x, t$. As bandwidths increase with the order of the derivatives, the bandwidth might be large for higher derivative orders.
 
 The estimator for $m^{(1, 0)}(x, t)$ is
 ```{r}
@@ -533,7 +564,7 @@ $$
 \end{pmatrix},
 \end{align*}
 $$
-where $\Phi$ is the AR-part (`$var_model$ar`) and $\Psi$ is the MA-part (`$var_model$ma`). The example from 3.2,
+where $\Phi$ is the AR-part (`$var_model$ar`) and $\Psi$ is the MA-part (`$var_model$ma`). The example from 3.3,
 $$
 \begin{align}
 \boldsymbol{\phi} = \begin{pmatrix} 1 & 0.4 \\ -0.3 & -0.12 \end{pmatrix}

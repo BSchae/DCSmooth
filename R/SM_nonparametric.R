@@ -39,7 +39,7 @@ specDens = function(Y, omega)
   hVec[1, ] = trunc(0.5*c(nX, nT))
 
   # global step
-  for (g in 2:21)
+  for (g in 2:6)
   {
     hVecInfl = hVec[g - 1, ] / c(nX^(2/21), nT^(2/21))
     hVecInfl = trunc(hVecInfl) + 1

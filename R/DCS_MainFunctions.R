@@ -80,13 +80,13 @@ set.options <- function(    # inside function with default values in arguments
   # get ellipsis
   args_list <- list(...)
   
-  args_names = names(args_list)
+  args_names <- names(args_list)
   if (any(!(args_names %in% c("IPI_options", "model_order", "order_max",
-                              "var_est"))))
+                              "var_est", dcs_list_IPI, "delta"))))
   {
-    arg_unknown = args_names[which(!(args_names %in% 
+    arg_unknown <- args_names[which(!(args_names %in% 
                          c("IPI_options", "model_order", "order_max",
-                           "var_est")))]
+                           "var_est", dcs_list_IPI, "delta")))]
     stop("Unsupported argument(s) \"",arg_unknown, "\" in set.options().")
   }
   
@@ -96,17 +96,17 @@ set.options <- function(    # inside function with default values in arguments
     message("Note: option \"var_est\" is deprecated, argument is converted to ",
             "\"var_model\" automatically.")
     if (args_list$var_est == "iid") {
-      var_model = "iid"
+      var_model <- "iid"
     } else if (args_list$var_est == "qarma") {
-      var_model = "sarma_HR"
+      var_model <- "sarma_HR"
     } else if (args_list$var_est == "sarma") {
-      var_model = "sarma_sep"
+      var_model <- "sarma_sep"
     } else if (args_list$var_est == "sarma2") {
-      var_model = "sarma_RSS"
+      var_model <- "sarma_RSS"
     } else if (args_list$var_est == "lm") {
-      var_model = "sfarima_RSS"
+      var_model <- "sfarima_RSS"
     } else if (args_list$var_est %in% c("qarma_gpac", "qarma_bic")) {
-      args_list$var_model = "sarma_HR"
+      args_list$var_model <- "sarma_HR"
       warning("For automatic order selection, use \"model_order\" in ",
               "\"dcs()\".")
     } else {
@@ -118,12 +118,22 @@ set.options <- function(    # inside function with default values in arguments
   if (exists("IPI_options", args_list))
   {
     IPI_options = args_list$IPI_options
+    # check for argument "delta"
+    if (exists("delta", IPI_options)) {
+      IPI_options$trim <- IPI_options$delta
+      message("IPI_options argument \"delta\" is deprecated. ",
+              "Use \"trim\" instead.")
+    }
   } else {
     IPI_options = list()
     # get IPI_options from higher-ranking list "args_list"
     if (exists("trim", args_list))
     {
-      IPI_options$trim = args_list$trim
+      IPI_options$trim <- args_list$trim
+    } else if (exists("delta", args_list)) {
+      IPI_options$trim <- args_list$delta
+      message("IPI_options argument \"delta\" is deprecated. ",
+              "Use \"trim\" instead.")
     }
     if (exists("infl_par", args_list))
     {
@@ -132,6 +142,10 @@ set.options <- function(    # inside function with default values in arguments
     if (exists("infl_exp", args_list))
     {
       IPI_options$infl_exp = args_list$infl_exp
+    }
+    if (exists("const_window", args_list))
+    {
+      IPI_options$const_window = args_list$const_window
     }
   }
   
@@ -336,13 +350,15 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
       if (any(dcs_options$drv > 0))
       {
         dcs_options_0 = dcs_options
-        dcs_options_0$drv = c(0, 0)
-        dcs_options_0$kerns = c("MW_220", "MW_220") # TODO: Change later to correct orders
+        dcs_options_0$drv <- c(0, 0)
+        kernel_0_id = paste0(sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns),
+                             "_220")
+        dcs_options_0$kerns <- kernel_0_id# TODO: Change later to correct orders
         h_aux_obj <- KR.bndw(Y, dcs_options_0, add_options, cf_est = TRUE)
         cf_est = list(var_coef = h_aux_obj$var_coef,
                       var_model = h_aux_obj$var_model)
       } else {
-        cf_est = TRUE
+        cf_est <- TRUE
       }
       
       h_select_obj <- KR.bndw(Y, dcs_options, add_options, cf_est = cf_est)
@@ -354,9 +370,11 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
         dcs_options_0 = dcs_options
         dcs_options_0$drv = c(0, 0)
         dcs_options_0$p_order = c(1, 1)
-        dcs_options_0$kerns = c("MW_220", "MW_220") # TODO: Change later to correct orders
+        kernel_0_id <- paste0(sub("^([[:alpha:]]*).*", "\\1", dcs_options$kerns),
+                             "_220")
+        dcs_options_0$kerns <- kernel_0_id# TODO: Change later to correct orders
         h_aux_obj <- LP.bndw(Y, dcs_options_0, add_options, cf_est = TRUE)
-        cf_est = list(var_coef = h_aux_obj$var_coef,
+        cf_est <- list(var_coef = h_aux_obj$var_coef,
                       var_model = h_aux_obj$var_model)
       } else {
         cf_est = TRUE
@@ -379,7 +397,7 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     time_end <- time_start <- Sys.time()
   }
   
-  #-------Estimation of Result-------#
+#-------Estimation of Result-------#
   
   if (dcs_options$type == "KR") # kernel regression
   {
@@ -390,30 +408,43 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
     ### check bandwidth
       if (any(h_opt > c(0.45, 0.45)))
       {
-        h_opt = pmin(h_opt, c(0.45, 0.45))
+        h_opt <- pmin(h_opt, c(0.45, 0.45))
         warning("Bandwidth h too large for \"KR\", changed to largest ",
                 "working value.")
       }
     
-    Y_smth_out <- KR_dcs_const0(yMat = Y, hVec = h_opt, drvVec = c(0, 0), 
-                            kernFcnPtrX = kernel_x,
-                            kernFcnPtrT = kernel_t)
+    # Surface to estimate
+    Y_smth_out <- KR_dcs_const0(yMat = Y, hVec = h_opt,
+                                drvVec = dcs_options$drv, 
+                                kernFcnPtrX = kernel_x,
+                                kernFcnPtrT = kernel_t)
+    
+    if (any(dcs_options$drv > 0))
+    {
+      kernel_0 <- kernel_fcn_assign(kernel_0_id[1])
+      R <- Y - KR_dcs_const0(yMat = Y, hVec = h_aux_obj$h_opt,
+                                drvVec = c(0, 0), 
+                                kernFcnPtrX = kernel_0,
+                                kernFcnPtrT = kernel_0)
+    } else {
+      R <- Y - Y_smth_out 
+    }
   } else if (dcs_options$type == "LP") {     # local polynomial regression
     ### prepare weight functions
       # set variables for weight type
-      kern_type_vec = sub("^([[:alpha:]]*).*", "\\1", dcs_options$kern)
+      kern_type_vec <- sub("^([[:alpha:]]*).*", "\\1", dcs_options$kern)
       # extract weighting type
-      mu_vec = as.numeric(substr(dcs_options$kern, 
+      mu_vec <- as.numeric(substr(dcs_options$kern, 
                                  nchar(dcs_options$kern) - 1,
                                  nchar(dcs_options$kern) - 1))
       # extract kernel parameter mu
-      weight_x = weight_fcn_assign(kern_type_vec[1])
-      weight_t = weight_fcn_assign(kern_type_vec[2])
+      weight_x <- weight_fcn_assign(kern_type_vec[1])
+      weight_t <- weight_fcn_assign(kern_type_vec[2])
     
     ### check bandwidth
       if (any(h_opt < (dcs_options$p_order + 2)/(c(n_x, n_t) - 1)))
       {
-        h_opt = pmax(h_opt, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
+        h_opt <- pmax(h_opt, (dcs_options$p_order + 2)/(c(n_x, n_t) - 1))
         warning("Bandwidth h too small for \"LP\", changed to smallest ",
                 "working value.")
       }
@@ -422,15 +453,24 @@ dcs <- function(Y, dcs_options = set.options(), h = "auto",
                             dcs_options$p_order, drvVec = dcs_options$drv,
                             muVec = mu_vec, weightFcnPtr_x = weight_x,
                             weightFcnPtr_t = weight_t)
+    
+    if (any(dcs_options$drv > 0))
+    {
+      R <- Y - LP_dcs_const0_BMod(yMat = Y, hVec = h_aux_obj$h_opt,
+                                  polyOrderVec = c(1, 1), drvVec = c(0, 0),
+                                  muVec = c(2, 2), weightFcnPtr_x = weight_x,
+                                  weightFcnPtr_t = weight_t)
+    } else {
+      R <- Y - Y_smth_out 
+    }
   }
   
-  # calculate residuals and estimate model
-  R <- Y - Y_smth_out
+  # Variance Model
   var_model_est <- cf.estimation(R, dcs_options, add_options)
+  var_model <- var_model_est$model
   
-  # output of var_model for downstream compatibility
-  var_model = var_model_est$model
   
+#-------Preperation of Output-------#
   if (h_select_auto == TRUE)
   {
     dcs_out <- list(Y = Y, X = X, T = T, M = Y_smth_out, R = R, h = h_opt,

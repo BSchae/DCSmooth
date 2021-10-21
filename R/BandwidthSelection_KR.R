@@ -55,9 +55,6 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
     # parallel estimation of surfaces
     if (add_options$parallel == TRUE)
     {
-      n_core = parallel::detectCores() - 1
-      doParallel::registerDoParallel(n_core)
-      
       par_list_Y = list(h = h_opt_temp, drv = dcs_options$drv,
                         kernel_x = dcs_options$kerns[1], 
                         kernel_t = dcs_options$kerns[2])
@@ -69,9 +66,7 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
                           drv = c(dcs_options$drv[1], k_vec[2]),
                           kernel_x = dcs_options$kerns[1],
                           kernel_t = kernel_kt_id)
-      
-      doParallel::stopImplicitCluster
-      
+
       par_list = list(par_Y = par_list_Y, par_mxx = par_list_mxx, 
                       par_mtt = par_list_mtt)
       
@@ -128,16 +123,17 @@ KR.bndw = function(Y, dcs_options, add_options, cf_est)
 
       mxx = mxx[shrink_x, shrink_t]
       mtt = mtt[shrink_x, shrink_t]
+      R = (Y - Y_smth)[shrink_x, shrink_t]
       n_sub = dim(mxx)[1]*dim(mxx)[2]   # number of used observations
     } else {
+      R = Y - Y_smth
       n_sub = n                         # all observations are used
     }
     
     ### Estimation of Variance Factor and Model ###
     if (isTRUE(cf_est))
     {
-      var_est = suppressWarnings(cf.estimation(Y - Y_smth, 
-                                               dcs_options, add_options))
+      var_est = suppressWarnings(cf.estimation(R, dcs_options, add_options))
       var_coef = var_est$cf_est
       var_model = var_est$model_est
     } else {

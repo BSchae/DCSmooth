@@ -3,9 +3,9 @@
 * Bandwidth selection of derivative estimation improved.
 * Additional argument "trim" in surface.dcs for trimming the boundaries of the plot.
 * Data sets "returns.alv", "returns.bmw", "volumes.alv", "volumes.bmw" added.
-* Bugs in estimation of derivatives ("KR" and "LP") corrected.
+* Bugs in estimation of derivatives ("KR" and "LP") corrected and corresponding error model are fixed.
 
-# DCSmooth 1.1.1
+# DCSmooth 1.1.0
 * Estimation of variance model revised.
 * set.options takes argument var_model = c("iid", "sarma_HR", "sarma_sep", "sarma_RSS", "sfarima_RSS") instead of var_est. However, var_est is still available for downstream compatibility, with the old identifiers.
 * The notation "QARMA" and "SARMA" has been unified to "SARMA" for all spatial ARMA models.
