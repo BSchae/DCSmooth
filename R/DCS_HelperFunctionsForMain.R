@@ -17,6 +17,8 @@
                      x_lab = "X", t_lab = "T", y_lab = "Value", 
                      showaxes = TRUE)
 {
+  color_scale = list(seq(from = 0, to = 1, length.out = length(color)), color)
+  
   if (class(Y)[1] == "dcs")
   {
     Y_data = Y$M
@@ -54,12 +56,12 @@
     #           showbackground = TRUE, zerolinecolor = "black",
     #           tickformat = ".1e")
     axx = list(title = t_lab, gridcolor = "lightgray", zerolinecolor = "black",
-               automargin = TRUE)
+               automargin = TRUE, autorange = FALSE)
     axy = list(title = x_lab, gridcolor = "lightgray", zerolinecolor = "black",
-               autorange = "reversed", automargin = TRUE)
+               autorange = FALSE, automargin = TRUE, range = rev(range(T0)))
     axz = list(title = y_lab, backgroundcolor = "white",  gridcolor = "lightgray",
                showbackground = TRUE, zerolinecolor = "black",
-               tickformat = ".1e", automargin = TRUE) #, tickmode = "linear", dtick = 4000, tick0 = 2000)
+               tickformat = ".1e", automargin = TRUE, autorange = FALSE) #, tickmode = "linear", dtick = 4000, tick0 = 2000)
   } else {
     axx = list(title = "", showticklabels = FALSE, gridcolor = "lightgray",
                zerolinecolor = "black")

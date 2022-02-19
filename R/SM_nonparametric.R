@@ -35,7 +35,7 @@ specDens = function(Y, omega)
   acfMat = acfMatrix(Y)
 
   # initial values
-  hVec = matrix(NA, 21, 2)
+  hVec = matrix(NA, 6, 2)
   hVec[1, ] = trunc(0.5*c(nX, nT))
 
   # global step
@@ -123,7 +123,7 @@ localBndwEst = function(acfMat, hLag, omega)
     f01 = specDensEst(acfMat, drv = c(0, 1), hLag = hLag, omega = omega)
 
     Lx = 0
-    Lt = (2 * (f01/f00)^2 * nX*nT/sqrt(mu_2w))
+    Lt = (2 * (f01/f00)^2 * nX*nT/sqrt(mu_2w))^(1/3)
   }
 
   hOut = c(trunc(Lx) + 1, trunc(Lt) + 1)

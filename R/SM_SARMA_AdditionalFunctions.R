@@ -45,7 +45,7 @@ sarma.statTest = function(ar)
     z1c = complex(modulus = opt$par[3], argument = opt$par[1])
     z2c = complex(modulus = opt$par[4], argument = opt$par[2])
     
-    if ((abs(z1c) < 1) && (abs(z2c) < 1) && opt$value < 0.000001)
+    if ((abs(z1c) < 1) && (abs(z2c) < 1) && opt$value < 0.00001)
     {
       return(FALSE)
     }

@@ -247,11 +247,43 @@ sarma.sep.est = function(Y, model_order = list(ar = c(1, 1), ma = c(1, 1)))
   n_x = dim(Y)[1]; n_t = dim(Y)[2]
   max_lag_x = max(model_order$ar[1], model_order$ma[1])
   max_lag_t = max(model_order$ar[2], model_order$ma[2])
+  
+  # ar_t = matrix(NA, nrow = n_x, ncol = model_order$ar[2])
+  # ma_t = matrix(NA, nrow = n_x, ncol = model_order$ma[2])
+  # ar_x = matrix(NA, nrow = n_t, ncol = model_order$ar[1])
+  # ma_x = matrix(NA, nrow = n_t, ncol = model_order$ma[1])
+  # 
+  # for (i in 1:n_x)
+  # {
+  #   model = arima(Y[i, ],
+  #                 order = c(model_order$ar[2], 0, model_order$ma[2]),
+  #                 include.mean = TRUE, method = "CSS")
+  #   ar_t[i, ] = model$coef[which(grepl("ar", names(model$coef)))]
+  #   ma_t[i, ] = model$coef[which(grepl("ma", names(model$coef)))]
+  # }
+  # 
+  # for (j in 1:n_t)
+  # {
+  #   model = arima(Y[, j],
+  #                 order = c(model_order$ar[1], 0, model_order$ma[1]),
+  #                 include.mean = TRUE, method = "CSS")
+  #   ar_x[j, ] = model$coef[which(grepl("ar", names(model$coef)))]
+  #   ma_x[j, ] = model$coef[which(grepl("ma", names(model$coef)))]
+  # }
+  # 
+  # if (any(is.na(ar_x), is.na(ar_t), is.na(ma_x), is.na(ma_t)))
+  # {
+  #   stop("Model not stationary in sarma.est.")
+  # }
+  # 
+  # # build coefficient matrices
+  # ar_mat = c(1, -colMeans(ar_x)) %*% t(c(1, -colMeans(ar_t)))
+  # ma_mat = c(1, colMeans(ma_x)) %*% t(c(1, colMeans(ma_t)))
 
   arma_t = stats::arima(as.vector(t(Y)),
                  order = c(model_order$ar[2], 0, model_order$ma[2]),
                  include.mean = FALSE)
- 
+
   arma_x = stats::arima(as.vector(Y),
                  order = c(model_order$ar[1], 0, model_order$ma[1]),
                  include.mean = FALSE)

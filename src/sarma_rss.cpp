@@ -50,35 +50,27 @@ double sarma_rss(const arma::vec theta,
   arma::colvec phi1, psi1, phi2, psi2;
   if (nar1 > 0) {
     phi1 = theta.subvec(0, nar1 - 1);
-  }
-  else {
+  } else {
     phi1.zeros(1);
   }
   if (nar2 > 0) {
     phi2 = theta.subvec(nar1, nar12 - 1);
-  }
-  else {
+  } else {
     phi2.zeros(1);
   }
   if (nma1 > 0) {
     psi1 = theta.subvec(nar12, nar12 + nma1 - 1);
-  }
-  else {
+  } else {
     psi1.zeros(1);
   }
-
   if (nma2 > 0) {
     psi2 = theta.subvec(nar12 + nma1, nar12 + nma12 - 1);
-  }
-  else {
+  } else {
     psi2.zeros(1);
   }
 
   arma::vec bk1 = ar_coef(phi1, psi1, 0, Kx);
   arma::vec bk2 = ar_coef(phi2, psi2, 0, Kt);
-  
-  // arma::vec bk1 = ARMA_to_AR(phi1, psi1, Kx);
-  // arma::vec bk2 = ARMA_to_AR(phi2, psi2, Kt);
 
   // calculating the RSS
   arma::mat e_est(n1, n2);

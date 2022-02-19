@@ -41,7 +41,6 @@ double sfarima_rss(const arma::vec theta,
   } else {
     psi1.zeros(1);
   }
-  
   if (nma2 > 0) {
     psi2 = theta.subvec(nar12 + nma1 + 2, nar12 + nma12 + 1);
   } else {

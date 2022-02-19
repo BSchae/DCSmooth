@@ -31,27 +31,33 @@ is included.
 You can install the released version of DCSmooth from 
 [CRAN](https://CRAN.R-project.org) with:
 
-``` r
+```{r, eval = FALSE}
 install.packages("DCSmooth")
 ```
 
-```
 ## Example
 
-This basic example shows the two-dimensional estimation of a single gaussian peak
-function (in `y.norm1`).
+This basic example shows the two-dimensional estimation of a single gaussian peak. The observations $y(x, t)$ should be stored in a numeric matrix, say `Y`, ordered by $x$ (rows) and $t$ (columns). Our example data is `temp.yuma`. Simple estimation of the mean surface of $y$ can now be done using the `dcs()` command of the package:
 
-```{r example}
+```{r}
 library(DCSmooth)
-
-# simulated data
-y = y.norm1 + matrix(rnorm(101^2), nrow = 101, ncol = 101)
-
-# smooth trend surface
-y_dcs = dcs(y)
-plot(y_dcs, plot_choice = 2)
-# surface.dcs(y_dcs, plot_choice = 2)
+Y = temp.yuma
+Y_dcs = dcs(Y)
 ```
+
+This procedure uses some default values which can be tuned if necessary (see below). The estimated values of the smoothed surface $\widehat{y}(x, t)$ are stored in `Y_dcs$M`, the residuals in `Y_dcs$R`.
+
+Surface plots are produced via the `surface.dcs()` command
+
+```{r, eval = FALSE}
+surface.dcs(Y_dcs)
+```
+Example of smoothed surface:
+
+```{r}
+surface.dcs(Y_dcs, plot_choice = 2)
+```
+
 
 ## Details
 

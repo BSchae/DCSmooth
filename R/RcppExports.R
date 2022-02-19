@@ -9,8 +9,48 @@ cumsum_part_reverse <- function(vec_1, vec_2) {
     .Call('_DCSmooth_cumsum_part_reverse', PACKAGE = 'DCSmooth', vec_1, vec_2)
 }
 
+specDens_cpp <- function(Y, omega) {
+    .Call('_DCSmooth_specDens_cpp', PACKAGE = 'DCSmooth', Y, omega)
+}
+
 acfMatrix_quarter2 <- function(y_Mat) {
     .Call('_DCSmooth_acfMatrix_quarter2', PACKAGE = 'DCSmooth', y_Mat)
+}
+
+acfMatrix_quarter <- function(y_Mat) {
+    .Call('_DCSmooth_acfMatrix_quarter', PACKAGE = 'DCSmooth', y_Mat)
+}
+
+acfMatrix_cpp <- function(y_Mat) {
+    .Call('_DCSmooth_acfMatrix_cpp', PACKAGE = 'DCSmooth', y_Mat)
+}
+
+globalBndw_cpp <- function(acfMat, hLag) {
+    .Call('_DCSmooth_globalBndw_cpp', PACKAGE = 'DCSmooth', acfMat, hLag)
+}
+
+specInt00_cpp <- function(acfMat) {
+    .Call('_DCSmooth_specInt00_cpp', PACKAGE = 'DCSmooth', acfMat)
+}
+
+specIntDrv_cpp <- function(acfMat, drv1, drv2, hLag) {
+    .Call('_DCSmooth_specIntDrv_cpp', PACKAGE = 'DCSmooth', acfMat, drv1, drv2, hLag)
+}
+
+localBndw_cpp <- function(acfMat, hLag, omega) {
+    .Call('_DCSmooth_localBndw_cpp', PACKAGE = 'DCSmooth', acfMat, hLag, omega)
+}
+
+specDensEst_cpp <- function(acfMat, drv, hLag, omega) {
+    .Call('_DCSmooth_specDensEst_cpp', PACKAGE = 'DCSmooth', acfMat, drv, hLag, omega)
+}
+
+fourier_mat <- function(Lx, Lt, omega) {
+    .Call('_DCSmooth_fourier_mat', PACKAGE = 'DCSmooth', Lx, Lt, omega)
+}
+
+bartlett_mat <- function(Lx, Lt, drv1, drv2, power) {
+    .Call('_DCSmooth_bartlett_mat', PACKAGE = 'DCSmooth', Lx, Lt, drv1, drv2, power)
 }
 
 KRSmooth_matrix2 <- function(yMat, h, drv, kernFcnPtr) {

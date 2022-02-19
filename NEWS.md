@@ -1,3 +1,5 @@
+# DCSmooth 1.1.3
+
 # DCSmooth 1.1.2
 * Parallelization for DCS procedure added.
 * Bandwidth selection of derivative estimation improved.
