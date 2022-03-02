@@ -39,7 +39,8 @@ cf.estimation = function(Y, dcs_options, add_options)
     cf_est = cf.from.model(sarma_HR$model)
     model_est = sarma_HR
   } else if (dcs_options$var_model == "np") {
-    cf_est = specDens(Y, omega = c(0, 0))$cf
+    # cf_est = specDens(Y, omega = c(0, 0))$cf   # R
+    cf_est = specDens_cpp(Y, omega = c(0, 0))[1] # C++
     model_est = list(stnry = TRUE)
   } else if (dcs_options$var_model == "sarma_sep") {
     sarma_sep = sarma.sep.est(Y, model_order = model_order)

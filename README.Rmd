@@ -61,7 +61,7 @@ surface.dcs(Y_dcs, plot_choice = 2)
 
 ## Details
 
-For a detailed description, see the vignette of this package.
+For a detailed description see the vignette of this package.
 
 ```{r, eval = FALSE}
 vignette("DCSmooth")

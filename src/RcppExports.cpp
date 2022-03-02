@@ -37,80 +37,69 @@ BEGIN_RCPP
 END_RCPP
 }
 // specDens_cpp
-double specDens_cpp(arma::mat Y, arma::vec omega);
-RcppExport SEXP _DCSmooth_specDens_cpp(SEXP YSEXP, SEXP omegaSEXP) {
+arma::vec specDens_cpp(const arma::mat& y_mat, arma::vec omega);
+RcppExport SEXP _DCSmooth_specDens_cpp(SEXP y_matSEXP, SEXP omegaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type y_mat(y_matSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type omega(omegaSEXP);
-    rcpp_result_gen = Rcpp::wrap(specDens_cpp(Y, omega));
-    return rcpp_result_gen;
-END_RCPP
-}
-// acfMatrix_quarter2
-arma::mat acfMatrix_quarter2(const arma::mat y_Mat);
-RcppExport SEXP _DCSmooth_acfMatrix_quarter2(SEXP y_MatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type y_Mat(y_MatSEXP);
-    rcpp_result_gen = Rcpp::wrap(acfMatrix_quarter2(y_Mat));
-    return rcpp_result_gen;
-END_RCPP
-}
-// acfMatrix_quarter
-arma::mat acfMatrix_quarter(const arma::mat y_Mat);
-RcppExport SEXP _DCSmooth_acfMatrix_quarter(SEXP y_MatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type y_Mat(y_MatSEXP);
-    rcpp_result_gen = Rcpp::wrap(acfMatrix_quarter(y_Mat));
+    rcpp_result_gen = Rcpp::wrap(specDens_cpp(y_mat, omega));
     return rcpp_result_gen;
 END_RCPP
 }
 // acfMatrix_cpp
-arma::mat acfMatrix_cpp(const arma::mat y_Mat);
-RcppExport SEXP _DCSmooth_acfMatrix_cpp(SEXP y_MatSEXP) {
+arma::mat acfMatrix_cpp(const arma::mat& y0_Mat);
+RcppExport SEXP _DCSmooth_acfMatrix_cpp(SEXP y0_MatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type y_Mat(y_MatSEXP);
-    rcpp_result_gen = Rcpp::wrap(acfMatrix_cpp(y_Mat));
+    Rcpp::traits::input_parameter< const arma::mat& >::type y0_Mat(y0_MatSEXP);
+    rcpp_result_gen = Rcpp::wrap(acfMatrix_cpp(y0_Mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// acfMatrix_quarter
+arma::mat acfMatrix_quarter(const arma::mat& y_Mat);
+RcppExport SEXP _DCSmooth_acfMatrix_quarter(SEXP y_MatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type y_Mat(y_MatSEXP);
+    rcpp_result_gen = Rcpp::wrap(acfMatrix_quarter(y_Mat));
     return rcpp_result_gen;
 END_RCPP
 }
 // globalBndw_cpp
-arma::vec globalBndw_cpp(const arma::mat acfMat, arma::vec hLag);
+arma::vec globalBndw_cpp(const arma::mat& acfMat, arma::vec hLag);
 RcppExport SEXP _DCSmooth_globalBndw_cpp(SEXP acfMatSEXP, SEXP hLagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type acfMat(acfMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type acfMat(acfMatSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type hLag(hLagSEXP);
     rcpp_result_gen = Rcpp::wrap(globalBndw_cpp(acfMat, hLag));
     return rcpp_result_gen;
 END_RCPP
 }
 // specInt00_cpp
-double specInt00_cpp(arma::mat acfMat);
+double specInt00_cpp(const arma::mat& acfMat);
 RcppExport SEXP _DCSmooth_specInt00_cpp(SEXP acfMatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type acfMat(acfMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type acfMat(acfMatSEXP);
     rcpp_result_gen = Rcpp::wrap(specInt00_cpp(acfMat));
     return rcpp_result_gen;
 END_RCPP
 }
 // specIntDrv_cpp
-double specIntDrv_cpp(arma::mat acfMat, arma::vec drv1, arma::vec drv2, arma::vec hLag);
+double specIntDrv_cpp(const arma::mat& acfMat, arma::vec drv1, arma::vec drv2, arma::vec hLag);
 RcppExport SEXP _DCSmooth_specIntDrv_cpp(SEXP acfMatSEXP, SEXP drv1SEXP, SEXP drv2SEXP, SEXP hLagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type acfMat(acfMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type acfMat(acfMatSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type drv1(drv1SEXP);
     Rcpp::traits::input_parameter< arma::vec >::type drv2(drv2SEXP);
     Rcpp::traits::input_parameter< arma::vec >::type hLag(hLagSEXP);
@@ -119,12 +108,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // localBndw_cpp
-arma::vec localBndw_cpp(const arma::mat acfMat, arma::vec hLag, arma::vec omega);
+arma::vec localBndw_cpp(const arma::mat& acfMat, arma::vec hLag, arma::vec omega);
 RcppExport SEXP _DCSmooth_localBndw_cpp(SEXP acfMatSEXP, SEXP hLagSEXP, SEXP omegaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type acfMat(acfMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type acfMat(acfMatSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type hLag(hLagSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type omega(omegaSEXP);
     rcpp_result_gen = Rcpp::wrap(localBndw_cpp(acfMat, hLag, omega));
@@ -132,12 +121,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // specDensEst_cpp
-double specDensEst_cpp(arma::mat acfMat, arma::vec drv, arma::vec hLag, arma::vec omega);
+double specDensEst_cpp(const arma::mat& acfMat, arma::vec drv, arma::vec hLag, arma::vec omega);
 RcppExport SEXP _DCSmooth_specDensEst_cpp(SEXP acfMatSEXP, SEXP drvSEXP, SEXP hLagSEXP, SEXP omegaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type acfMat(acfMatSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type acfMat(acfMatSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type drv(drvSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type hLag(hLagSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type omega(omegaSEXP);
@@ -666,9 +655,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DCSmooth_xMatrix", (DL_FUNC) &_DCSmooth_xMatrix, 2},
     {"_DCSmooth_cumsum_part_reverse", (DL_FUNC) &_DCSmooth_cumsum_part_reverse, 2},
     {"_DCSmooth_specDens_cpp", (DL_FUNC) &_DCSmooth_specDens_cpp, 2},
-    {"_DCSmooth_acfMatrix_quarter2", (DL_FUNC) &_DCSmooth_acfMatrix_quarter2, 1},
-    {"_DCSmooth_acfMatrix_quarter", (DL_FUNC) &_DCSmooth_acfMatrix_quarter, 1},
     {"_DCSmooth_acfMatrix_cpp", (DL_FUNC) &_DCSmooth_acfMatrix_cpp, 1},
+    {"_DCSmooth_acfMatrix_quarter", (DL_FUNC) &_DCSmooth_acfMatrix_quarter, 1},
     {"_DCSmooth_globalBndw_cpp", (DL_FUNC) &_DCSmooth_globalBndw_cpp, 2},
     {"_DCSmooth_specInt00_cpp", (DL_FUNC) &_DCSmooth_specInt00_cpp, 1},
     {"_DCSmooth_specIntDrv_cpp", (DL_FUNC) &_DCSmooth_specIntDrv_cpp, 4},

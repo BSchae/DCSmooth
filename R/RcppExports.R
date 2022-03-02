@@ -9,20 +9,16 @@ cumsum_part_reverse <- function(vec_1, vec_2) {
     .Call('_DCSmooth_cumsum_part_reverse', PACKAGE = 'DCSmooth', vec_1, vec_2)
 }
 
-specDens_cpp <- function(Y, omega) {
-    .Call('_DCSmooth_specDens_cpp', PACKAGE = 'DCSmooth', Y, omega)
+specDens_cpp <- function(y_mat, omega) {
+    .Call('_DCSmooth_specDens_cpp', PACKAGE = 'DCSmooth', y_mat, omega)
 }
 
-acfMatrix_quarter2 <- function(y_Mat) {
-    .Call('_DCSmooth_acfMatrix_quarter2', PACKAGE = 'DCSmooth', y_Mat)
+acfMatrix_cpp <- function(y0_Mat) {
+    .Call('_DCSmooth_acfMatrix_cpp', PACKAGE = 'DCSmooth', y0_Mat)
 }
 
 acfMatrix_quarter <- function(y_Mat) {
     .Call('_DCSmooth_acfMatrix_quarter', PACKAGE = 'DCSmooth', y_Mat)
-}
-
-acfMatrix_cpp <- function(y_Mat) {
-    .Call('_DCSmooth_acfMatrix_cpp', PACKAGE = 'DCSmooth', y_Mat)
 }
 
 globalBndw_cpp <- function(acfMat, hLag) {

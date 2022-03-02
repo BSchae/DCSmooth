@@ -56,12 +56,13 @@
     #           showbackground = TRUE, zerolinecolor = "black",
     #           tickformat = ".1e")
     axx = list(title = t_lab, gridcolor = "lightgray", zerolinecolor = "black",
-               automargin = TRUE, autorange = FALSE)
+               automargin = TRUE, autorange = FALSE, range = range(T0))
     axy = list(title = x_lab, gridcolor = "lightgray", zerolinecolor = "black",
-               autorange = FALSE, automargin = TRUE, range = rev(range(T0)))
+               autorange = FALSE, automargin = TRUE, range = rev(range(X0)))
     axz = list(title = y_lab, backgroundcolor = "white",  gridcolor = "lightgray",
                showbackground = TRUE, zerolinecolor = "black",
-               tickformat = ".1e", automargin = TRUE, autorange = FALSE) #, tickmode = "linear", dtick = 4000, tick0 = 2000)
+               tickformat = ".1e", automargin = TRUE, autorange = FALSE,
+               range = range(Y_data)) #, tickmode = "linear", dtick = 4000, tick0 = 2000)
   } else {
     axx = list(title = "", showticklabels = FALSE, gridcolor = "lightgray",
                zerolinecolor = "black")
@@ -69,7 +70,7 @@
                zerolinecolor = "black", autorange = "reversed")
     axz = list(title = "", showticklabels = FALSE, backgroundcolor = "white",
                gridcolor = "lightgray", showbackground = TRUE, 
-               zerolinecolor = "black")
+               zerolinecolor = "black", range = range(Y_data))
   }
   scene = list(xaxis = axx, yaxis = axy, zaxis = axz,
              camera = list(eye = list(x = -1.8, y = 1.2, z = 1),
