@@ -174,7 +174,7 @@ exception.check.options = function(dcs_opt)
 {
   sys.call(-1)
 # check class
-  if(!(class(dcs_opt) == "dcs_options"))
+  if(!inherits(dcs_opt, "dcs_options"))
   {
     stop("Incorrect options specified, please use \"set.options()\".")
   }

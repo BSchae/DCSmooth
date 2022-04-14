@@ -38,9 +38,9 @@
 #' 
 #' This dataset contains the 5-minute observations of the 2020 temperature in
 #' Yuma, AZ. The data is from the U.S. Climate Reference Network database at 
-#' \href{https://www.ncdc.noaa.gov/crn/qcdatasets.html}{www.ncdc.noaa.gov}. 
-#' (see Diamond et al., 2013). The observations were adjusted matrix form for 
-#' direct use with the \code{DCSmooth}-functions.
+#' \href{https://www.ncei.noaa.gov/access/crn/qcdatasets.html}{www.ncei.noaa.gov}
+#' (see Diamond et al., 2013). The observations were
+#' adjusted matrix form for direct use with the \code{DCSmooth}-functions.
 #' 
 #' @format A numeric matrix with 366 rows and 288 columns containing the
 #' temperatures in Celsius.
@@ -50,9 +50,9 @@
 #' 
 #' This dataset contains the 5-minute observations of the 2020 temperature in
 #' Nunn, CO. The data is from the U.S. Climate Reference Network database at 
-#' \href{https://www.ncdc.noaa.gov/crn/qcdatasets.html}{www.ncdc.noaa.gov}. 
-#' (see Diamond et al., 2013). The observations were adjusted matrix form for 
-#' direct use with the \code{DCSmooth}-functions.
+#' \href{https://www.ncei.noaa.gov/access/crn/qcdatasets.html}{www.ncei.noaa.gov}
+#' (see Diamond et al., 2013). The observations were
+#' adjusted matrix form for direct use with the \code{DCSmooth}-functions.
 #' 
 #' @format A numeric matrix with 366 rows and 288 columns containing the
 #' temperatures in Celsius.
@@ -62,9 +62,9 @@
 #' 
 #' This dataset contains the 5-minute observations of the 2020 wind speed in
 #' Yuma, AZ. The data is from the U.S. Climate Reference Network database at 
-#' \href{https://www.ncdc.noaa.gov/crn/qcdatasets.html}{www.ncdc.noaa.gov}. 
-#' (see Diamond et al., 2013). The observations were adjusted matrix form for 
-#' direct use with the \code{DCSmooth}-functions.
+#' \href{https://www.ncei.noaa.gov/access/crn/qcdatasets.html}{www.ncei.noaa.gov}
+#' (see Diamond et al., 2013). The observations were
+#' adjusted matrix form for direct use with the \code{DCSmooth}-functions.
 #' 
 #' @format A numeric matrix with 366 rows and 288 columns containing the
 #' wind speeds in \eqn{m/s}.
@@ -74,9 +74,9 @@
 #' 
 #' This dataset contains the 5-minute observations of the 2020 wind speed in
 #' Nunn, CO. The data is from the U.S. Climate Reference Network database at 
-#' \href{https://www.ncdc.noaa.gov/crn/qcdatasets.html}{www.ncdc.noaa.gov}. 
-#' (see Diamond et al., 2013). The observations were adjusted matrix form for 
-#' direct use with the \code{DCSmooth}-functions.
+#' \href{https://www.ncei.noaa.gov/access/crn/qcdatasets.html}{www.ncei.noaa.gov}
+#' (see Diamond et al., 2013). The observations were
+#' adjusted matrix form for direct use with the \code{DCSmooth}-functions.
 #' 
 #' @format A numeric matrix with 366 rows and 288 columns containing the
 #' wind speed in \eqn{m/s}.

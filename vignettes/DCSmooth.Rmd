@@ -37,12 +37,12 @@ This procedure uses some default values which can be tuned if necessary (see bel
 Surface plots are produced via the `surface.dcs()` command
 
 ```{r, eval = FALSE}
-surface.dcs(Y_dcs)
+# surface.dcs(Y_dcs)
 ```
 Example of smoothed surface:
 
 ```{r}
-surface.dcs(Y_dcs, plot_choice = 2)
+# surface.dcs(Y_dcs, plot_choice = 2)
 ```
 
 # 1 Introduction

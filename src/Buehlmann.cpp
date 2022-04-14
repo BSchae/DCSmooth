@@ -25,8 +25,8 @@ arma::vec globalBndw_cpp(const arma::mat& acfMat, arma::vec hLag);
 //[[Rcpp::export]]
 arma::vec specDens_cpp(const arma::mat& y_mat, arma::vec omega)
 {
-  int nX{ y_mat.n_rows };
-  int nT{ y_mat.n_cols };
+  int nX{ static_cast<int>(y_mat.n_rows) };
+  int nT{ static_cast<int>(y_mat.n_cols) };
 
   arma::mat acfMat{ acfMatrix_cpp(y_mat) };
 
@@ -72,8 +72,8 @@ arma::vec specDens_cpp(const arma::mat& y_mat, arma::vec omega)
 //[[Rcpp::export]]
 arma::mat acfMatrix_cpp(const arma::mat& y0_Mat)
 {
-  int nRow{ y0_Mat.n_rows };
-  int nCol{ y0_Mat.n_cols };
+  int nRow{ static_cast<int>(y0_Mat.n_rows) };
+  int nCol{ static_cast<int>(y0_Mat.n_cols) };
 
   // matrix should already be centered
   // arma::mat y0_Mat{ y_Mat - arma::accu(y_Mat)/(nRow * nCol) };
@@ -126,8 +126,8 @@ arma::mat acfMatrix_quarter(const arma::mat& y_Mat)
 //[[Rcpp::export]]
 arma::vec globalBndw_cpp(const arma::mat& acfMat, arma::vec hLag)
 {
-  int nX{ acfMat.n_rows/2 + 1 };
-  int nT{ acfMat.n_cols/2 + 1 };
+  int nX{ static_cast<int>(acfMat.n_rows)/2 + 1 };
+  int nT{ static_cast<int>(acfMat.n_cols)/2 + 1 };
   double mu_2w { 4.0/9.0 };
 
   double F00;
@@ -183,7 +183,8 @@ arma::vec globalBndw_cpp(const arma::mat& acfMat, arma::vec hLag)
     Lt = 0;
   }
 
-  arma::vec hOut = { std::min(Lx + 1, nX - 1), std::min(Lt + 1, nT - 1) };
+  arma::vec hOut = { static_cast<double>(std::min(Lx + 1, nX - 1)),
+                     static_cast<double>(std::min(Lt + 1, nT - 1)) };
 
   return hOut;
 }
@@ -199,8 +200,8 @@ double specInt00_cpp(const arma::mat& acfMat)
 double specIntDrv_cpp(const arma::mat& acfMat, arma::vec drv1, arma::vec drv2,
                       arma::vec hLag)
 {
-  int origin_x{ acfMat.n_rows/2 };  // as first element has index 0,
-  int origin_t{ acfMat.n_cols/2 };  // origin is at floor(n/2)
+  int origin_x{ static_cast<int>(acfMat.n_rows)/2 };  // as first element has index 0,
+  int origin_t{ static_cast<int>(acfMat.n_cols)/2 };  // origin is at floor(n/2)
   int Lx = hLag(0);
   int Lt = hLag(1);
 
@@ -237,8 +238,8 @@ double specIntDrv_cpp(const arma::mat& acfMat, arma::vec drv1, arma::vec drv2,
 // [[Rcpp::export]]
 arma::vec localBndw_cpp(const arma::mat& acfMat, arma::vec hLag, arma::vec omega)
 {
-  int nX{ acfMat.n_rows/2 + 1 };
-  int nT{ acfMat.n_cols/2 + 1 };
+  int nX{ static_cast<int>(acfMat.n_rows)/2 + 1 };
+  int nT{ static_cast<int>(acfMat.n_cols)/2 + 1 };
   double mu_2w { 4.0/9.0 };
 
   double f00;
@@ -291,7 +292,8 @@ arma::vec localBndw_cpp(const arma::mat& acfMat, arma::vec hLag, arma::vec omega
     Lt = 0;
   }
 
-  arma::vec hOut = { std::min(Lx + 1, nX - 1), std::min(Lt + 1, nT - 1) };
+  arma::vec hOut = { static_cast<double>(std::min(Lx + 1, nX - 1)),
+                     static_cast<double>(std::min(Lt + 1, nT - 1)) };
 
   return hOut;
 }
@@ -300,10 +302,10 @@ arma::vec localBndw_cpp(const arma::mat& acfMat, arma::vec hLag, arma::vec omega
 double specDensEst_cpp(const arma::mat& acfMat, arma::vec drv, arma::vec hLag,
                        arma::vec omega)
 {
-  int origin_x{ acfMat.n_rows/2 };  // as first element has index 0,
-  int origin_t{ acfMat.n_cols/2 };  // origin is at floor(n/2)
-  int Lx{ hLag(0) };
-  int Lt{ hLag(1) };
+  int origin_x{ static_cast<int>(acfMat.n_rows)/2 };  // as first element has index 0,
+  int origin_t{ static_cast<int>(acfMat.n_cols)/2 };  // origin is at floor(n/2)
+  int Lx{ static_cast<int>(hLag(0)) };
+  int Lt{ static_cast<int>(hLag(1)) };
   arma::vec drv0 = { 0, 0 };
 
   arma::cx_mat w_mat(2*(Lx - 1) + 1, 2*(Lt - 1) + 1);
