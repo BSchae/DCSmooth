@@ -301,7 +301,7 @@ Each of the three simulated example data sets is a matrix of size $101 \times 10
 # surface.dcs(y.norm3)
 ```
 
-The environmental application data sets feature the temperature and wind speed surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius* and wind speed is given in *m/s*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncdc.noaa.gov](https://www.ncdc.noaa.gov/crn/qcdatasets.html). (see Diamond et al., 2013)
+The environmental application data sets feature the temperature and wind speed surfaces of Nunn, CO (`temp.nunn`, `wind.nunn`) and Yuma, AZ (`temp.yuma`, `wind.yuma`). The observations are taken in 2020 in 5-minute intervals. The temperatures are given in *Celsius* and wind speed is given in *m/s*. All data sets consist therefore of 288 columns (the intraday observations) and 366 rows (the days). The data is taken from the U.S. Climate Reference Network database at [www.ncei.noaa.gov](https://www.ncei.noaa.gov/access/crn/qcdatasets.html). (see Diamond et al., 2013)
 
 ```{r}
 # surface.dcs(temp.nunn)

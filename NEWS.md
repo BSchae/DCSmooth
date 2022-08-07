@@ -1,5 +1,6 @@
 # DCSmooth 1.1.3
 * Included nonparametric modeling and estimation of the variance structure.
+* Vignette includes now a quick start guide.
 
 # DCSmooth 1.1.2
 * Parallelization for DCS procedure added.
